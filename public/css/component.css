@@ -1,0 +1,85 @@
+
+.rows {
+    width: 100%;
+    padding: 1px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.inputs-groups {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+    min-width: 100%;
+}
+
+.forms-groups {
+    width: 100%;
+    display: table;
+    padding: 1px;
+    margin-top: 8px;
+}
+
+.react-resizable {
+    position: relative;
+    background-clip: padding-box;
+}
+  
+.react-resizable-handle {
+    position: absolute;
+    right: -5px;
+    bottom: 0;
+    z-index: 1;
+    width: 10px;
+    height: 100%;
+    cursor: col-resize;
+}
+
+.h-40-horus {
+    /* height: 40px !important; */
+    /* border: 1px solid red;
+    box-shadow: 0 0 12px 5px red inset; */
+}
+
+.h-40-horus.error {
+    border: 1px solid red;
+    box-shadow: 0 0 12px 5px red inset;
+}
+
+.icon-table-horus {
+    margin-right: 3px;
+    padding: 3px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all .5s ease;
+}
+.icon-table-horus:hover {
+    border: 1px solid #387DFF;
+    color: #387DFF;
+}
+
+.icon-operation-horus {
+    padding: 2px;
+    padding-top: 1px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all .5s ease;
+}
+.icon-operation-horus:hover {
+    border: 1px solid #387DFF;
+    color: #387DFF;
+}
+
+
+.table-fixed th, 
+.table-fixed td {
+    /* width: 50px;
+    position: fixed; */
+    /* cursor: pointer;
+    background: white; */
+    font-size: 12px;
+}

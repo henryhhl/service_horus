@@ -1,0 +1,45 @@
+
+.border-danger-error {
+    border: 2px solid red !important;
+    border-radius: 3px !important;
+}
+
+.ant-picker {
+    padding-top: 2px !important;
+    height: 36px !important;
+}
+
+
+.lbls-date {
+    position: absolute;
+    display: block;
+    bottom: 0;
+    left: 11px;
+    top: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.45);
+    padding: 4px;
+    padding-left: 3px;
+    padding-right: 3px;
+    height: 25px;
+    line-height: 15px;
+    background: transparent;
+    transition: all .8s ease;
+    z-index: 100;
+}
+
+.lbls-date.active {
+    display: block;
+    background: white;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: Roboto,sans-serif;
+    top: 2px;
+    height: 15px;
+    line-height: 15px;
+    padding: 2px;
+    padding-left: 3px;
+    padding-right: 3px;
+    left: 11px;
+}

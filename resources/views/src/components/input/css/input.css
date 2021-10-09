@@ -1,0 +1,21 @@
+
+.componentInputReact .MuiSelect-selectMenu {
+    position: relative !important;
+    top: -3px !important;
+}
+
+.componentInputReact .MuiInputBase-input {
+    height: 8px !important;
+    min-height: 15px !important;
+    font-size: 12px !important;
+}
+/* .componentInputReact .MuiInputBase-root {
+    padding-bottom: 4px !important;
+} */
+/* .componentInputReact .MuiFormLabel-root { */
+    /* font-size: 12px !important; */
+    /* margin-left: -3px !important; */
+/* }; */
+/* .componentInputReact .MuiInputBase-root {
+    padding-bottom: 1px !important;
+} */

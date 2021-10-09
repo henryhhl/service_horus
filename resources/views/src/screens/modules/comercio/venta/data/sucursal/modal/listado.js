@@ -1,0 +1,64 @@
+
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { C_ModalDraggable } from '../../../../../../../components';
+import C_ListadoSucursal from '../components/listado';
+
+function M_ListadoSucursal( props ) {
+
+    const { create, value } = props;
+
+    function onChecked( data ) {
+        if ( props.onChange ) {
+            props.onChange( data );
+        }
+    }
+
+    return (
+        <C_ModalDraggable
+            visible={ props.visible } onClose={ props.onClose }
+            maskStyle={{ background: "transparent", }}
+            width={props.width}  zIndex={ props.zIndex }  
+            title={ props.title }
+        >
+            <C_ListadoSucursal
+                onChecked={ onChecked }
+                value={ value }
+                create={ create }
+                // onCreate={ props.onCreate }
+            />
+        </C_ModalDraggable>
+    );
+
+};
+
+M_ListadoSucursal.propTypes = {
+    visible: PropTypes.bool,
+    create:  PropTypes.bool,
+
+    value: PropTypes.any,
+
+    width:  PropTypes.number,
+    zIndex: PropTypes.number,
+
+    title:    PropTypes.string,
+    onClose:  PropTypes.func,
+    onCreate: PropTypes.func,
+    onChange: PropTypes.func,
+}
+
+
+M_ListadoSucursal.defaultProps = {
+    visible: false,
+    create: false,
+
+    value: null,
+
+    width: 900,
+    zIndex: 1200,
+
+    title: "SUCURSAL",
+}
+
+export default M_ListadoSucursal;
