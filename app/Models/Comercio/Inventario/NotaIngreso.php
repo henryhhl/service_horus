@@ -88,7 +88,7 @@ class NotaIngreso extends Model
                     ->select( 
                         'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
                         'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costototal',
+                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
                         'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
                         'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
                         'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
@@ -158,7 +158,7 @@ class NotaIngreso extends Model
                     ->select( 
                         'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
                         'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costototal',
+                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
                         'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
                         'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
                         'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
@@ -305,7 +305,7 @@ class NotaIngreso extends Model
                     ->select( 
                         'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
                         'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costototal',
+                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
                         'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
                         'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
                         'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
@@ -371,7 +371,7 @@ class NotaIngreso extends Model
                     ->select( 
                         'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
                         'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costototal',
+                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
                         'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
                         'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
                         'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',

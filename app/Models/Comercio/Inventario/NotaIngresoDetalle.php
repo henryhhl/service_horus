@@ -19,14 +19,14 @@ class NotaIngresoDetalle extends Model
 
     protected $attributes = [ 
         'estado' => 'A',  'isdelete' => 'A', 
-        'cantidad' => 0, 'costounitario' => 0, 'costototal' => 0, 'nrocajas' => 0,
+        'cantidad' => 0, 'costounitario' => 0, 'costosubtotal' => 0, 'nrocajas' => 0,
         'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'fechavencimiento' => null,
         'nrolote' => 0, 'nrofabrica' => 0, 'precio' => 0, 'nota'=> null, 'esingresado' => 'N',
     ];
 
     protected $fillable = [ 
         'fkidnotaingreso', 'fkidalmacenunidadmedidaproducto',
-        'cantidad', 'costounitario', 'costototal', 'nrocajas', 'peso', 'pesosubtotal', 'volumen',
+        'cantidad', 'costounitario', 'costosubtotal', 'nrocajas', 'peso', 'pesosubtotal', 'volumen',
         'volumensubtotal', 'fechavencimiento', 'nrolote', 'nrofabrica', 'precio', 'nota', 'esingresado',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
@@ -41,7 +41,7 @@ class NotaIngresoDetalle extends Model
 
         $cantidad   = is_numeric( $detalle->cantidad )  ? $detalle->cantidad : 0;
         $costounitario   = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
-        $costototal   = is_numeric( $detalle->costototal )  ? $detalle->costototal : 0;
+        $costosubtotal   = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
         $nrocajas   = is_numeric( $detalle->nrocajas )  ? $detalle->nrocajas : 0;
         $peso   = is_numeric( $detalle->peso )  ? $detalle->peso : 0;
         $pesosubtotal   = is_numeric( $detalle->pesosubtotal )  ? $detalle->pesosubtotal : 0;
@@ -63,7 +63,7 @@ class NotaIngresoDetalle extends Model
 
             'cantidad' => $cantidad,
             'costounitario' => $costounitario,
-            'costototal' => $costototal,
+            'costosubtotal' => $costosubtotal,
             'nrocajas' => $nrocajas,
             'peso' => $peso,
             'pesosubtotal' => $pesosubtotal,
@@ -92,7 +92,7 @@ class NotaIngresoDetalle extends Model
 
         $cantidad   = is_numeric( $detalle->cantidad )  ? $detalle->cantidad : 0;
         $costounitario   = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
-        $costototal   = is_numeric( $detalle->costototal )  ? $detalle->costototal : 0;
+        $costosubtotal   = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
         $nrocajas   = is_numeric( $detalle->nrocajas )  ? $detalle->nrocajas : 0;
         $peso   = is_numeric( $detalle->peso )  ? $detalle->peso : 0;
         $pesosubtotal   = is_numeric( $detalle->pesosubtotal )  ? $detalle->pesosubtotal : 0;
@@ -112,7 +112,7 @@ class NotaIngresoDetalle extends Model
 
                 'cantidad' => $cantidad,
                 'costounitario' => $costounitario,
-                'costototal' => $costototal,
+                'costosubtotal' => $costosubtotal,
                 'nrocajas' => $nrocajas,
                 'peso' => $peso,
                 'pesosubtotal' => $pesosubtotal,

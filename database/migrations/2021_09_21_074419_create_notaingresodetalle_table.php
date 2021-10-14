@@ -21,7 +21,7 @@ class CreateNotaingresodetalleTable extends Migration
 
             $table->integer('cantidad')->default(0);
             $table->decimal('costounitario', 24, 8)->default(0);
-            $table->decimal('costototal', 24, 8)->default(0);
+            $table->decimal('costosubtotal', 24, 8)->default(0);
             $table->integer('nrocajas')->default(0);
 
             $table->decimal('peso', 24, 8)->default(0);

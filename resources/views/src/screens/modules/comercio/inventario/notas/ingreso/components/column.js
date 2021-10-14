@@ -18,7 +18,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
         notaIngreso.arrayNotaIngresoDetalle.map( (item) => {
             if ( item.fkidproducto !== null ) {
                 cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costototal);
+                montototal += parseFloat(item.costosubtotal);
                 nrocajastotal += parseFloat(item.nrocajas);
                 pesototal += parseFloat(item.pesosubtotal);
                 volumentotal += parseFloat(item.volumensubtotal);
@@ -39,7 +39,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             ciudadorigen: "",
             cantidad: "",
             costounitario: "",
-            costototal: "",
+            costosubtotal: "",
             nrocajas: "",
             peso: "",
             pesosubtotal: "",
@@ -179,7 +179,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                             if ( value == "" ) value = 0;
                                             if ( !isNaN( value ) ) {
                                                 data.cantidad = parseInt(value);
-                                                data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                 data.pesosubtotal = parseFloat( data.cantidad * data.peso ).toFixed(2);
                                                 data.volumensubtotal = parseFloat( data.cantidad * data.volumen ).toFixed(2);
                                                 updateTotales();
@@ -191,7 +191,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     data.cantidad = parseInt(data.cantidad) + 1;
-                                                    data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                    data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
                                                     onChangeDetalle(notaIngreso);
                                                 } }
@@ -203,7 +203,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                                     if ( disabled.data ) return;
                                                     if ( parseInt( data.cantidad ) > 0 ) {
                                                         data.cantidad = parseInt(data.cantidad) - 1;
-                                                        data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                        data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                         updateTotales();
                                                         onChangeDetalle(notaIngreso);
                                                     }
@@ -241,7 +241,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                             if ( !isNaN( value ) ) {
                                                 if ( Functions.esDecimal( value, 2 ) ) {
                                                     data.costounitario = Functions.onChangeNumberDecimal(value);
-                                                    data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                    data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
                                                     onChangeDetalle( notaIngreso );
                                                 }
@@ -252,7 +252,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     data.costounitario = Functions.onIncrementarNumberDecimal(data.costounitario);
-                                                    data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                    data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
                                                     onChangeDetalle(notaIngreso);
                                                 } }
@@ -263,7 +263,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     data.costounitario = Functions.onDecrementarNumberDecimal(data.costounitario);
-                                                    data.costototal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
+                                                    data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
                                                     onChangeDetalle(notaIngreso);
                                                 } }
@@ -283,13 +283,13 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costototal', key: 'costototal', width: 120,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 120,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.costototal.toString().length == 0 ) ?
+                    { ( data.costosubtotal.toString().length == 0 ) ?
                         "" : 
                         <label> 
-                            {data.costototal}
+                            {data.costosubtotal}
                         </label>
                     }
                 </span>

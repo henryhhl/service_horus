@@ -176,7 +176,7 @@ function C_Form( props ) {
                     detalle.ciudadorigen = data.ciudadorigen;
                     detalle.cantidad = 0;
                     detalle.costounitario = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].costo).toFixed(2) : "0.00";
-                    detalle.costototal = "0.00";
+                    detalle.costosubtotal = "0.00";
                     detalle.nrocajas = 0;
                     detalle.pesosubtotal = "0.00";
                     detalle.volumensubtotal = "0.00";
@@ -212,7 +212,7 @@ function C_Form( props ) {
                     detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
                     detalle.unidadmedidaproducto = parseFloat(data.peso).toFixed(2) + " " + data.abreviatura;
                     detalle.costounitario = parseFloat(data.costo).toFixed(2);
-                    detalle.costototal = parseFloat( detalle.cantidad * detalle.costounitario ).toFixed(2);
+                    detalle.costosubtotal = parseFloat( detalle.cantidad * detalle.costounitario ).toFixed(2);
 
                     detalle.peso = parseFloat(data.peso).toFixed(2);
                     detalle.volumen = parseFloat(data.volumen).toFixed(2);
@@ -238,7 +238,7 @@ function C_Form( props ) {
         notaIngreso.arrayNotaIngresoDetalle.map( (item) => {
             if ( item.fkidproducto !== null ) {
                 cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costototal);
+                montototal += parseFloat(item.costosubtotal);
                 nrocajastotal += parseFloat(item.nrocajas);
                 pesototal += parseFloat(item.pesosubtotal);
                 volumentotal += parseFloat(item.volumensubtotal);

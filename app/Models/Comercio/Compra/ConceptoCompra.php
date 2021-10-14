@@ -28,6 +28,14 @@ class ConceptoCompra extends Model
         'estado', 'fecha', 'hora',
     ];
 
+    public function arraynotacompra() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\NotaCompra',
+            'fkidconceptocompra',
+            'idconceptocompra'
+        );
+    }
+
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;

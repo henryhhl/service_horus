@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Col, Row } from 'antd';
-import { C_Button, C_Date, C_Input, C_Message, C_Radio } from '../../../../../../../components';
+import { C_Button, C_Date, C_Input, C_Message, C_Radio, C_Select } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
 import M_ListadoSucursal from '../../../../venta/data/sucursal/modal/listado';
@@ -16,6 +16,7 @@ import M_ListadoProductoMarca from '../../../../inventario/data/productomarca/mo
 import M_ListadoProductoGrupo from '../../../../inventario/data/productogrupo/modal/listado';
 import M_ListadoProductoSubGrupo from '../../../../inventario/data/productosubgrupo/modal/listado';
 import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
+import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 
 function C_Form( props ) {
 
@@ -59,6 +60,11 @@ function C_Form( props ) {
 
     function onChangePorProductos( value ) {
         informeCompra.tipoinforme = "P";
+        onChange(informeCompra);
+    };
+
+    function onChangeFormato( value ) {
+        informeCompra.formato = value;
         onChange(informeCompra);
     };
 
@@ -253,8 +259,9 @@ function C_Form( props ) {
     };
 
     function onChangeFKIDProducto( data ) {
+        console.log(data)
         informeCompra.fkidproducto  = data.idproducto;
-        informeCompra.producto      = data.nombre;
+        informeCompra.producto      = `${parseFloat(data.peso).toFixed(2)}${data.abreviatura} ${data.producto}`;
         onChange( informeCompra );
         setVisibleProducto(false);
     };
@@ -262,7 +269,7 @@ function C_Form( props ) {
     function componentProducto() {
         if ( !visible_producto ) return null;
         return (
-            <M_ListadoProducto
+            <M_ListadoUnidadMedidaProducto
                 visible={visible_producto}
                 onClose={ () =>  setVisibleProducto(false) }
                 value={informeCompra.fkidproducto}
@@ -366,9 +373,15 @@ function C_Form( props ) {
                         <div className="card-body pb-2 pt-0">
                             <Row gutter={ [12, 8] } style={{ marginTop: -12, }}>
                                 <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                                    <C_Input 
-                                        value={ "Proveedor y Notas" }
-                                        disabled
+                                    <C_Select
+                                        value={ informeCompra.formato }
+                                        onChange={ onChangeFormato }
+                                        data={ [
+                                            { title: "Proveedor y Notas", value: "PN" },
+                                            { title: "Álmacen y Notas", value: "AN" },
+                                            { title: "Concepto y Notas", value: "CN" },
+                                            { title: "Correlativo por Notas", value: "CPN" },
+                                        ] }
                                     />
                                 </Col>
                             </Row>
@@ -516,7 +529,7 @@ function C_Form( props ) {
                             <div className="form-row d-flex justify-content-end">
                                 <C_Button
                                     outline={true}
-                                    // onClick={props.onCreate}
+                                    onClick={props.onLimpiar}
                                 >
                                     Limpiar
                                 </C_Button>
@@ -545,6 +558,7 @@ C_Form.propTypes = {
     onClose:  PropTypes.func,
     onChange: PropTypes.func,
     onImprimir: PropTypes.func,
+    onLimpiar: PropTypes.func,
     informeCompra: PropTypes.object,
 }
 

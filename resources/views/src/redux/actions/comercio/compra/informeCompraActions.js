@@ -32,10 +32,10 @@ const initData = ( ) => {
     };
 };
 
-const onImprimir = ( ) => {
+const onImprimir = ( informeCompra ) => {
     return async ( dispatch ) => {
         await dispatch( setLoading() );
-        return await InformeCompraServices.onImprimir().then( async (result) => {
+        return await InformeCompraServices.onImprimir( informeCompra ).then( async (result) => {
             if ( result.response == 1 ) {
                 await dispatch( setImprimir( result ) );
             }

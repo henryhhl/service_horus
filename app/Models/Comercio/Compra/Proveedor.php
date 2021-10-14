@@ -35,6 +35,14 @@ class Proveedor extends Model
         'estado', 'fecha', 'hora',
     ];
 
+    public function arraynotacompra() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\NotaCompra',
+            'fkidproveedor',
+            'idproveedor'
+        );
+    }
+
     public function arrayproveedorproductotipo() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\ProveedorProductoTipo',

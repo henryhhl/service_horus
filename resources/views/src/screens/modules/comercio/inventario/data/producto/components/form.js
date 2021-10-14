@@ -598,7 +598,7 @@ function C_Form( props ) {
                         </Row>
                         <Row gutter={ [12, 8] } className="mb-2">
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
-                                <div className="main-card mt-3 card pl-2 pr-2 pb-3 pt-1"
+                                <div className="main-card mt-2 card pl-2 pr-2 pb-3 pt-1"
                                     style={{ maxHeight: 170, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     { producto.arrayProveedor.map( (item, key) => {
@@ -636,7 +636,7 @@ function C_Form( props ) {
                                 }
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                                <div className="main-card mt-3 card pl-2 pr-2 pb-2 pt-1"
+                                <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1"
                                     style={{ maxHeight: 200, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     { producto.arrayUnidadMedidaProducto.map( (item, key) => {

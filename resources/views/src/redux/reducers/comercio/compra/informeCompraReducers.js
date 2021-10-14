@@ -42,19 +42,12 @@ const initialState = {
     fkidproducto: "",
     producto: "",
 
-    formato: "",
+    formato: "PN",
     tipoinforme: "",
     tipocompra: "",
     rangoimporte: {
         init: "",
         finish: "",
-    },
-
-    error: {
-        descripcion:  false,
-    },
-    message: {
-        descripcion:  "",
     },
 
     reporte: {
@@ -80,6 +73,7 @@ export const InformeCompraReducer = ( state = initialState, action = { payload, 
             state.moneda = "Bolivianos";
             state.tipoinforme = "N";
             state.tipocompra = "T";
+            state.formato = "PN";
             state = Object.assign( {}, state );
             return state;
 

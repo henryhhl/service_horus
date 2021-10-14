@@ -30,6 +30,14 @@ class Almacen extends Model
         'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
+    public function arraynotacompra() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\NotaCompra',
+            'fkidalmacen',
+            'idalmacen'
+        );
+    }
+
     public function get_data( $query, $request )
     {
         $fkidsucursal  = isset($request->fkidsucursal)  ? $request->fkidsucursal  : null;

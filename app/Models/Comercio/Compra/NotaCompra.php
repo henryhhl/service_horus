@@ -36,6 +36,14 @@ class NotaCompra extends Model
         'tipocompra', 'issolicitudcompra', 'isordencompra', 'isdevolucioncompra', 'iscompra', 'estado', 'fecha', 'hora', 'isdelete',
     ];
 
+    public function arraynotacompradetalle() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\NotaCompraDetalle',
+            'fkidnotacompra',
+            'idnotacompra'
+        );
+    }
+
     public function notacompradetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\NotaCompraDetalle',
