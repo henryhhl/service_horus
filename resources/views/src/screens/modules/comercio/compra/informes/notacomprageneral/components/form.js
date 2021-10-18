@@ -55,11 +55,13 @@ function C_Form( props ) {
 
     function onChangePorNotas( value ) {
         informeCompra.tipoinforme = "N";
+        informeCompra.formato = "PN";
         onChange(informeCompra)
     };
 
     function onChangePorProductos( value ) {
         informeCompra.tipoinforme = "P";
+        informeCompra.formato = "LD";
         onChange(informeCompra);
     };
 
@@ -376,12 +378,20 @@ function C_Form( props ) {
                                     <C_Select
                                         value={ informeCompra.formato }
                                         onChange={ onChangeFormato }
-                                        data={ [
-                                            { title: "Proveedor y Notas", value: "PN" },
-                                            { title: "Álmacen y Notas", value: "AN" },
-                                            { title: "Concepto y Notas", value: "CN" },
-                                            { title: "Correlativo por Notas", value: "CPN" },
-                                        ] }
+                                        data={ 
+                                            informeCompra.tipoinforme == "N" ?
+                                            [
+                                                { title: "Proveedor y Notas", value: "PN" },
+                                                { title: "Álmacen y Notas", value: "AN" },
+                                                { title: "Concepto y Notas", value: "CN" },
+                                                { title: "Correlativo por Notas", value: "CPN" },
+                                            ] : 
+                                            [
+                                                { title: "Libro Diario", value: "LD" },
+                                                { title: "Libro Mayor", value: "LM" },
+                                                { title: "Proveedor y Producto", value: "PP" },
+                                            ] 
+                                        }
                                     />
                                 </Col>
                             </Row>

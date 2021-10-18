@@ -107,10 +107,11 @@ function IndexInformeGeneralNotacompra( props ) {
                 <C_Form 
                     informeCompra={informeCompra}
                     onChange={onChange}
-                    onImprimir={ () => {
-                        option.visible = true;
-                        props.setPrintOption(option);
-                    } }
+                    // onImprimir={ () => {
+                    //     option.visible = true;
+                    //     props.setPrintOption(option);
+                    // } }
+                    onImprimir={ onSubmitOption }
                     onLimpiar={props.initData}
                 />
             </div>

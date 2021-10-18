@@ -47,6 +47,7 @@ const onImprimir = async ( informeCompra ) => {
         fkidproductosubgrupo: informeCompra.fkidproductosubgrupo,
         fkidproducto: informeCompra.fkidproducto,
         tipocompra: informeCompra.tipocompra,
+        tipoinforme: informeCompra.tipoinforme,
         formato: informeCompra.formato,
     } ) . then ( ( result ) => {
         console.log(result)

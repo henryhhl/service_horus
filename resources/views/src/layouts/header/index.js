@@ -2,14 +2,18 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { Menu, Dropdown } from 'antd';
+import { RightOutlined } from '@ant-design/icons';
+import { Menu, Dropdown, Drawer } from 'antd';
 const { SubMenu } = Menu;
+
+import {C_Button } from '../../components';
 
 import { treeMenu } from '../../utils/treemenu';
 
 function Header( props ) {
 
     const [ arrayMenu, setTreeMenu ] = useState( treeMenu );
+    const [ open, setOpen ] = useState( false );
     const  {} = props;
 
     function updateMenu() {
@@ -49,6 +53,7 @@ function Header( props ) {
                 array.push( 
                     <Menu.Item key={ element.key } style={{ marginLeft: 4, }}
                         onClick={ () => {
+                            setOpen(false);
                             let array = [ element.key ];
                             objTreeMenu( arrayMenu, array, element.key );
                             updateMenu();
@@ -73,8 +78,95 @@ function Header( props ) {
         );
     };
 
+    function componentSidebar( item ) {
+        let array = [];
+        item.map( ( element ) => {
+            if ( element.children.length > 0 ) {
+                array.push( 
+                    <li key={element.key}>
+                        <a href="#" onClick={ (event) => event.preventDefault() } style={{ fontSize: 11, fontWeight: 'bold', }}>
+                            <i className="fa fa-fa-bookmark mr-1"></i>
+                            { element.title }
+                            <i className="metismenu-state-icon pe-7s-angle-down fa fa-angle-down"></i>
+                        </a>
+                        <ul>
+                            { componentSidebar( element.children ) }
+                        </ul>
+                    </li>
+                 );
+            } else {
+                array.push(
+                    <li key={element.key}>
+                        <a href="#" 
+                            onClick={ (event) => {
+                                event.preventDefault();
+                                setOpen(false);
+                                let array = [ element.key ];
+                                objTreeMenu( arrayMenu, array, element.key );
+                                props.onMenu( array );
+                            } } 
+                            style={{ fontSize: 10, }}
+                        >
+                            <i className="metismenu-icon"></i>
+                            { element.title }
+                        </a>
+                    </li>
+                 );
+            }
+        } );
+        return array;
+    };
+
+    function onComponentSidebarMobile() {
+        return (
+            <Drawer
+                title={null}
+                placement={"left"}
+                closable={false}
+                onClose={ () => setOpen(false) }
+                visible={open}
+                bodyStyle={{ padding: 0, }}
+                width={310}
+                footer={
+                    <div className="pull-right">
+                        <C_Button
+                            onClick={ () => setOpen(false) }
+                        >
+                            Cerrar <RightOutlined />
+                        </C_Button>
+                    </div>
+                }
+            >
+                <div className="app-sidebars sidebar-shadow w-100 p-0" style={{width: '100% !important',}}>
+                    <div className="scrollbar-sidebar">
+                        <div className="app-sidebar__inner p-2">
+                            <ul className="vertical-nav-menu">
+                                <li className="app-sidebar__heading border-bottom border-primary">inicio</li>
+
+                                { arrayMenu[0].children.map( ( item, key ) => {
+                                    return (
+                                        <li key={ item.key }>
+                                            <a href="#" onClick={ (event) => event.preventDefault() } style={{ fontWeight: 'bold', }}>
+                                                <i className="fa fa-clone pe-7s-rocket"></i>
+                                                    <label > { item.title } </label>
+                                                <i className="metismenu-state-icon pe-7s-angle-down fa fa-angle-double-down"></i>
+                                            </a>
+                                            { componentSidebar( item.children ) }
+                                        </li>
+                                    );
+                                } ) }
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </Drawer>
+        );
+    };
+
     return (
         <>
+            { onComponentSidebarMobile() }
             <div className="app-header header-shadow">
                 {/* <div className="app-header__logo">
                     <div className="logo-src"></div>
@@ -90,7 +182,10 @@ function Header( props ) {
                 </div> */}
                 <div className="app-header__mobile-menu">
                     <div>
-                        <button type="button" className="hamburger hamburger--elastic mobile-toggle-nav">
+                        <button type="button" className="hamburger hamburger--elastic"
+                            onClick={ () => setOpen(true) }
+                        >
+                        {/* <button type="button" className="hamburger hamburger--elastic mobile-toggle-nav"> */}
                             <span className="hamburger-box">
                                 <span className="hamburger-inner"></span>
                             </span>

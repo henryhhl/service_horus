@@ -30,6 +30,14 @@ class UnidadMedidaProducto extends Model
         'isdelete', 'estado', 'fecha', 'hora',
     ];
 
+    public function arraynotacompradetalle() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\NotaCompraDetalle',
+            'fkidunidadmedidaproducto',
+            'idunidadmedidaproducto'
+        );
+    }
+
     public function unidadmedida() {
         return $this->belongsTo("App\Models\Comercio\Inventario\UnidadMedida", "fkidunidadmedida", "idunidadmedida");
     }
