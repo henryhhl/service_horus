@@ -40,9 +40,6 @@ class ProveedorRequest extends FormRequest
 
             'direccion' => 'max:250',
             'nit'       => 'max:200',
-            'telefono'  => 'max:50',
-            'celular'   => 'max:50',
-            'fax'       => 'max:150',
             'email'     => 'max:300',
         ];
     }
@@ -68,9 +65,6 @@ class ProveedorRequest extends FormRequest
 
             'direccion.max' => 'Campo :attribute permite máximo de 250 caracteres.',
             'nit.max'       => 'Campo :attribute permite máximo de 200 caracteres.',
-            'telefono.max'  => 'Campo :attribute permite máximo de 50 caracteres.',
-            'celular.max'   => 'Campo :attribute permite máximo de 50 caracteres.',
-            'fax.max'       => 'Campo :attribute permite máximo de 150 caracteres.',
             'email.max'     => 'Campo :attribute permite máximo de 300 caracteres.',
         ];
     }
@@ -88,9 +82,6 @@ class ProveedorRequest extends FormRequest
 
             'direccion' => 'dirección',
             'nit'       => 'nit',
-            'telefono'  => 'teléfono',
-            'celular'   => 'celular',
-            'fax'       => 'fax',
             'email'     => 'email',
         ];
     }

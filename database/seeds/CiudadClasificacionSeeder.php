@@ -24,21 +24,28 @@ class CiudadClasificacionSeeder extends Seeder
         
         return [
             [
-                'codigo'      => '1',
+                'codigo'      => 'P',
                 'descripcion' => 'Pais',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
             ],
             [
-                'codigo'      => '2',
+                'codigo'      => 'D',
                 'descripcion' => 'Departamento',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
             ],
             [
-                'codigo'      => '3',
+                'codigo'      => 'E',
+                'descripcion' => 'Estado',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'estado'      => 'A',
+            ],
+            [
+                'codigo'      => 'P',
                 'descripcion' => 'Provincia',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),

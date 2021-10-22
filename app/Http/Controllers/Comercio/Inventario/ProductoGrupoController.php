@@ -300,6 +300,13 @@ class ProductoGrupoController extends Controller
                 ] );
             }
 
+            if ( $productogrupo->isdelete == "N" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Acción no permitido.',
+                ] );
+            }
+
             /* fin de restriccion */
 
             $result = $obj->remove( $obj, $request );

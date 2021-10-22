@@ -31,7 +31,7 @@ class SeccionInventarioSeeder extends Seeder
                 'estado'      => 'A',
             ],
             [
-                'descripcion' => 'taller',
+                'descripcion' => 'Taller',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',

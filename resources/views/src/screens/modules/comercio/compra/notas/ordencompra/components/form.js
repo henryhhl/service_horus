@@ -276,7 +276,7 @@ function C_Form( props ) {
             let detalle = ordenCompra.arrayOrdenCompraDetalle[row_detalle.index];
             detalle.fkidproducto = data.idproducto;
             detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-            detalle.unidadmedidaproducto = `${parseFloat(data.peso).toFixed(2)} ${data.unidadmedida}`;
+            detalle.unidadmedidaproducto = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.unidadmedida}`;
             detalle.codigo = data.codigo ? data.codigo : "";
             detalle.producto = data.producto;
             detalle.stockactual = parseInt(data.stock);
@@ -371,7 +371,7 @@ function C_Form( props ) {
                 productomarca: detalle.productomarca,
 
                 fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-                unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.abreviatura,
+                unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
 
                 cantidad: parseInt(detalle.cantidadsolicitada),
                 cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
@@ -575,7 +575,7 @@ function C_Form( props ) {
                     />
                 </Col>
             </Row>
-            <div className="main-card card mb-3 mt-3 pl-1 pr-1 pb-1">
+            <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
                 <Table 
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}

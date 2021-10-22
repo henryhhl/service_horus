@@ -22,8 +22,8 @@ class CreateProveedorpersonalTable extends Migration
             $table->string('nombre', 200);
             $table->string('apellido', 300);
 
-            $table->string('telefono', 50)->nullable();
-            $table->string('celular', 50)->nullable();
+            $table->text('telefono', 50)->nullable();
+            $table->text('celular', 50)->nullable();
             $table->string('email', 300)->nullable();
 
             $table->longText('imagen')->nullable();

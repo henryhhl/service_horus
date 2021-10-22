@@ -285,7 +285,7 @@ function setStateDetailsBuyDevolution( devolucioncompradetalle ) {
             productomarca: detalle.productomarca,
 
             fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.abreviatura,
+            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
 
             cantidad: parseInt(detalle.cantidad),
             cantidadcomprada: parseInt(detalle.cantidadcomprada),
@@ -321,6 +321,7 @@ function setStateDetailsBuyDevolution( devolucioncompradetalle ) {
             fkidnotacompradetalle: detalle.fkidnotacompradetalle,
             nota: detalle.nota,
             iddevolucioncompradetalle: detalle.iddevolucioncompradetalle,
+            errorcantidad: false,
         };
         array = [ ...array, element];
     };

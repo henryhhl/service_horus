@@ -25,22 +25,18 @@ class ProveedorTipoSeeder extends Seeder
         
         return [
             [
-                'descripcion' => 'Por definir',
-                'fecha'       => $mytime->toDateString(),
-                'hora'        => $mytime->toTimeString(),
-                'estado'      => 'A',
-            ],
-            [
                 'descripcion' => 'Mayorista',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
+                'isdelete'    => 'A',
             ],
             [
                 'descripcion' => 'Minorista',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
+                'isdelete'    => 'A',
             ],
         ];
     }

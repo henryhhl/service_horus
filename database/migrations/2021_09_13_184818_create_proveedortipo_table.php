@@ -22,6 +22,7 @@ class CreateProveedortipoTable extends Migration
             $table->date('fecha');
             $table->time('hora');
             $table->enum('estado', ['A', 'N'])->default('A');
+            $table->enum('isdelete', ['A', 'N'])->default('A');
 
             $table->timestamps();
             $table->softDeletes();

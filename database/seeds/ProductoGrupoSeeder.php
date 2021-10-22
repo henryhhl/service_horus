@@ -25,10 +25,17 @@ class ProductoGrupoSeeder extends Seeder
         
         return [
             [
-                'descripcion' => 'Reten',
+                'descripcion' => 'Ninguno',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'isdelete'    => 'N',
+                'estado'      => 'A',
+            ],
+            [
+                'descripcion' => 'Reten',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'isdelete'    => 'A',
                 'estado'      => 'A',
             ],
         ];

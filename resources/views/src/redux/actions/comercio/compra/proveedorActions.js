@@ -300,21 +300,6 @@ function onValidate( proveedor ) {
         proveedor.message.nit = "Se permite máximo 200 caracteres";
         bandera = false;
     }
-    if ( proveedor.telefono?.toString().length > 50 ) {
-        proveedor.error.telefono   = true;
-        proveedor.message.telefono = "Se permite máximo 50 caracteres";
-        bandera = false;
-    }
-    if ( proveedor.celular?.toString().length > 50 ) {
-        proveedor.error.celular   = true;
-        proveedor.message.celular = "Se permite máximo 50 caracteres";
-        bandera = false;
-    }
-    if ( proveedor.fax?.toString().length > 150 ) {
-        proveedor.error.fax   = true;
-        proveedor.message.fax = "Se permite máximo 150 caracteres";
-        bandera = false;
-    }
     if ( proveedor.email?.toString().length > 0 ) {
         if ( proveedor.email.toString().length > 300 ) {
             proveedor.error.email   = true;

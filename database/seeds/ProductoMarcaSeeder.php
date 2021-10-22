@@ -25,6 +25,13 @@ class ProductoMarcaSeeder extends Seeder
         
         return [
             [
+                'descripcion' => 'Ninguno',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'isdelete'    => 'N',
+                'estado'      => 'A',
+            ],
+            [
                 'descripcion' => 'Volta',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),

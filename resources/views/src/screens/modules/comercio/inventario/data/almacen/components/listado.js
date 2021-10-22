@@ -122,9 +122,6 @@ function C_ListadoAlmacen( props ) {
                                     <th className="text-left" style={{ width: 15, }}>Sel.</th>
                                     <th className="text-left" >#</th>
                                     <th className="text-left">
-                                        Breve
-                                    </th>
-                                    <th className="text-left">
                                         Descripción
                                     </th>
                                     <th className="text-left">
@@ -152,9 +149,6 @@ function C_ListadoAlmacen( props ) {
                                             </td>
                                             <td className="text-left">
                                                 { item.idalmacen }
-                                            </td>
-                                            <td className="text-left">
-                                                { item.abreviatura }
                                             </td>
                                             <td className="text-left">
                                                 { item.descripcion }

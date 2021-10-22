@@ -146,7 +146,7 @@ function C_ListadoUnidadMedidaProducto( props ) {
                                                 { item.codigo ? item.codigo : "" }
                                             </td>
                                             <td className="text-left">
-                                                <label style={{ color: "rgb(56, 125, 255)", }}> {parseFloat(item.peso).toFixed(2)}{item.abreviatura} </label>
+                                                <label style={{ color: "rgb(56, 125, 255)", }}> {parseFloat(item.valorequivalente).toFixed(2)}{item.abreviatura} </label>
                                                 {` ${item.producto}` }
                                             </td>
                                             <td className="text-left">

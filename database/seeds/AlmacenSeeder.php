@@ -27,7 +27,7 @@ class AlmacenSeeder extends Seeder
             [
                 'descripcion'  => 'PRINCIPAL',
                 'direccion'    => 'Planta baja',
-                'fkidsucursal' => '1',
+                'fkidsucursal' => 1,
                 'fecha'        => $mytime->toDateString(),
                 'hora'         => $mytime->toTimeString(),
                 'isdelete'     => 'A',

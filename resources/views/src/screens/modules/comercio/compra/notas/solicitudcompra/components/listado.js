@@ -123,9 +123,6 @@ function C_ListadoSolicitudCompra( props ) {
                                     <th className="text-left" style={{ width: 15, }}>Sel.</th>
                                     <th className="text-left" >#</th>
                                     <th className="text-left">
-                                        Código
-                                    </th>
-                                    <th className="text-left">
                                         Fecha
                                     </th>
                                     <th className="text-left">
@@ -165,9 +162,6 @@ function C_ListadoSolicitudCompra( props ) {
                                             </td>
                                             <td className="text-left">
                                                 { item.idsolicitudcompra }
-                                            </td>
-                                            <td className="text-left">
-                                                { item.codigo ? item.codigo : "" }
                                             </td>
                                             <td className="text-left">
                                                 { Functions.convertYMDToDMY(item.fechasolicitada) }

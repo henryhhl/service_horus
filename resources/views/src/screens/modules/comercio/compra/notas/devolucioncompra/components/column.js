@@ -97,8 +97,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.unidadmedidaproducto.toString().length == 0 ) ? "" :
-                        <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}
-                        > 
+                        <label> 
                             { data.unidadmedidaproducto }
                         </label>
                     }
@@ -122,6 +121,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             if ( disabled.data ) return;
                                             if ( value == "" ) value = 0;
                                             if ( !isNaN( value ) ) {
+                                                data.errorcantidad = false;
                                                 data.cantidad = parseInt(value);
                                                 data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                 data.pesosubtotal = parseFloat( data.cantidad * data.peso ).toFixed(2);
@@ -134,6 +134,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             <i className="fa fa-plus icon-table-horus"
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
+                                                    data.errorcantidad = false;
                                                     data.cantidad = parseInt(data.cantidad) + 1;
                                                     data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     data.pesosubtotal = parseFloat( data.cantidad * data.peso ).toFixed(2);
@@ -148,6 +149,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     if ( parseInt( data.cantidad ) > 0 ) {
+                                                        data.errorcantidad = false;
                                                         data.cantidad = parseInt(data.cantidad) - 1;
                                                         data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                         data.pesosubtotal = parseFloat( data.cantidad * data.peso ).toFixed(2);
@@ -163,7 +165,11 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             }
                         >
                             <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.cantidad}
+                                {data.cantidad} { data.errorcantidad === true && 
+                                    <ExclamationOutlined 
+                                        style={{ position: 'relative', top: -2, padding: 4, borderRadius: 30, color: 'white', backgroundColor: 'red', }} 
+                                    /> 
+                                }
                             </label>
                         </Popover>
                     }

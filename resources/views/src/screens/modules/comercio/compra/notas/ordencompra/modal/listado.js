@@ -55,7 +55,7 @@ M_ListadoOrdenCompra.defaultProps = {
 
     value: null,
 
-    width: "85%",
+    width: "90%",
     zIndex: 1200,
 
     title: "ORDEN COMPRA",

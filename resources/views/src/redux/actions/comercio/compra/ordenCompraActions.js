@@ -307,6 +307,12 @@ function onValidate( ordencompra ) {
             if ( parseInt(element.cantidad) <= 0 ) {
                 C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
                 bandera = false;
+                element.errorcantidad = true;
+            }
+            if ( parseInt(element.costounitario) <= 0 ) {
+                C_Message( "warning", `El costo de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+                element.errorcosto = true;
             }
         } else {
             contador++;

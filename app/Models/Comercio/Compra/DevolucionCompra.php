@@ -96,7 +96,8 @@ class DevolucionCompra extends Model
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
                         'prod.idproducto', 'prod.nombre', 'prod.codigo',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -168,7 +169,8 @@ class DevolucionCompra extends Model
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
                         'prod.idproducto', 'prod.nombre', 'prod.codigo',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -286,7 +288,8 @@ class DevolucionCompra extends Model
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
                         'prod.idproducto', 'prod.nombre', 'prod.codigo',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -354,7 +357,8 @@ class DevolucionCompra extends Model
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
                         'prod.idproducto', 'prod.nombre', 'prod.codigo',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'

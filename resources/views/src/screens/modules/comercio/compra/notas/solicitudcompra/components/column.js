@@ -2,7 +2,7 @@
 import React from 'react';
 
 import { Popconfirm, Popover, Tooltip } from "antd";
-import { DeleteOutlined, FileSearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { C_Date, C_Input } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
@@ -45,9 +45,9 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             nota: null,
 
             visible_producto: false,
-
             fkidproducto: null,
             idsolicitudcompradetalle: null,
+            error: false,
         };
         detalle.arraySolicitudCompraDetalle = [ ...detalle.arraySolicitudCompraDetalle, element ];
         onChangeDetalle( detalle );
@@ -62,7 +62,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
     return ( [
         {
             title: <span style={{ fontSize: 11, }}> { 'Nro.' } </span>,
-            width: 30,
+            width: 20,
             dataIndex: 'nro',
             key: 'nro',
             fixed: 'left',
@@ -76,7 +76,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Código' } </span>,
-            width: 80,
+            width: 60,
             dataIndex: 'codigo',
             key: 'codigo',
             fixed: 'left',
@@ -99,7 +99,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         { 
             title: <span style={{ fontSize: 11, }}> { 'Producto' } </span>, 
             dataIndex: 'producto', 
-            key: 'producto', width: 110,
+            key: 'producto', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
@@ -118,7 +118,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>,
-            width: 60,
+            width: 50,
             dataIndex: 'ciudadorigen',
             key: 'ciudadorigen',
             render: ( text, data, index ) => (
@@ -144,19 +144,6 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 </span>
             ),
         },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
-            width: 40,
-            dataIndex: 'stockactual',
-            key: 'stockactual',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    <label> 
-                        { data.stockactual }
-                    </label>
-                </span>
-            ),
-        },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Cant.' } </span>, 
             dataIndex: 'cantidadsolicitada', key: 'cantidadsolicitada', width: 50,
@@ -174,6 +161,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             if ( disabled.data ) return;
                                             if ( value == "" ) value = 0;
                                             if ( !isNaN( value ) ) {
+                                                data.error = false;
                                                 data.cantidadsolicitada = parseInt(value);
                                                 data.costosubtotal = parseFloat( data.cantidadsolicitada * data.costounitario ).toFixed(2);
                                                 updateTotales();
@@ -184,6 +172,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             <i className="fa fa-plus icon-table-horus"
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
+                                                    data.error = false;
                                                     data.cantidadsolicitada = parseInt(data.cantidadsolicitada) + 1;
                                                     data.costosubtotal = parseFloat( data.cantidadsolicitada * data.costounitario ).toFixed(2);
                                                     updateTotales();
@@ -196,6 +185,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     if ( parseInt( data.cantidadsolicitada ) > 0 ) {
+                                                        data.error = false;
                                                         data.cantidadsolicitada = parseInt(data.cantidadsolicitada) - 1;
                                                         data.costosubtotal = parseFloat( data.cantidadsolicitada * data.costounitario ).toFixed(2);
                                                         updateTotales();
@@ -209,16 +199,33 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             }
                         >
                             <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.cantidadsolicitada}
+                                {data.cantidadsolicitada} { data.error === true && 
+                                    <ExclamationOutlined 
+                                        style={{ position: 'relative', top: -2, padding: 4, borderRadius: 30, color: 'white', backgroundColor: 'red', }} 
+                                    /> 
+                                }
                             </label>
                         </Popover>
                     }
                 </span>
             ),
         },
+        {
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
+            width: 40,
+            dataIndex: 'stockactual',
+            key: 'stockactual',
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label> 
+                        { data.stockactual }
+                    </label>
+                </span>
+            ),
+        },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
-            dataIndex: 'costounitario', key: 'costounitario', width: 70,
+            dataIndex: 'costounitario', key: 'costounitario', width: 50,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costounitario.toString().length == 0 ) ?
@@ -277,7 +284,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 80,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costosubtotal.toString().length == 0 ) ?
@@ -375,7 +382,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             </span>,
             key: 'accion',
             fixed: 'right',
-            width: 40,
+            width: 30,
             render: ( text, data, index ) => (
                 <Popconfirm title={"Estas seguro de quitar la fila?"}
                     onConfirm={ () => {

@@ -96,8 +96,8 @@ class OrdenCompra extends Model
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmedprod.stock', 'unidmedprod.codigo',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -169,8 +169,8 @@ class OrdenCompra extends Model
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmedprod.stock', 'unidmedprod.codigo',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -298,8 +298,8 @@ class OrdenCompra extends Model
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmedprod.stock', 'unidmedprod.codigo',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -367,8 +367,8 @@ class OrdenCompra extends Model
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmedprod.stock', 'unidmedprod.codigo',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'

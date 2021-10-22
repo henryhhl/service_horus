@@ -209,7 +209,7 @@ function C_Form( props ) {
             let detalle = solicitudCompra.arraySolicitudCompraDetalle[row_detalle.index];
             detalle.fkidproducto = data.idproducto;
             detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-            detalle.unidadmedidaproducto = `${parseFloat(data.peso).toFixed(2)} ${data.unidadmedida}`;
+            detalle.unidadmedidaproducto = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.unidadmedida}`;
             detalle.codigo = data.codigo ? data.codigo : "";
             detalle.producto = data.producto;
             detalle.stockactual = parseInt(data.stock);
@@ -397,7 +397,7 @@ function C_Form( props ) {
                     />
                 </Col>
             </Row>
-            <div className="main-card card mb-3 mt-3 pl-1 pr-1 pb-1">
+            <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
                 <Table 
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
@@ -407,7 +407,7 @@ function C_Form( props ) {
                 />
             </div>
             <Row gutter={ [12, 8] }>
-                <Col xs={{ span: 24, }} sm={{ span: 20, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                     <C_Input
                         label={ "Nota"}
                         placeholder={ "INGRESAR NOTA..." }
@@ -418,22 +418,18 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <Row gutter={ [12, 8] }>
-                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                            <C_Input
-                                label={ "Cant. Soli. Total"}
-                                value={ solicitudCompra.cantidadsolicitadatotal }
-                                readOnly
-                            />
-                        </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                            <C_Input
-                                label={ "Mto. Total"}
-                                value={ solicitudCompra.montototal }
-                                readOnly
-                            />
-                        </Col>
-                    </Row>
+                    <C_Input
+                        label={ "Cant. Total"}
+                        value={ solicitudCompra.cantidadsolicitadatotal }
+                        readOnly
+                    />
+                </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Input
+                        label={ "Mto. Total"}
+                        value={ solicitudCompra.montototal }
+                        readOnly
+                    />
                 </Col>
             </Row>
         </>

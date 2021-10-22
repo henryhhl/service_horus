@@ -112,7 +112,8 @@ class NotaCompra extends Model
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
                         'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -189,7 +190,8 @@ class NotaCompra extends Model
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
                         'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -336,7 +338,8 @@ class NotaCompra extends Model
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
                         'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
@@ -409,7 +412,8 @@ class NotaCompra extends Model
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
                         'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
                         'prod.idproducto', 'prod.nombre', 
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'

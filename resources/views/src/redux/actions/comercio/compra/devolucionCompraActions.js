@@ -295,6 +295,25 @@ function onValidate( devolucioncompra ) {
         devolucioncompra.message.fkidmoneda = "Campo requerido";
         bandera = false;
     }
+
+    let contador = 0;
+    for (let index = 0; index < devolucioncompra.arrayDevolucionCompraDetalle.length; index++) {
+        const element = devolucioncompra.arrayDevolucionCompraDetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === devolucioncompra.arrayDevolucionCompraDetalle.length ) {
+        C_Message( "warning", `Campo Producto requerido` );
+        bandera = false;
+    }
+
     if ( !bandera ) {
         C_Message( "error", "Problemas al registrar" );
     }

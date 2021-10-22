@@ -35,7 +35,7 @@ class LibroCompra extends Model
         $fechafactura = isset( $request->fechafactura ) ? $request->fechafactura : null;
         $tipocompra = isset( $request->tipocompra ) ? $request->tipocompra : null;
         $nombrerazonsocial = isset( $request->nombrerazonsocial ) ? $request->nombrerazonsocial : null;
-        $nitproveedor = isset( $request->nitproveedor ) ? $request->nitproveedor : null;
+        $nitproveedor = isset( $request->nitproveedor ) ? $request->nitproveedor : "0";
         $nroautorizacion = isset( $request->nroautorizacion ) ? $request->nroautorizacion : null;
         $codigocontrol = isset( $request->codigocontrol ) ? $request->codigocontrol : null;
 

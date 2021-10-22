@@ -41,7 +41,7 @@ class UnidadMedidadSeeder extends Seeder
                 'estado'      => 'A',
             ],
             [
-                'abreviatura' => 'Gr',
+                'abreviatura' => 'gr',
                 'descripcion' => 'Gramo',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
@@ -51,6 +51,22 @@ class UnidadMedidadSeeder extends Seeder
             [
                 'abreviatura' => 'L',
                 'descripcion' => 'Litro',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'isdelete'    => 'A',
+                'estado'      => 'A',
+            ],
+            [
+                'abreviatura' => 'm',
+                'descripcion' => 'Metro',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'isdelete'    => 'A',
+                'estado'      => 'A',
+            ],
+            [
+                'abreviatura' => 'cm',
+                'descripcion' => 'Centimetro',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'isdelete'    => 'A',

@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Comercio\Inventario\ProductoSubGrupo;
+use App\Models\Comercio\Compra\ProveedorCargo;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
-class ProductoSubGrupoSeeder extends Seeder
+class ProveedorCargoSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,7 +15,7 @@ class ProductoSubGrupoSeeder extends Seeder
     {
         $data = $this->_getdata();
         foreach ( $data as $key => $d ) {
-            ProductoSubGrupo::create( $d );
+            ProveedorCargo::create( $d );
         }
     }
 
@@ -25,20 +25,11 @@ class ProductoSubGrupoSeeder extends Seeder
         
         return [
             [
-                'descripcion' => 'Ninguno',
-                'fkidproductogrupo' => 1,
+                'descripcion' => 'Ejecutivo de venta',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
-                'isdelete'    => 'N',
                 'estado'      => 'A',
-            ],
-            [
-                'descripcion' => 'Reten 1mmx2mmx3mm',
-                'fkidproductogrupo' => 2,
-                'fecha'       => $mytime->toDateString(),
-                'hora'        => $mytime->toTimeString(),
                 'isdelete'    => 'A',
-                'estado'      => 'A',
             ],
         ];
     }

@@ -139,6 +139,9 @@ function C_ListadoOrdenCompra( props ) {
                                     <th className="text-left">
                                         Sección
                                     </th>
+                                    <th className="text-left">
+                                        Mto. Total
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -179,6 +182,9 @@ function C_ListadoOrdenCompra( props ) {
                                             </td>
                                             <td className="text-left">
                                                 { item.seccioninventario }
+                                            </td>
+                                            <td className="text-left">
+                                                { parseFloat(item.montototal).toFixed(2) }
                                             </td>
                                         </tr>
                                     );

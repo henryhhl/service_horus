@@ -264,6 +264,8 @@ function loadDetailBuyOrder() {
             fkidproducto: null,
             fkidsolicitudcompradetalle: null,
             idordencompradetalle: null,
+            errorcantidad: false,
+            errorcosto: false,
         };
         array = [ ...array, element];
     }
@@ -284,7 +286,7 @@ function setStateDetailsBuyOrder( ordencompradetalle ) {
             productomarca: detalle.productomarca,
 
             fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.abreviatura,
+            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
 
             cantidad: parseInt(detalle.cantidad),
             cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
@@ -307,6 +309,8 @@ function setStateDetailsBuyOrder( ordencompradetalle ) {
             fkidproducto: detalle.idproducto,
             fkidsolicitudcompradetalle: detalle.fkidsolicitudcompradetalle,
             idordencompradetalle: detalle.idordencompradetalle,
+            errorcantidad: false,
+            errorcosto: false,
         };
         array = [ ...array, element];
     };

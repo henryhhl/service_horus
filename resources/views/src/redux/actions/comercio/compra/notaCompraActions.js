@@ -305,7 +305,13 @@ function onValidate( notacompra ) {
         const element = notacompra.arrayNotaCompraDetalle[index];
         if ( element.fkidproducto != null ) {
             if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
                 C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+            if ( parseInt(element.costounitario) <= 0 ) {
+                element.errorcosto = true;
+                C_Message( "warning", `El costo de ${element.producto} debe ser mayor a 0` );
                 bandera = false;
             }
         } else {

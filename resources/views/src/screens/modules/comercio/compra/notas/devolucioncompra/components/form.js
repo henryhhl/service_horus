@@ -7,8 +7,6 @@ import { C_Date, C_Input, C_Select } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
 import M_ListadoConceptoCompra from '../../../data/conceptocompra/modal/listado';
-import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
-import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 import M_ListadoNotaCompra from '../../notacompra/modal/listado';
 
 import { columns } from './column';
@@ -19,8 +17,6 @@ function C_Form( props ) {
 
     const [ visible_concepto, setVisibleConcepto ] = useState(false);
     const [ visible_notacompra, setVisibleNotaCompra ] = useState(false);
-
-    const [ row_detalle, setRowDetalle ] = useState( null );
 
     function onChangeID( value ) {
         devolucionCompra.iddevolucioncompra = value;
@@ -117,114 +113,6 @@ function C_Form( props ) {
         );
     };
 
-    function onVisibleProducto( detalle, index ) {
-        detalle.index = index;
-        detalle.visible_producto = true;
-        detalle.visible_unidadmedida = false;
-        setRowDetalle(detalle);
-    };
-
-    function componentProducto() {
-        if ( row_detalle === null ) return null;
-        if ( !row_detalle.visible_producto ) return null;
-        return (
-            <M_ListadoProducto
-                visible={row_detalle.visible_producto}
-                onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
-                onChange={ ( data ) => {
-                    
-                    let detalle = devolucionCompra.arrayDevolucionCompraDetalle[row_detalle.index];
-
-                    let array_unidadmedida = data.unidadmedidaproducto;
-
-                    detalle.fkidproducto = data.idproducto;
-                    detalle.array_unidadmedidaproducto = array_unidadmedida;
-
-                    detalle.fkidunidadmedidaproducto = array_unidadmedida.length > 0 ? array_unidadmedida[0].idunidadmedidaproducto : null;
-                    detalle.unidadmedidaproducto = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].peso).toFixed(2) + " " + array_unidadmedida[0].abreviatura : "";
-
-                    detalle.peso = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].peso).toFixed(2) : "0.00";
-                    detalle.pesosubtotal = "0.00";
-
-                    detalle.volumen = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].volumen).toFixed(2) : "0.00";
-                    detalle.volumensubtotal = "0.00";
-
-                    detalle.codigo = data.codigo ? data.codigo : "";
-                    detalle.producto = data.nombre;
-                    detalle.ciudadorigen = data.ciudadorigen;
-
-                    detalle.cantidadsolicitada = "0";
-                    detalle.cantidadrecibida = "0";
-                    detalle.cantidadfaltante = "0";
-                    detalle.cantidadsobrante = "0";
-
-                    detalle.cantidad = 0;
-                    detalle.costounitario = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].costo).toFixed(2) : "0.00";
-                    detalle.costosubtotal = "0.00";
-
-                    detalle.nrolote = "0.00";
-                    detalle.nrofabrica = "0.00";
-                    detalle.nrocajas = "0";
-
-                    detalle.productomarca = data.productomarca;
-                    onChange(devolucionCompra);
-                    setRowDetalle(null);
-                } }
-            />
-        );
-    };
-
-    function onVisibleUnidadMedidaProducto( detalle, index ) {
-        detalle.index = index;
-        detalle.visible_unidadmedida = true;
-        detalle.visible_producto = false;
-        setRowDetalle(detalle);
-    };
-
-    function componentUnidadMedidaProducto() {
-        if ( row_detalle === null ) return null;
-        if ( !row_detalle.visible_unidadmedida ) return null;
-        return (
-            <M_ListadoUnidadMedidaProducto
-                visible={row_detalle.visible_unidadmedida}
-                onClose={ () => setRowDetalle(null) }
-                value={row_detalle.fkidunidadmedidaproducto}
-                onChange={ ( data ) => {
-                    let detalle = devolucionCompra.arrayDevolucionCompraDetalle[row_detalle.index];
-                    detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-                    detalle.unidadmedidaproducto = parseFloat(data.peso).toFixed(2) + " " + data.abreviatura;
-                    detalle.peso = parseFloat(data.peso).toFixed(2);
-                    detalle.pesosubtotal = parseFloat(data.peso * detalle.cantidad).toFixed(2);
-                    detalle.volumen = parseFloat(data.volumen * detalle.cantidad).toFixed(2);
-                    detalle.volumensubtotal = parseFloat(data.volumen * detalle.cantidad).toFixed(2);
-                    detalle.costounitario = parseFloat(data.costo).toFixed(2);
-                    detalle.costosubtotal = parseFloat( detalle.costounitario * detalle.cantidad ).toFixed(2);
-                    updateTotales();
-                    onChange(devolucionCompra);
-                    setRowDetalle(null);
-                } }
-                data={row_detalle.array_unidadmedidaproducto}
-            />
-        );
-    };
-
-    function updateTotales() {
-        let cantidadtotal = 0;
-        let montototal = 0;
-        devolucionCompra.arrayDevolucionCompraDetalle.map( (item) => {
-            if ( item.fkidproducto !== null ) {
-                cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costosubtotal);
-            }
-        } );
-        devolucionCompra.cantidadtotal = parseInt(cantidadtotal);
-        devolucionCompra.montosubtotal = parseFloat(montototal).toFixed(2);
-        let montosubtotal = parseFloat(devolucionCompra.montosubtotal);
-        let montodescuento = parseFloat(devolucionCompra.montodescuento);
-        devolucionCompra.montototal = parseFloat(montosubtotal - montodescuento).toFixed(2);
-    };
-
     function onShowNotaCompra() {
         if ( !disabled.data ) setVisibleNotaCompra(true);
     };
@@ -257,7 +145,7 @@ function C_Form( props ) {
                 productomarca: detalle.productomarca,
 
                 fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-                unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.abreviatura,
+                unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
 
                 cantidad: "0",
                 cantidadcomprada: parseInt(detalle.cantidad),
@@ -318,9 +206,6 @@ function C_Form( props ) {
         <>
 
             { componentConcepto() }
-            { componentProducto() }
-            { componentUnidadMedidaProducto() }
-
             { componentNotaCompra() }
 
             <Row gutter={ [12, 8] }>
@@ -470,7 +355,7 @@ function C_Form( props ) {
                     />
                 </Col>
             </Row>
-            <div className="main-card card mb-3 mt-3 pl-1 pr-1 pb-1">
+            <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
                 <Table 
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}

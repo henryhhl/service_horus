@@ -270,13 +270,22 @@ function C_Form( props ) {
         );
     };
 
+    function onChangeValorEquivalente( data, value ) {
+        if ( value === "" ) value = 0;
+        if ( !isNaN( value ) ) {
+            if ( Functions.esDecimal( value, 2 ) ) {
+                let valorequivalente = Functions.onChangeNumberDecimal(value);
+                producto.arrayUnidadMedidaProducto[data.index].valorequivalente = valorequivalente;
+                onChange( producto );
+            }
+        };
+    };
+
     function onChangePeso( data, value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
-                value += '';
-                const list = value.split('.');
-                let peso = `${ parseInt( list[0] ) }${ ( list[1] ) ? `.${ list[1] }` : ( list.length > 1 ) ? '.' : '' }`;
+                let peso = Functions.onChangeNumberDecimal(value);
                 producto.arrayUnidadMedidaProducto[data.index].peso = peso;
                 onChange( producto );
             }
@@ -287,9 +296,7 @@ function C_Form( props ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
-                value += '';
-                const list = value.split('.');
-                let volumen = `${ parseInt( list[0] ) }${ ( list[1] ) ? `.${ list[1] }` : ( list.length > 1 ) ? '.' : '' }`;
+                let volumen = Functions.onChangeNumberDecimal(value);
                 producto.arrayUnidadMedidaProducto[data.index].volumen = volumen;
                 onChange( producto );
             }
@@ -308,9 +315,7 @@ function C_Form( props ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
-                value += '';
-                const list = value.split('.');
-                let costo = `${ parseInt( list[0] ) }${ ( list[1] ) ? `.${ list[1] }` : ( list.length > 1 ) ? '.' : '' }`;
+                let costo = Functions.onChangeNumberDecimal(value);
                 producto.arrayUnidadMedidaProducto[data.index].costounitario = costo;
 
                 let detalle = producto.arrayUnidadMedidaProducto[data.index];
@@ -339,6 +344,7 @@ function C_Form( props ) {
             codigo: null,
             fkidunidadmedida: null,
             unidadmedida: "",
+            valorequivalente: "0.00",
             peso: "0.00",
             volumen: "0.00",
             stock: "0",
@@ -637,30 +643,11 @@ function C_Form( props ) {
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                                 <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1"
-                                    style={{ maxHeight: 200, overflowX: 'hidden', overflowY: 'auto', }}
+                                    style={{ maxHeight: 255, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     { producto.arrayUnidadMedidaProducto.map( (item, key) => {
                                         return (
                                             <div key={key} className="main-card card pl-1 pr-1 pb-1 pt-0 mb-2">
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                                                        <C_Input
-                                                            label={"Código"}
-                                                            placeholder={ "INGRESAR CÓDIGO..." }
-                                                            value={ item.codigo }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                item.codigo = value;
-                                                                item.message.codigo = "";
-                                                                item.error.codigo = false;
-                                                                onChange(producto);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                            message={ item.message.codigo }
-                                                            error={ item.error.codigo }
-                                                        />
-                                                    </Col>
-                                                </Row>
                                                 <Row gutter={ [12, 8] }>
                                                     <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                                                         <C_Input
@@ -684,6 +671,7 @@ function C_Form( props ) {
                                                                             item.fkidunidadmedida = null;
                                                                             item.unidadmedida = "";
                                                                             item.codigo= null;
+                                                                            item.valorequivalente = "0.00";
                                                                             item.peso = "0.00";
                                                                             item.volumen = "0.00";
                                                                             item.costounitario = "0.00";
@@ -695,6 +683,51 @@ function C_Form( props ) {
                                                                     />
                                                                 </Tooltip>
                                                             }
+                                                        />
+                                                    </Col>
+                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
+                                                        <C_Input
+                                                            label={"V. Equiv."}
+                                                            placeholder={ "INGRESAR VALOR EQUIVALENTE..." }
+                                                            value={ item.valorequivalente }
+                                                            onChange={ (value) => {
+                                                                item.index = key;
+                                                                onChangeValorEquivalente(item, value);
+                                                            } }
+                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                                <Row gutter={ [12, 8] }>
+                                                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                                        <C_Input
+                                                            label={"Código"}
+                                                            placeholder={ "INGRESAR CÓDIGO..." }
+                                                            value={ item.codigo }
+                                                            onChange={ (value) => {
+                                                                item.index = key;
+                                                                item.codigo = value;
+                                                                item.message.codigo = "";
+                                                                item.error.codigo = false;
+                                                                onChange(producto);
+                                                            } }
+                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
+                                                            message={ item.message.codigo }
+                                                            error={ item.error.codigo }
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                                <Row gutter={ [12, 8] }>
+                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
+                                                        <C_Input
+                                                            label={"Peso"}
+                                                            placeholder={ "INGRESAR PESO..." }
+                                                            value={ item.peso }
+                                                            onChange={ (value) => {
+                                                                item.index = key;
+                                                                onChangePeso(item, value);
+                                                            } }
+                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
                                                         />
                                                     </Col>
                                                     <Col xs={{ span: 24, }} sm={{ span: 12, }}>
@@ -711,19 +744,7 @@ function C_Form( props ) {
                                                     </Col>
                                                 </Row>
                                                 <Row gutter={ [12, 8] }>
-                                                    <Col sm={{ span: 24, }} md={{ span: 6, }}>
-                                                        <C_Input
-                                                            label={"Peso"}
-                                                            placeholder={ "INGRESAR PESO..." }
-                                                            value={ item.peso }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangePeso(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                    <Col sm={{ span: 24, }} md={{ span: 6, }}>
+                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
                                                         <C_Input
                                                             label={"Volumen"}
                                                             placeholder={ "INGRESAR VOLUMEN..." }

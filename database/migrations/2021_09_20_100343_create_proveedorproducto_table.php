@@ -19,6 +19,8 @@ class CreateProveedorproductoTable extends Migration
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidproducto')->unsigned();
 
+            $table->decimal('costo', 24, 8)->default(0);
+
             $table->date('fecha');
             $table->time('hora');
             $table->enum('estado', ['A', 'N'])->default('A');

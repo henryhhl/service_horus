@@ -97,7 +97,7 @@ class Producto extends Model
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
                         'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 
+                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
                     ] )
                     ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
@@ -171,7 +171,7 @@ class Producto extends Model
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
                         'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 
+                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
                     ] )
                     ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
@@ -317,7 +317,7 @@ class Producto extends Model
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
                         'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 
+                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
                     ] )
                     ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
@@ -383,7 +383,7 @@ class Producto extends Model
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
                         'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 
+                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
                     ] )
                     ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');

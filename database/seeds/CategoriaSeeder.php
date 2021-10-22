@@ -25,24 +25,31 @@ class CategoriaSeeder extends Seeder
         
         return [
             [
-                'descripcion' => 'Bateria',
+                'descripcion' => 'Ninguno',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'isdelete'    => 'N',
+                'estado'      => 'A',
+            ],
+            [
+                'descripcion' => 'Bateria',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'isdelete'    => 'A',
                 'estado'      => 'A',
             ],
             [
                 'descripcion' => 'Motor',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
-                'isdelete'    => 'N',
+                'isdelete'    => 'A',
                 'estado'      => 'A',
             ],
             [
                 'descripcion' => 'Goma',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
-                'isdelete'    => 'N',
+                'isdelete'    => 'A',
                 'estado'      => 'A',
             ],
         ];

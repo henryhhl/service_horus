@@ -20,12 +20,12 @@ class ProveedorTipo extends Model
     ];
 
     protected $attributes = [ 
-        'estado' => 'A', 'codigo' => null,
+        'estado' => 'A', 'isdelete' => 'A', 'codigo' => null,
     ];
 
     protected $fillable = [ 
         'codigo', 'descripcion',
-        'estado', 'fecha', 'hora',
+        'estado', 'isdelete', 'fecha', 'hora',
     ];
 
     public function get_data( $query, $request )

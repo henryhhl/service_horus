@@ -324,6 +324,8 @@ function loadDetailBuyNote() {
             fkidalmacenunidadmedidaproducto: null,
             fkidordencompradetalle: null,
             idnotacompradetalle: null,
+            errorcantidad: false,
+            errorcosto: false,
         };
         array = [ ...array, element];
     }
@@ -344,7 +346,7 @@ function setStateDetailsBuyNote( notacompradetalle ) {
             productomarca: detalle.productomarca,
 
             fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.abreviatura,
+            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
 
             cantidad: parseInt(detalle.cantidad),
             cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
@@ -381,6 +383,8 @@ function setStateDetailsBuyNote( notacompradetalle ) {
             fkidordencompradetalle: detalle.fkidordencompradetalle,
             nota: detalle.nota,
             idnotacompradetalle: detalle.idnotacompradetalle,
+            errorcantidad: false,
+            errorcosto: false,
         };
         array = [ ...array, element];
     };

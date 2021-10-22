@@ -25,9 +25,9 @@ class CreateProveedorTable extends Migration
             $table->string('direccion', 250)->nullable();
             $table->string('nit', 200)->nullable();
 
-            $table->string('telefono', 50)->nullable();
-            $table->string('celular', 50)->nullable();
-            $table->string('fax', 150)->nullable();
+            $table->text('telefono')->nullable();
+            $table->text('celular')->nullable();
+            $table->text('fax')->nullable();
             $table->longText('contacto')->nullable();
             $table->string('email', 300)->nullable();
             $table->longText('sitioweb')->nullable();

@@ -21,6 +21,7 @@ class CreateUnidadmedidaproductoTable extends Migration
             
             $table->string('codigo', 150)->nullable();
 
+            $table->decimal('valorequivalente', 24, 8)->default(0);
             $table->decimal('peso', 24, 8)->default(0);
             $table->decimal('volumen', 24, 8)->default(0);
             

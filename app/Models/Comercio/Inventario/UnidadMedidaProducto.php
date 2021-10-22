@@ -21,11 +21,11 @@ class UnidadMedidaProducto extends Model
     protected $attributes = [ 
         'estado' => 'A',  'isdelete' => 'A', 
         'codigo' => null, 'peso' => 0, 'costo' => 0, 'stock' => 0, 'costounitario' => 0,
-        'volumen' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0,
+        'volumen' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0, 'valorequivalente' => 0,
     ];
 
     protected $fillable = [ 
-        'fkidunidadmedida', 'fkidproducto', 'codigo', 'peso', 'costo', 'stock',
+        'fkidunidadmedida', 'fkidproducto', 'codigo', 'valorequivalente', 'peso', 'costo', 'stock',
         'volumen', 'costodescuento', 'costomontodescuento', 'costounitario',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
@@ -62,6 +62,7 @@ class UnidadMedidaProducto extends Model
                 'unidadmedidaproducto.codigo', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.volumen',
                 'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento', 
                 'unidadmedidaproducto.costomontodescuento', 'unidadmedidaproducto.costounitario',
+                'unidadmedidaproducto.valorequivalente',
                 'unidadmedidaproducto.fecha', 'unidadmedidaproducto.hora', 'unidadmedidaproducto.estado', 'unidadmedidaproducto.isdelete',
 
                 'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -120,6 +121,7 @@ class UnidadMedidaProducto extends Model
                 'unidadmedidaproducto.codigo', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.volumen',
                 'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento', 
                 'unidadmedidaproducto.costomontodescuento', 'unidadmedidaproducto.costounitario',
+                'unidadmedidaproducto.valorequivalente',
                 'unidadmedidaproducto.fecha', 'unidadmedidaproducto.hora', 'unidadmedidaproducto.estado', 'unidadmedidaproducto.isdelete',
 
                 'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -165,8 +167,9 @@ class UnidadMedidaProducto extends Model
         $fkidproducto     = $detalle->fkidproducto;
         $codigo = isset( $detalle->codigo ) ? $detalle->codigo : null;
 
-        $peso    = isset( $detalle->peso )     ? $detalle->peso : 0;
-        $volumen = isset( $detalle->volumen )  ? $detalle->volumen : 0;
+        $peso    = isset( $detalle->peso )    ? $detalle->peso : 0;
+        $volumen = isset( $detalle->volumen ) ? $detalle->volumen : 0;
+        $valorequivalente = isset( $detalle->valorequivalente ) ? $detalle->valorequivalente : 0;
 
         $costo = isset( $detalle->costo ) ? $detalle->costo : 0;
         $costodescuento = isset( $detalle->costodescuento ) ? $detalle->costodescuento : 0;
@@ -184,6 +187,7 @@ class UnidadMedidaProducto extends Model
             'codigo'  => $codigo,
             'volumen' => $volumen,
             'peso'    => $peso,
+            'valorequivalente'    => $valorequivalente,
 
             'costo' => $costo,
             'costodescuento' => $costodescuento,
@@ -208,6 +212,7 @@ class UnidadMedidaProducto extends Model
 
         $peso   = isset( $detalle->peso )  ? $detalle->peso : 0;
         $volumen = isset( $detalle->volumen )  ? $detalle->volumen : 0;
+        $valorequivalente = isset( $detalle->valorequivalente ) ? $detalle->valorequivalente : 0;
 
         $costo = isset( $detalle->costo ) ? $detalle->costo : 0;
         $costodescuento = isset( $detalle->costodescuento ) ? $detalle->costodescuento : 0;
@@ -223,6 +228,7 @@ class UnidadMedidaProducto extends Model
                 'codigo' => $codigo,
                 'volumen' => $volumen,
                 'peso'    => $peso,
+                'valorequivalente' => $valorequivalente,
 
                 'costo' => $costo,
                 'costodescuento' => $costodescuento,

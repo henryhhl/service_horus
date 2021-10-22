@@ -22,8 +22,8 @@ function C_Message( type, messages ) {
                 { messages } 
             </span>,
         className: `bg-${ type === "error" ? "danger" : type }`,
-        closeIcon: <CloseOutlined style={{ color: "white", fontWeight: "bold", position: "relative", top: -10, }} />,
-        style: { paddingLeft: 8, paddingRight: 0, width: 250, paddingTop: 4, paddingBottom: 4, }
+        closeIcon: <CloseOutlined style={{ color: "white", fontWeight: "bold", position: "relative", top: -10,  }} />,
+        style: { paddingLeft: 8, paddingRight: 45, width: 250, paddingTop: 4, paddingBottom: 4, }
     } );
 };
 

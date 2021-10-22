@@ -221,6 +221,7 @@ function loadDetailBuySolicitude() {
             visible_producto: false,
             fkidproducto: null,
             idsolicitudcompradetalle: null,
+            error: false,
         };
         array = [ ...array, element];
     }
@@ -240,7 +241,7 @@ function setStateDetailsBuySolicitude( solicitudcompradetalle ) {
             ciudadorigen: detalle.ciudadorigen,
 
             fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.peso).toFixed(2) + " " + detalle.unidadmedida,
+            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.unidadmedida,
 
             stockactual: parseInt(detalle.stockactual),
             cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
@@ -256,6 +257,7 @@ function setStateDetailsBuySolicitude( solicitudcompradetalle ) {
             visible_producto: false,
             fkidproducto: null,
             idsolicitudcompradetalle: null,
+            error: false,
         };
         array = [ ...array, element];
     };

@@ -46,7 +46,7 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="PRODUCTO"
-                        width={"98%"} style={{ top: 30, }}
+                        width={"98%"} style={{ top: 10, }}
                     >
                         <IndexProducto
                             onClose={ onClose }
