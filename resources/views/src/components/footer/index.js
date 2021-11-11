@@ -11,8 +11,8 @@ function C_Footer( props ) {
 
     return (
         <div className="form-group mb-1 pl-1 pr-1 pt-2 border-top">
-            <div className="d-flex justify-content-between">
-                <div className="form-row center-elem pl-2">
+            <div className="d-md-flex justify-content-md-between">
+                <div className="form-row center-elem pl-2 mt-2">
                     <C_Pagination 
                         total={props.pagination.total}
                         page={props.pagina}
@@ -20,11 +20,12 @@ function C_Footer( props ) {
                         onChangePage={props.onChangePage}
                     />
                 </div>
-                <div className="form-row">
+                <div className="form-row mt-2">
                     <C_Button
                         outline={true}
                         onClick={props.onCreate}
                         disabled={ props.disabled.btnnuevo }
+                        className="mb-2"
                     >
                         Nuevo
                     </C_Button>
@@ -32,6 +33,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onGrabar}
                         disabled={ props.disabled.btngrabar }
+                        className="mb-2"
                     >
                         Grabar
                     </C_Button>
@@ -40,6 +42,7 @@ function C_Footer( props ) {
                             outline={true}
                             onClick={props.onUpdate}
                             disabled={ props.disabled.btnmodificar }
+                            className="mb-2"
                         >
                             Modificar
                         </C_Button>
@@ -48,6 +51,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onSearch}
                         disabled={ props.disabled.btnbuscar }
+                        className="mb-2"
                     >
                         Buscar
                     </C_Button>
@@ -55,6 +59,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onDelete}
                         disabled={ props.disabled.btneliminar }
+                        className="mb-2"
                     >
                         Eliminar
                     </C_Button>
@@ -62,6 +67,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onCancelar}
                         disabled={ props.disabled.btncancelar }
+                        className="mb-2"
                     >
                         Cancelar
                     </C_Button>
@@ -69,6 +75,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onImprimir}
                         disabled={ props.disabled.btnimprimir }
+                        className="mb-2"
                     >
                         Imprimir
                     </C_Button>
@@ -76,6 +83,7 @@ function C_Footer( props ) {
                         outline={true}
                         onClick={props.onClose}
                         disabled={ props.disabled.btnterminar }
+                        className="mb-2"
                     >
                         Terminar
                     </C_Button>

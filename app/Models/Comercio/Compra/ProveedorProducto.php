@@ -18,11 +18,11 @@ class ProveedorProducto extends Model
     ];
 
     protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+        'costounitario' => 0, 'estado' => 'A',  'isdelete' => 'A', 
     ];
 
     protected $fillable = [ 
-        'fkidproveedor', 'fkidproducto', 
+        'fkidproveedor', 'fkidproducto', 'costounitario',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
 

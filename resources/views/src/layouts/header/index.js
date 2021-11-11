@@ -84,7 +84,7 @@ function Header( props ) {
             if ( element.children.length > 0 ) {
                 array.push( 
                     <li key={element.key}>
-                        <a href={`#`} onClick={ (event) => event.preventDefault() } style={{ fontSize: 11, fontWeight: 'bold', }}>
+                        <a style={{ fontSize: 11, fontWeight: 'bold', }}>
                             <i className="fa fa-fa-bookmark mr-1"></i>
                             { element.title }
                             <i className="metismenu-state-icon pe-7s-angle-down fa fa-angle-down"></i>
@@ -97,7 +97,7 @@ function Header( props ) {
             } else {
                 array.push(
                     <li key={element.key}>
-                        <a href={`#${element.key}`} 
+                        <a
                             onClick={ (event) => {
                                 event.preventDefault();
                                 setOpen(false);
@@ -146,7 +146,7 @@ function Header( props ) {
                                 { arrayMenu[0].children.map( ( item, key ) => {
                                     return (
                                         <li key={ item.key }>
-                                            <a href={`#${item.key}`} onClick={ (event) => event.preventDefault() } style={{ fontWeight: 'bold', }}>
+                                            <a style={{ fontWeight: 'bold', }}>
                                                 <i className="fa fa-clone pe-7s-rocket"></i>
                                                     <label > { item.title } </label>
                                                 <i className="metismenu-state-icon pe-7s-angle-down fa fa-angle-double-down"></i>

@@ -2,7 +2,7 @@
 import React from 'react';
 
 import { Popconfirm, Popover, Tooltip } from "antd";
-import { DeleteOutlined, FileSearchOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined } from "@ant-design/icons";
 
 import { C_Input } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';

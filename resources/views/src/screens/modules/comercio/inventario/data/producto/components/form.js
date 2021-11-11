@@ -643,7 +643,7 @@ function C_Form( props ) {
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                                 <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1"
-                                    style={{ maxHeight: 255, overflowX: 'hidden', overflowY: 'auto', }}
+                                    style={{ maxHeight: 270, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     { producto.arrayUnidadMedidaProducto.map( (item, key) => {
                                         return (
@@ -685,7 +685,7 @@ function C_Form( props ) {
                                                             }
                                                         />
                                                     </Col>
-                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
+                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
                                                         <C_Input
                                                             label={"V. Equiv."}
                                                             placeholder={ "INGRESAR VALOR EQUIVALENTE..." }
@@ -718,7 +718,7 @@ function C_Form( props ) {
                                                     </Col>
                                                 </Row>
                                                 <Row gutter={ [12, 8] }>
-                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
+                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
                                                         <C_Input
                                                             label={"Peso"}
                                                             placeholder={ "INGRESAR PESO..." }
@@ -744,7 +744,7 @@ function C_Form( props ) {
                                                     </Col>
                                                 </Row>
                                                 <Row gutter={ [12, 8] }>
-                                                    <Col sm={{ span: 24, }} md={{ span: 12, }}>
+                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
                                                         <C_Input
                                                             label={"Volumen"}
                                                             placeholder={ "INGRESAR VOLUMEN..." }
@@ -805,13 +805,13 @@ function C_Form( props ) {
                                         );
                                     } ) }
                                 </div>
-                                { ( !disabled.data ) &&
+                                {/* { ( !disabled.data ) &&
                                     <Row gutter={ [12, 8] } justify={"end"} className={"mt-2"}>
                                         <C_Button color={"link"} onClick={AddRowUnidadMedida}>
                                             Agregar Unidad Medida
                                         </C_Button>
                                     </Row>
-                                }
+                                } */}
                             </Col>
                         </Row>
                     </Col>

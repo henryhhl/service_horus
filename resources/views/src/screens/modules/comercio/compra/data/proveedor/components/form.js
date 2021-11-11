@@ -650,7 +650,7 @@ function C_Form( props ) {
                         Personal de la Empresa
                     </div>
                     <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
-                        style={{ maxHeight: 160, overflowX: 'hidden', overflowY: 'auto', }}
+                        style={{ maxHeight: 130, overflowX: 'hidden', overflowY: 'auto', }}
                     >
                         { proveedor.arrayProveedorPersonal.map( (item, key) => {
                             return (

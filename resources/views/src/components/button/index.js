@@ -36,7 +36,7 @@ function C_Button( props ) {
         return ( //rounded-circle
             <button 
                 disabled={props.disabled}
-                className={`mb-1 btn-transition ${border} btn ${dashed} btn${outline}-${color} ${size} ${disabled} ${block} d-flex align-items-center`}
+                className={`mb-1 btn-transition ${border} btn ${dashed} btn${outline}-${color} ${size} ${disabled} ${block} d-flex align-items-center ${props.className}`}
                 onClick={props.onClick}
                 type={props.type}
                 style={style}

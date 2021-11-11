@@ -59,6 +59,9 @@ const initialState = {
     arrayProveedorPersonal: [],
     arrayDeleteProveedorPersonal: [],
 
+    arrayProducto: [],
+    arrayDeleteProducto: [],
+
     error: {
         nombre:  false,
         fkidciudad: false,
@@ -110,6 +113,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
 
             state.arrayProductoTipo = loadProductoTipo();
             state.arrayProveedorPersonal = loadProveedorPersonal();
+            state.arrayProducto = loadProducto();
 
             let arrayProductoTipo = action.payload.arrayProductoTipo;
             state.arrayProductoTipo[0].fkidproductotipo = arrayProductoTipo.length == 0 ? null : arrayProductoTipo[0].idproductotipo;
@@ -343,6 +347,30 @@ function loadProveedorPersonal() {
                 nombre: "",
                 apellido: "",
                 fkidproveedorcargo: "",
+            },
+
+        };
+        array = [ ...array, element];
+    }
+    return array;
+};
+
+function loadProducto() {
+    let array = [];
+    for (let index = 0; index < 3; index++) {
+        const element = {
+            idproveedorproducto: null,
+            fkidproveedor: null,
+            fkidproducto: null,
+            costounitario: '',
+
+            error: {
+                fkidproducto: false,
+                costounitario: false,
+            },
+            message: {
+                fkidproducto: "",
+                costounitario: "",
             },
 
         };

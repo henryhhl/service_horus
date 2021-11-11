@@ -11,6 +11,10 @@
 |
 */
 
+// npm i --save-dev nodemon concurrently
+
+use Illuminate\Support\Facades\Route;
+
 Route::get('/', function () {
     return view('welcome');
 });
