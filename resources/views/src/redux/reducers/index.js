@@ -38,6 +38,8 @@ import { NotaCompraCompraReducer } from './comercio/compra/notaCompraReducers';
 import { DevolucionCompraCompraReducer } from './comercio/compra/devolucionCompraReducers';
 
 import { InformeCompraReducer } from './comercio/compra/informeCompraReducers';
+import { ClienteTipoReducer } from './comercio/venta/clienteTipoReducers';
+import { ConceptoVentaReducer } from './comercio/venta/conceptoVentaReducers';
 
 const rootReducer = combineReducers( {
     visible:     VisibleReducer,
@@ -65,6 +67,8 @@ const rootReducer = combineReducers( {
     unionSucursal: UnionSucursalReducer,
     sucursal:      SucursalReducer,
     listaPrecio:   ListaPrecioReducer,
+    clienteTipo:   ClienteTipoReducer,
+    conceptoVenta: ConceptoVentaReducer,
 
     proveedorTipo:    ProveedorTipoReducer,
     proveedorGrupo:   ProveedorGrupoReducer,

@@ -172,6 +172,14 @@ export const treeMenu = [
                                 children: [],
                             },
                             {
+                                key: "cliente", title: "CLIENTE",
+                                children: [],
+                            },
+                            {
+                                key: "clientetipo", title: "TIPO CLIENTE",
+                                children: [],
+                            },
+                            {
                                 key: "sucursal", title: "SUCURSAL",
                                 children: [],
                             },

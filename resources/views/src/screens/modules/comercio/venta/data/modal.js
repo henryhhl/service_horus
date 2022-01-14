@@ -7,6 +7,7 @@ import { C_ModalDraggable } from '../../../../../components';
 import IndexUnionSucursal from './unionsucursal';
 import IndexSucursal from './sucursal';
 import IndexListaPrecio from './listaprecio';
+import IndexClienteTipo from './clientetipo';
 
 function ModalDatoGeneral( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -30,15 +31,15 @@ function ModalDatoGeneral( props ) {
                     </C_ModalDraggable>
                 );
 
-            case "unionsucursal":
+            case "clientetipo":
                 return (
                     <C_ModalDraggable
                         visible={visible}
                         onClose={onClose}
-                        title="UNIÓN SUCURSAL"
+                        title="TIPO CLIENTE"
                         width={650}
                     >
-                        <IndexUnionSucursal 
+                        <IndexClienteTipo 
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -53,6 +54,20 @@ function ModalDatoGeneral( props ) {
                         width={650}
                     >
                         <IndexSucursal 
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "unionsucursal":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="UNIÓN SUCURSAL"
+                        width={650}
+                    >
+                        <IndexUnionSucursal 
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>

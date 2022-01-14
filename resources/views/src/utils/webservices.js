@@ -176,6 +176,26 @@ const webservices = {
     wscomercioventalistaprecio_reporte:    module.comercio.venta + '/listaprecio/reporte',
     wscomercioventalistaprecio_searchByID: module.comercio.venta + '/listaprecio/searchByID',
 
+    wscomercioventaconceptoventa_index:      module.comercio.venta + '/conceptoventa/index',
+    wscomercioventaconceptoventa_create:     module.comercio.venta + '/conceptoventa/create',
+    wscomercioventaconceptoventa_store:      module.comercio.venta + '/conceptoventa/store',
+    wscomercioventaconceptoventa_editar:     module.comercio.venta + '/conceptoventa/editar',
+    wscomercioventaconceptoventa_update:     module.comercio.venta + '/conceptoventa/update',
+    wscomercioventaconceptoventa_show:       module.comercio.venta + '/conceptoventa/show',
+    wscomercioventaconceptoventa_delete:     module.comercio.venta + '/conceptoventa/delete',
+    wscomercioventaconceptoventa_reporte:    module.comercio.venta + '/conceptoventa/reporte',
+    wscomercioventaconceptoventa_searchByID: module.comercio.venta + '/conceptoventa/searchByID',
+
+    wscomercioventaclientetipo_index:      module.comercio.venta + '/clientetipo/index',
+    wscomercioventaclientetipo_create:     module.comercio.venta + '/clientetipo/create',
+    wscomercioventaclientetipo_store:      module.comercio.venta + '/clientetipo/store',
+    wscomercioventaclientetipo_editar:     module.comercio.venta + '/clientetipo/editar',
+    wscomercioventaclientetipo_update:     module.comercio.venta + '/clientetipo/update',
+    wscomercioventaclientetipo_show:       module.comercio.venta + '/clientetipo/show',
+    wscomercioventaclientetipo_delete:     module.comercio.venta + '/clientetipo/delete',
+    wscomercioventaclientetipo_reporte:    module.comercio.venta + '/clientetipo/reporte',
+    wscomercioventaclientetipo_searchByID: module.comercio.venta + '/clientetipo/searchByID',
+
     
 
     wscomerciocompraproveedortipo_index:      module.comercio.compra + '/proveedortipo/index',

@@ -201,6 +201,27 @@ Route::post($submodulocomercioventa . '/listaprecio/delete', 'Comercio\Venta\Lis
 Route::get($submodulocomercioventa  . '/listaprecio/searchByID', 'Comercio\Venta\ListaPrecioController@searchByID');
 Route::post($submodulocomercioventa . '/listaprecio/reporte', 'Comercio\Venta\ListaPrecioController@reporte');
 
+Route::get($submodulocomercioventa  . '/clientetipo/index', 'Comercio\Venta\ClienteTipoController@index');
+Route::get($submodulocomercioventa  . '/clientetipo/create', 'Comercio\Venta\ClienteTipoController@create');
+Route::get($submodulocomercioventa  . '/clientetipo/editar/{idclientetipo}', 'Comercio\Venta\ClienteTipoController@edit');
+Route::post($submodulocomercioventa . '/clientetipo/store', 'Comercio\Venta\ClienteTipoController@store');
+Route::post($submodulocomercioventa . '/clientetipo/update', 'Comercio\Venta\ClienteTipoController@update');
+Route::get($submodulocomercioventa  . '/clientetipo/show/{idclientetipo}', 'Comercio\Venta\ClienteTipoController@show');
+Route::post($submodulocomercioventa . '/clientetipo/delete', 'Comercio\Venta\ClienteTipoController@delete');
+Route::get($submodulocomercioventa  . '/clientetipo/searchByID', 'Comercio\Venta\ClienteTipoController@searchByID');
+Route::post($submodulocomercioventa . '/clientetipo/reporte', 'Comercio\Venta\ClienteTipoController@reporte');
+
+Route::get($submodulocomercioventa  . '/conceptoventa/index', 'Comercio\Venta\ConceptoVentaController@index');
+Route::get($submodulocomercioventa  . '/conceptoventa/create', 'Comercio\Venta\ConceptoVentaController@create');
+Route::get($submodulocomercioventa  . '/conceptoventa/editar/{idconceptoventa}', 'Comercio\Venta\ConceptoVentaController@edit');
+Route::post($submodulocomercioventa . '/conceptoventa/store', 'Comercio\Venta\ConceptoVentaController@store');
+Route::post($submodulocomercioventa . '/conceptoventa/update', 'Comercio\Venta\ConceptoVentaController@update');
+Route::get($submodulocomercioventa  . '/conceptoventa/show/{idconceptoventa}', 'Comercio\Venta\ConceptoVentaController@show');
+Route::post($submodulocomercioventa . '/conceptoventa/delete', 'Comercio\Venta\ConceptoVentaController@delete');
+Route::get($submodulocomercioventa  . '/conceptoventa/searchByID', 'Comercio\Venta\ConceptoVentaController@searchByID');
+Route::post($submodulocomercioventa . '/conceptoventa/reporte', 'Comercio\Venta\ConceptoVentaController@reporte');
+
+
 
 Route::get($submodulocomerciocompra  . '/proveedortipo/index', 'Comercio\Compra\ProveedorTipoController@index');
 Route::get($submodulocomerciocompra  . '/proveedortipo/create', 'Comercio\Compra\ProveedorTipoController@create');
