@@ -35,34 +35,44 @@ function C_Tree( props ) {
                     if ( props.fkiddata == element[props.option.value] ) {
                         let obj = {
                             title: (
-                                <span style={{ fontSize: 14, }} onClick={ () => {
-                                    if ( props.selectedPadre)  props.onSelect(element);
-                                } }>
-                                    { element[props.option.title] }
-                                    { Functions.esBoolean( props.show ) && <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
-                                        <EyeOutlined className="icon-operation-horus"
-                                            style={{ position: 'relative', top: -2, left: 10, }}
-                                            onClick={ () => {
-                                                if ( props.onShow ) props.onShow(element);
-                                            } }
-                                        />
-                                    </Tooltip>}
-                                    { Functions.esBoolean( props.editar ) && <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
-                                        <EditOutlined className="icon-operation-horus"
-                                            style={{ position: 'relative', top: -2, left: 10, }}
-                                            onClick={ () => {
-                                                if ( props.onEdit ) props.onEdit(element);
-                                            } }
-                                        />
-                                    </Tooltip>}
-                                    { Functions.esBoolean( props.delete ) && <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
-                                        <DeleteOutlined className="icon-operation-horus"
-                                            style={{ position: 'relative', top: -2, left: 10, }}
-                                            onClick={ () => {
-                                                if ( props.onDelete ) props.onDelete(element);
-                                            } }
-                                        /> 
-                                    </Tooltip>}
+                                <span style={{ fontSize: 14, paddingRight: 25, paddingBottom: 4, borderBottom: '1px solid #E8E8E8', }}
+                                    onClick={ () => {
+                                        if ( props.selectedPadre)  props.onSelect(element);
+                                    } }
+                                >
+                                    { Functions.esBoolean( props.show ) &&
+                                        <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
+                                            <EyeOutlined className="icon-operation-horus"
+                                                style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                                onClick={ () => {
+                                                    if ( props.onShow ) props.onShow(element);
+                                                } }
+                                            />
+                                        </Tooltip>
+                                    }
+                                    { Functions.esBoolean( props.editar ) &&
+                                        <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
+                                            <EditOutlined className="icon-operation-horus"
+                                                style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                                onClick={ () => {
+                                                    if ( props.onEdit ) props.onEdit(element);
+                                                } }
+                                            />
+                                        </Tooltip>
+                                    }
+                                    { Functions.esBoolean( props.delete ) &&
+                                        <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
+                                            <DeleteOutlined className="icon-operation-horus"
+                                                style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                                onClick={ () => {
+                                                    if ( props.onDelete ) props.onDelete(element);
+                                                } }
+                                            />
+                                        </Tooltip>
+                                    }
+                                    <span style={{ position: 'relative', paddingLeft: 10, }}>
+                                        { element[props.option.title] }
+                                    </span>
                                 </span>
                             ),
                             key:   element[props.option.value],
@@ -74,34 +84,44 @@ function C_Tree( props ) {
                 } else {
                     let obj = {
                         title: (
-                            <span style={{ fontSize: 14, }} onClick={ () => {
-                                if ( props. selectedPadre)  props.onSelect(element);
-                            } }>
-                                { element[props.option.title] }
-                                { Functions.esBoolean( props.show ) && <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
-                                    <EyeOutlined className="icon-operation-horus"
-                                        style={{ position: 'relative', top: -2, left: 10, }}
-                                        onClick={ () => {
-                                            if ( props.onShow ) props.onShow(element);
-                                        } }
-                                    />
-                                </Tooltip>}
-                                { Functions.esBoolean( props.editar ) && <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
-                                    <EditOutlined className="icon-operation-horus"
-                                        style={{ position: 'relative', top: -2, left: 10, }}
-                                        onClick={ () => {
-                                            if ( props.onEdit ) props.onEdit(element);
-                                        } }
-                                    />
-                                </Tooltip>}
-                                { Functions.esBoolean( props.delete ) && <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
-                                    <DeleteOutlined className="icon-operation-horus"
-                                        style={{ position: 'relative', top: -2, left: 10, }}
-                                        onClick={ () => {
-                                            if ( props.onDelete ) props.onDelete(element);
-                                        } }
-                                    /> 
-                                </Tooltip>}
+                            <span style={{ fontSize: 14, paddingRight: 25, paddingBottom: 4, borderBottom: '1px solid #E8E8E8', }}
+                                onClick={ () => {
+                                    if ( props.selectedPadre)  props.onSelect(element);
+                                } }
+                            >
+                                { Functions.esBoolean( props.show ) &&
+                                    <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
+                                        <EyeOutlined className="icon-operation-horus"
+                                            style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                            onClick={ () => {
+                                                if ( props.onShow ) props.onShow(element);
+                                            } }
+                                        />
+                                    </Tooltip>
+                                }
+                                { Functions.esBoolean( props.editar ) &&
+                                    <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
+                                        <EditOutlined className="icon-operation-horus"
+                                            style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                            onClick={ () => {
+                                                if ( props.onEdit ) props.onEdit(element);
+                                            } }
+                                        />
+                                    </Tooltip>
+                                }
+                                { Functions.esBoolean( props.delete ) &&
+                                    <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
+                                        <DeleteOutlined className="icon-operation-horus"
+                                            style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                            onClick={ () => {
+                                                if ( props.onDelete ) props.onDelete(element);
+                                            } }
+                                        />
+                                    </Tooltip>
+                                }
+                                <span style={{ position: 'relative', paddingLeft: 10, }}>
+                                    { element[props.option.title] }
+                                </span>
                             </span>
                         ),
                         key:   element[props.option.value],
@@ -139,32 +159,42 @@ function C_Tree( props ) {
             if ( element[props.option.fkidpadre] == idpadre ) {
                 let obj = {
                     title: (
-                        <span style={{ fontSize: 14, }} onClick={ () => props.onSelect(element) }>
-                            { element[props.option.title] }
-                            { Functions.esBoolean( props.show ) && <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
-                                <EyeOutlined className="icon-operation-horus"
-                                    style={{ position: 'relative', top: -2, left: 10, }}
-                                    onClick={ () => {
-                                        if ( props.onShow ) props.onShow(element);
-                                    } }
-                                />
-                            </Tooltip>}
-                            { Functions.esBoolean( props.editar ) && <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
-                                <EditOutlined className="icon-operation-horus"
-                                    style={{ position: 'relative', top: -2, left: 10, }}
-                                    onClick={ () => {
-                                        if ( props.onEdit ) props.onEdit(element);
-                                    } }
-                                />
-                            </Tooltip>}
-                            { Functions.esBoolean( props.delete ) && <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
-                                <DeleteOutlined className="icon-operation-horus"
-                                    style={{ position: 'relative', top: -2, left: 10, }}
-                                    onClick={ () => {
-                                        if ( props.onDelete ) props.onDelete(element);
-                                    } }
-                                /> 
-                            </Tooltip>}
+                        <span style={{ fontSize: 14, paddingRight: 25, paddingBottom: 4, borderBottom: '1px solid #E8E8E8', }}
+                            onClick={ () => props.onSelect(element) }
+                        >
+                            { Functions.esBoolean( props.show ) &&
+                                <Tooltip title="VER" placement="topLeft" color={'#3DC7BE'}>
+                                    <EyeOutlined className="icon-operation-horus"
+                                        style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                        onClick={ () => {
+                                            if ( props.onShow ) props.onShow(element);
+                                        } }
+                                    />
+                                </Tooltip>
+                            }
+                            { Functions.esBoolean( props.editar ) &&
+                                <Tooltip title="EDITAR" placement="topLeft" color={'#2db7f5'}>
+                                    <EditOutlined className="icon-operation-horus"
+                                        style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                        onClick={ () => {
+                                            if ( props.onEdit ) props.onEdit(element);
+                                        } }
+                                    />
+                                </Tooltip>
+                            }
+                            { Functions.esBoolean( props.delete ) &&
+                                <Tooltip title="ELIMINAR" placement="topLeft" color={'red'}>
+                                    <DeleteOutlined className="icon-operation-horus"
+                                        style={{ position: 'relative', top: -2, left: 10, marginRight: 4, }}
+                                        onClick={ () => {
+                                            if ( props.onDelete ) props.onDelete(element);
+                                        } }
+                                    />
+                                </Tooltip>
+                            }
+                            <span style={{ position: 'relative', paddingLeft: 10, }}>
+                                { element[props.option.title] }
+                            </span>
                         </span>
                     ),
                     key:   element[props.option.value],
@@ -218,14 +248,16 @@ function C_Tree( props ) {
                         />
                     </Col>
                 </Row>
-                <Row gutter={ [12, 8] } justify={"end"}>
-                    <Switch style={{ height: 30, lineHeight: 'normal', paddingRight: 5, }}
-                        unCheckedChildren={'MOSTRAR TODOS'}
-                        checkedChildren={'OCULTAR TODOS'}
-                        checked={expanded}
-                        onChange={ onCheckedExpanded }
-                    />
-                </Row>
+                { Functions.esBoolean( props.showExpanded ) &&
+                    <Row gutter={ [12, 8] } justify={"end"}>
+                        <Switch style={{ height: 30, lineHeight: 'normal', paddingRight: 5, }}
+                            unCheckedChildren={'MOSTRAR TODOS'}
+                            checkedChildren={'OCULTAR TODOS'}
+                            checked={expanded}
+                            onChange={ onCheckedExpanded }
+                        />
+                    </Row>
+                }
             </div>
           );
     };
@@ -246,6 +278,7 @@ C_Tree.propTypes = {
     editar: PropTypes.bool,
     delete: PropTypes.bool,
     show:   PropTypes.bool,
+    showExpanded: PropTypes.bool,
 
     expanded: PropTypes.bool,
 
@@ -265,13 +298,14 @@ C_Tree.defaultProps = {
     showChildren: true,
     selectedPadre: true,
     expanded: false,
+    showExpanded: true,
 
     create: false,
     editar: false,
     delete: false,
     show:   false,
 
-    
+
 
     option: {
         title: "",

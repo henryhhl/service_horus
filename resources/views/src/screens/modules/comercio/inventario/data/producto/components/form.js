@@ -234,7 +234,7 @@ function C_Form( props ) {
                 onClose={ () => setVisibleSubGrupo(false) }
                 value={producto.fkidproductosubgrupo}
                 onChange={onChangeFKIDSubGrupo}
-                fkidproductogrupo={ ( typeof producto.fkidproductogrupo === "number" ) ? producto.fkidproductogrupo : null } 
+                fkidproductogrupo={ ( typeof producto.fkidproductogrupo === "number" ) ? producto.fkidproductogrupo : null }
             />
         );
     };
@@ -315,12 +315,21 @@ function C_Form( props ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
-                let costo = Functions.onChangeNumberDecimal(value);
-                producto.arrayUnidadMedidaProducto[data.index].costounitario = costo;
+                let costounitario = Functions.onChangeNumberDecimal(value);
+                producto.arrayUnidadMedidaProducto[data.index].costounitario = costounitario;
 
                 let detalle = producto.arrayUnidadMedidaProducto[data.index];
                 let montodescuento = parseFloat( ( detalle.costodescuento * 1 / 100 ) * detalle.costounitario );
-                producto.arrayUnidadMedidaProducto[data.index].costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
+
+                let costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
+                producto.arrayUnidadMedidaProducto[data.index].costo = costo;
+
+                for (let index = 0; index < producto.arrayProveedor.length; index++) {
+                    const element = producto.arrayProveedor[index];
+                    if ( element.fkidproveedor !== null ) {
+                        element.costounitario = costo;
+                    }
+                }
 
                 onChange( producto );
             }
@@ -330,11 +339,24 @@ function C_Form( props ) {
     function onChangeCostoDescuento( data, value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
-            let detalle = producto.arrayUnidadMedidaProducto[data.index];
-            producto.arrayUnidadMedidaProducto[data.index].costodescuento = parseInt(value);
-            let montodescuento = parseFloat( ( value * 1 / 100 ) * detalle.costounitario );
-            producto.arrayUnidadMedidaProducto[data.index].costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
-            onChange( producto );
+            if ( parseInt( value ) >= 0 && parseInt( value ) <= 100 ) {
+                let detalle = producto.arrayUnidadMedidaProducto[data.index];
+                producto.arrayUnidadMedidaProducto[data.index].costodescuento = parseInt(value);
+
+                let montodescuento = parseFloat( ( value * 1 / 100 ) * detalle.costounitario );
+                let costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
+
+                producto.arrayUnidadMedidaProducto[data.index].costo = costo;
+
+                for (let index = 0; index < producto.arrayProveedor.length; index++) {
+                    const element = producto.arrayProveedor[index];
+                    if ( element.fkidproveedor !== null ) {
+                        element.costounitario = costo;
+                    }
+                }
+
+                onChange( producto );
+            }
         };
     };
 
@@ -398,6 +420,7 @@ function C_Form( props ) {
         if ( !existProveedor( data.idproveedor ) ) {
             producto.arrayProveedor[proveedordetalle.index].fkidproveedor = data.idproveedor;
             producto.arrayProveedor[proveedordetalle.index].proveedor = data.nombre;
+            producto.arrayProveedor[proveedordetalle.index].costounitario = producto.arrayUnidadMedidaProducto[0].costo;
             onChange( producto );
             setProveedorDetalle(null);
             setVisibleProveedor(false);
@@ -426,6 +449,8 @@ function C_Form( props ) {
             idproveedorproducto: null,
             fkidproveedor: null,
             proveedor: "",
+            costounitario: producto.arrayUnidadMedidaProducto[0].costo,
+            stock: 0,
         };
         producto.arrayProveedor = [ ...producto.arrayProveedor, element];
         onChange( producto );
@@ -517,7 +542,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }} className="d-flex justify-content-start align-items-center mt-1">
                     <C_Checkbox disabled={disabled.data}
-                        titleText={ (producto.estado === "A") ? "Activo" : "Inactivo" } 
+                        titleText={ (producto.estado === "A") ? "Activo" : "Inactivo" }
                         checked={ (producto.estado === "A") }
                         onChange={ onChangeEstado }
                     />
@@ -604,32 +629,73 @@ function C_Form( props ) {
                         </Row>
                         <Row gutter={ [12, 8] } className="mb-2">
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
-                                <div className="main-card mt-2 card pl-2 pr-2 pb-3 pt-1"
-                                    style={{ maxHeight: 170, overflowX: 'hidden', overflowY: 'auto', }}
+                                <div className="main-card mt-2 card pl-0 pr-0 pb-3 pt-1"
+                                    style={{ maxHeight: 230, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
                                     { producto.arrayProveedor.map( (item, key) => {
                                         return (
-                                            <Col xs={{ span: 24, }} sm={{ span: 24, }} key={key}>
-                                                <C_Input
-                                                    label={ (key === 0) ? "Proveedor" : "Proveedor Alt." }
-                                                    placeholder={ "SELECCIONAR PROVEEDOR..." }
-                                                    value={ item.proveedor }
-                                                    onClick={ () => {
-                                                        item.index = key;
-                                                        onShowProveedor(item);
-                                                    } }
-                                                    disabled={ disabled.data }
-                                                    select={true}
-                                                    suffix={ ( !disabled.data ) && ( key !== 0 ) &&
-                                                        <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
-                                                            <DeleteOutlined 
-                                                                className="icon-table-horus"
-                                                                onClick={ () => DeleteRowProveedor(key) }
-                                                            />
-                                                        </Tooltip>
-                                                    }
-                                                />
-                                            </Col>
+                                            <div key={key} className="main-card card pl-1 pr-1 pb-1 pt-0 mb-2">
+                                                <Row gutter={ [12, 8] }>
+                                                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                                        <C_Input
+                                                            label={ (key === 0) ? "Proveedor" : "Proveedor Alt." }
+                                                            placeholder={ "SELECCIONAR PROVEEDOR..." }
+                                                            value={ item.proveedor }
+                                                            onClick={ () => {
+                                                                item.index = key;
+                                                                onShowProveedor(item);
+                                                            } }
+                                                            disabled={ disabled.data }
+                                                            select={true}
+                                                            suffix={ ( !disabled.data ) && ( key !== 0 ) &&
+                                                                <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
+                                                                    <DeleteOutlined
+                                                                        className="icon-table-horus"
+                                                                        onClick={ () => DeleteRowProveedor(key) }
+                                                                    />
+                                                                </Tooltip>
+                                                            }
+                                                        />
+                                                    </Col>
+                                                    <Col xs={{ span: 24, }} md={{ span: 24, }}>
+                                                        <C_Input
+                                                            label={"Costo unit."}
+                                                            placeholder={ "INGRESAR COSTO UNITARIO..." }
+                                                            value={ item.costounitario }
+                                                            onChange={ ( value ) => {
+                                                                item.index = key;
+                                                                if ( value === "" ) value = 0;
+                                                                if ( !isNaN( value ) ) {
+                                                                    if ( Functions.esDecimal( value, 2 ) ) {
+                                                                        let costounitario = Functions.onChangeNumberDecimal(value);
+                                                                        producto.arrayProveedor[key].costounitario = costounitario;
+                                                                        onChange( producto );
+                                                                    }
+                                                                };
+                                                            } }
+                                                            disabled={ disabled.data }
+                                                        />
+                                                    </Col>
+                                                    <Col xs={{ span: 24, }} md={{ span: 24, }}>
+                                                        <C_Input
+                                                            label={"Stock"}
+                                                            placeholder={ "INGRESAR STOCK..." }
+                                                            value={ item.stock }
+                                                            onChange={ ( value ) => {
+                                                                item.index = key;
+                                                                if ( value === "" ) value = 0;
+                                                                if ( !isNaN( value ) ) {
+                                                                    if ( parseInt( value ) >= 0 ) {
+                                                                        producto.arrayProveedor[key].stock = parseInt( value );
+                                                                        onChange( producto );
+                                                                    }
+                                                                };
+                                                            } }
+                                                            disabled={ disabled.data }
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </div>
                                         );
                                     } ) }
                                 </div>
@@ -664,7 +730,7 @@ function C_Form( props ) {
                                                             error={ item.error.fkidunidadmedida }
                                                             suffix={ ( !disabled.data ) && ( item.fkidunidadmedida !== null ) &&
                                                                 <Tooltip title="QUITAR" placement="top" color={'#2db7f5'}>
-                                                                    <CloseOutlined 
+                                                                    <CloseOutlined
                                                                         className="icon-table-horus"
                                                                         style={{ marginLeft: -20, }}
                                                                         onClick={ () => {
@@ -794,7 +860,7 @@ function C_Form( props ) {
                                                 </Row>
                                                 { ( !disabled.data ) && ( key !== 0 ) &&
                                                     <Row gutter={ [12, 8] } justify={"end"} className="mt-1">
-                                                        <C_Button color={"danger"} 
+                                                        <C_Button color={"danger"}
                                                             onClick={ () => DeleteRowUnidadMedida(key) }
                                                         >
                                                             Eliminar
@@ -818,7 +884,7 @@ function C_Form( props ) {
                     <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                         <Row gutter={ [12, 8] }>
                             <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                                <Table 
+                                <Table
                                     pagination={false} bordered size={"small"}
                                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                                     scroll={{ x: 1000, y: producto.arrayListaPrecio.length == 0 ? 40 : 200 }}

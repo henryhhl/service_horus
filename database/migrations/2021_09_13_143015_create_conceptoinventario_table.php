@@ -15,13 +15,14 @@ class CreateConceptoinventarioTable extends Migration
     {
         Schema::create('conceptoinventario', function (Blueprint $table) {
             $table->increments('idconceptoinventario');
-            
+
             $table->string('codigo', 150)->nullable();
             $table->string('descripcion', 200);
 
             $table->date('fecha');
             $table->time('hora');
             $table->enum('estado', ['A', 'N'])->default('A');
+            $table->enum('isdelete', ['A', 'N'])->default('A');
 
             $table->timestamps();
             $table->softDeletes();

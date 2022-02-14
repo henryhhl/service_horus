@@ -22,13 +22,13 @@ class ProveedorSeeder extends Seeder
     public function _getdata() {
 
         $mytime = Carbon::now( 'America/La_paz' );
-        
+
         return [
             [
                 'fkidciudadpais'     => 1,
                 'fkidciudad'         => 2,
-                'fkidproveedortipo'  => 1,
-                'fkidproveedorgrupo' => 2,
+                'fkidproveedortipo'  => 2,
+                'fkidproveedorgrupo' => 3,
                 'tipopersoneria'     => 'J',
                 'nroorden'  => '0',
                 'nombre'    => 'BATEBOL S.A.',
@@ -44,5 +44,5 @@ class ProveedorSeeder extends Seeder
             ],
         ];
     }
-    
+
 }

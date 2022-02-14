@@ -34,7 +34,7 @@ function ModalDatoGeneral( props ) {
                         title="ÁLMACEN"
                         width={650}
                     >
-                        <IndexAlmacen 
+                        <IndexAlmacen
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -46,7 +46,7 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="PRODUCTO"
-                        width={"98%"} style={{ top: 10, }}
+                        width={"99%"} style={{ top: 5, }}
                     >
                         <IndexProducto
                             onClose={ onClose }
@@ -62,7 +62,7 @@ function ModalDatoGeneral( props ) {
                         title="CONCEPTO INVENTARIO"
                         width={650}
                     >
-                        <IndexConceptoInventario 
+                        <IndexConceptoInventario
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -76,7 +76,7 @@ function ModalDatoGeneral( props ) {
                         title="CATEGORÍA"
                         width={650}
                     >
-                        <IndexCategoria 
+                        <IndexCategoria
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -90,7 +90,7 @@ function ModalDatoGeneral( props ) {
                         title="MARCA"
                         width={650}
                     >
-                        <IndexProductoMarca 
+                        <IndexProductoMarca
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -104,7 +104,7 @@ function ModalDatoGeneral( props ) {
                         title="TIPO PRODUCTO"
                         width={650}
                     >
-                        <IndexProductoTipo 
+                        <IndexProductoTipo
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -118,7 +118,7 @@ function ModalDatoGeneral( props ) {
                         title="UNIDAD MEDIDA"
                         width={650}
                     >
-                        <IndexUnidadMedida 
+                        <IndexUnidadMedida
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -132,7 +132,7 @@ function ModalDatoGeneral( props ) {
                         title="GRUPO PRODUCTO"
                         width={650}
                     >
-                        <IndexProductoGrupo 
+                        <IndexProductoGrupo
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -146,7 +146,7 @@ function ModalDatoGeneral( props ) {
                         title="SUB GRUPO DE PRODUCTO"
                         width={650}
                     >
-                        <IndexProductoSubGrupo 
+                        <IndexProductoSubGrupo
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -160,7 +160,7 @@ function ModalDatoGeneral( props ) {
                         title="CIUDAD"
                         width={650}
                     >
-                        <IndexCiudad 
+                        <IndexCiudad
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -174,7 +174,7 @@ function ModalDatoGeneral( props ) {
                         title="CIUDAD CLASIFICACIÓN"
                         width={650}
                     >
-                        <IndexCiudadClasificacion 
+                        <IndexCiudadClasificacion
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -188,12 +188,12 @@ function ModalDatoGeneral( props ) {
                         title="SECCIÓN INVENTARIO"
                         width={650}
                     >
-                        <IndexSeccionInventario 
+                        <IndexSeccionInventario
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
                 );
-        
+
             default:
                 return null;
         }

@@ -19,13 +19,13 @@ class ConceptoCompra extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A', 'codigo' => null,
+    protected $attributes = [
+        'estado' => 'A', 'isdelete' => 'A', 'codigo' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'codigo', 'descripcion',
-        'estado', 'fecha', 'hora',
+        'estado', 'isdelete', 'fecha', 'hora',
     ];
 
     public function arraynotacompra() {
@@ -124,7 +124,7 @@ class ConceptoCompra extends Model
             } )
             ->whereNull('deleted_at')
             ->get();
-        
+
         return ( sizeof( $conceptocompra ) > 0 );
     }
 
@@ -182,7 +182,7 @@ class ConceptoCompra extends Model
             ->whereNull('conceptocompra.deleted_at')
             ->orderBy('conceptocompra.idconceptocompra', 'DESC')
             ->first();
-        
+
         return $conceptocompra;
     }
 

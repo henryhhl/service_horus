@@ -34,7 +34,7 @@ function C_ListadoCiudad( props ) {
                 title="NUEVO CIUDAD"
                 width={400}
             >
-                <C_CreateCiudad 
+                <C_CreateCiudad
                     onClose={ () => setVisibleCreate( false ) }
                 />
             </C_ModalDraggable>
@@ -53,7 +53,7 @@ function C_ListadoCiudad( props ) {
                 title="EDITAR CIUDAD"
                 width={400}
             >
-                <C_EditarCiudad 
+                <C_EditarCiudad
                     onClose={ () => {
                         setVisibleEdit( false );
                         setIDData(null);
@@ -76,7 +76,7 @@ function C_ListadoCiudad( props ) {
                 title="VER CIUDAD"
                 width={400}
             >
-                <C_ShowCiudad 
+                <C_ShowCiudad
                     onClose={ () => {
                         setVisibleShow( false );
                         setIDData(null);
@@ -97,7 +97,7 @@ function C_ListadoCiudad( props ) {
             { componentCreateCiudad() }
             { componentEditCiudad() }
             { componentShowCiudad() }
-            <C_Tree 
+            <C_Tree
                 data={props.array_ciudad}
                 option={ {
                     value: "idciudad",
@@ -115,14 +115,15 @@ function C_ListadoCiudad( props ) {
                 } }
                 onDelete={ (obj) => onConfirmarDelete(obj) }
                 onSelect={props.onSelect}
-                create={props.create} 
-                editar={props.editar} 
-                delete={props.delete} 
+                create={props.create}
+                editar={props.editar}
+                delete={props.delete}
                 show={props.show}
                 expanded={props.expanded}
                 showChildren={props.showChildren}
                 selectedPadre={props.selectedPadre}
                 fkiddata={props.fkiddata}
+                showExpanded={props.showExpanded}
             />
         </>
     );
@@ -137,9 +138,10 @@ C_ListadoCiudad.propTypes = {
     editar: PropTypes.bool,
     delete: PropTypes.bool,
     show:   PropTypes.bool,
+    showExpanded: PropTypes.bool,
 
     expanded: PropTypes.bool,
-    
+
     fkiddata: PropTypes.any,
 
     onSelect:  PropTypes.func,
@@ -156,6 +158,7 @@ C_ListadoCiudad.defaultProps = {
     editar: true,
     delete: true,
     show:   true,
+    showExpanded: true,
 }
 
 const mapStateToProps = ( state ) => ( {

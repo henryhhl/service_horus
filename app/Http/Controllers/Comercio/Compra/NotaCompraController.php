@@ -9,6 +9,10 @@ use App\Models\Comercio\Compra\LibroCompra;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\NotaCompraDetalle;
 use App\Models\Comercio\Compra\OrdenCompra;
+use App\Models\Comercio\Compra\ProveedorProducto;
+use App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto;
+use App\Models\Comercio\Inventario\Producto;
+use App\Models\Comercio\Inventario\UnidadMedidaProducto;
 use App\Models\Configuracion\Moneda;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +43,7 @@ class NotaCompraController extends Controller
             }
 
             $notacompra = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'notacompra'  => $notacompra->getCollection(),
@@ -89,7 +93,7 @@ class NotaCompraController extends Controller
                 'idnotacompra' => $idnotacompra,
                 'arrayMoneda'   => $moneda,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -118,10 +122,7 @@ class NotaCompraController extends Controller
 
             $obj = new NotaCompra();
             $notacompra = $obj->store( $obj, $request );
-
             $request->fkidnotacompra = $notacompra->idnotacompra;
-            $libcomp = new LibroCompra();
-            $librocompra = $libcomp->store($libcomp, $request);
 
             if ( !is_null( $notacompra->fkidordencompra ) ) {
                 $ordcomp = new OrdenCompra();
@@ -132,22 +133,76 @@ class NotaCompraController extends Controller
 
             $arrayNotaCompraDetalle = json_decode($request->input('arrayNotaCompraDetalle', '[]'));
             foreach ( $arrayNotaCompraDetalle as $detalle ) {
-                if ( !is_null( $detalle->fkidproducto ) ) {
 
+                if ( !is_null( $detalle->fkidproducto ) ) {
                     $detalle->fkidnotacompra = $notacompra->idnotacompra;
+
+                    $almundmedprod = new AlmacenUnidadMedidaProducto();
+                    if ( !$almundmedprod->existAlmUndMedProd( $almundmedprod, $notacompra->fkidalmacen, $detalle->fkidunidadmedidaproducto ) ) {
+
+                        $almundmedprod->fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
+                        $almundmedprod->fkidalmacen = $notacompra->fkidalmacen;
+                        $almundmedprod->stockactual = $detalle->cantidad;
+                        $almundmedprod->stockminimo = 0;
+                        $almundmedprod->stockmaximo = 0;
+                        $almundmedprod->ingresos = 0;
+                        $almundmedprod->salidas = 0;
+                        $almundmedprod->traspasos = 0;
+                        $almundmedprod->ventas = 0;
+                        $almundmedprod->compras = 1;
+                        $almundmedprod->fecha = $request->x_fecha;
+                        $almundmedprod->hora = $request->x_hora;
+                        $almundmedprod->estado = "A";
+                        $almundmedprod->save();
+
+                        $detalle->fkidalmacenunidadmedidaproducto = $almundmedprod->idalmacenunidadmedidaproducto;
+
+                    } else {
+                        $firstAlmUndMedProd = $almundmedprod->firstAlmUndMedProd( $almundmedprod, $notacompra->fkidalmacen, $detalle->fkidunidadmedidaproducto );
+                        $almacenunidadmedidaproducto = $almundmedprod->find( $firstAlmUndMedProd->idalmacenunidadmedidaproducto );
+                        $almacenunidadmedidaproducto->stockactual = intval($detalle->cantidad) + intval($almacenunidadmedidaproducto->cantidad);
+                        $almacenunidadmedidaproducto->compras = intval($almundmedprod->compras) + 1;
+                        $almacenunidadmedidaproducto->update();
+
+                        $detalle->fkidalmacenunidadmedidaproducto = $almacenunidadmedidaproducto->idalmacenunidadmedidaproducto;
+                    }
+
                     $notacompradetalle = new NotaCompraDetalle();
                     $notacompradetalle->store($notacompradetalle, $request, $detalle);
-                    
+
+                    $prod = new Producto();
+                    $producto = $prod->find( $detalle->fkidproducto );
+                    $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
+                    $producto->update();
+
+                    $undmedprod = new UnidadMedidaProducto();
+                    $unidadmedidaproducto = $undmedprod->find( $detalle->fkidunidadmedidaproducto );
+                    $unidadmedidaproducto->stock = intval($unidadmedidaproducto->stock) + intval($detalle->cantidad);
+                    $unidadmedidaproducto->update();
+
+                    $provprod = new ProveedorProducto();
+                    if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor ) ) {
+                        $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor );
+                        $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
+                        $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
+                        $proveedorproducto->update();
+
+                    }
+
                 }
             }
+
+            $libcomp = new LibroCompra();
+            $librocompra = $libcomp->store($libcomp, $request);
 
             DB::commit();
             return response( )->json( [
                 'response' => 1,
                 'notacompra' => $notacompra,
+                'librocompra' => $librocompra,
                 'message'  => 'Nota Compra registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
             DB::rollBack();
             return response( )->json( [
@@ -358,7 +413,7 @@ class NotaCompraController extends Controller
             }
 
             $idnotacompra = $request->input('idnotacompra');
-            
+
             $obj = new NotaCompra();
             $notacompra = $obj->searchByID( $obj, $idnotacompra );
 
@@ -373,7 +428,7 @@ class NotaCompraController extends Controller
                 'response'  => 1,
                 'notacompra' => $notacompra,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -409,16 +464,16 @@ class NotaCompraController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayNotaCompra' => $notacompra,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

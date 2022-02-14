@@ -42,7 +42,7 @@ function Header( props ) {
         let array = [];
         item.map( ( element ) => {
             if ( element.children.length > 0 ) {
-                array.push( 
+                array.push(
                     <SubMenu key={ element.key }
                         title={ <span style={{ fontSize: 10, letterSpacing: 1, }}> { element.title } </span> }
                     >
@@ -50,7 +50,7 @@ function Header( props ) {
                     </SubMenu>
                  );
             } else {
-                array.push( 
+                array.push(
                     <Menu.Item key={ element.key } style={{ marginLeft: 4, }}
                         onClick={ () => {
                             setOpen(false);
@@ -82,7 +82,7 @@ function Header( props ) {
         let array = [];
         item.map( ( element ) => {
             if ( element.children.length > 0 ) {
-                array.push( 
+                array.push(
                     <li key={element.key}>
                         <a style={{ fontSize: 11, fontWeight: 'bold', }}>
                             <i className="fa fa-fa-bookmark mr-1"></i>
@@ -104,7 +104,7 @@ function Header( props ) {
                                 let array = [ element.key ];
                                 objTreeMenu( arrayMenu, array, element.key );
                                 props.onMenu( array );
-                            } } 
+                            } }
                             style={{ fontSize: 10, }}
                         >
                             <i className="metismenu-icon"></i>
@@ -162,6 +162,85 @@ function Header( props ) {
                 </div>
             </Drawer>
         );
+    };
+
+    function menu() {
+        return (
+            <div tabIndex="-1" role="menu" className={`rm-pointers dropdown-menu-lg dropdown-menu dropdown-menu-right show`}>
+                <div className="dropdown-menu-header">
+                    <div className="dropdown-menu-header-inner bg-info">
+                        <div className="menu-header-image opacity-2"
+                            style={{'backgroundImage': 'url( ' + '' + '/assets/images/dropdown-header/city3.jpg)'}}></div>
+                        <div className="menu-header-content text-left">
+                            <div className="widget-content p-0">
+                                <div className="widget-content-wrapper">
+                                    <div className="widget-content-left mr-3">
+                                        <img width="42" className="rounded-circle"
+                                            src={ "/img/anonimo.jpg"}
+                                            alt=""
+                                        />
+                                    </div>
+                                    <div className="widget-content-left">
+                                        <div className="widget-heading">
+                                            { "admin" }
+                                        </div>
+                                        <div className="widget-subheading opacity-8">
+                                            { "admin" }
+                                        </div>
+                                    </div>
+                                    <div className="widget-content-right mr-2">
+                                        <button type='button' className="btn-pill btn-shadow btn-shine btn btn-focus" onClick={logout}>
+                                            Logout
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="scroll-area-xs" style={{'height': '150px'}}>
+                    <div className="scrollbar-container ps">
+                        <ul className="nav flex-column">
+                            <li className="nav-item-header nav-item">
+                                Actividad
+                            </li>
+                            <li className="nav-item">
+                                <a href={ '/perfil' } className="nav-link">
+                                    Perfil
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a href={ '/ajuste' } className="nav-link">
+                                    Ajuste
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <a href="#" className="nav-link">
+                                    Messages
+                                    <div className="ml-auto badge badge-warning">
+                                        512
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ul className="nav flex-column">
+                    <li className="nav-item-divider nav-item">
+                    </li>
+                    <li className="nav-item-btn text-center nav-item">
+                        <button className="btn-wide btn btn-primary btn-sm">
+                            Open Messages
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        );
+    }
+
+    function logout( event ) {
+        event.preventDefault();
+        document.getElementById('logout-form').submit();
     };
 
     return (
@@ -236,6 +315,30 @@ function Header( props ) {
 
                         </ul>
                     </div>
+
+                    <div className="app-header-right">
+
+                        <div className="header-btn-lg pr-0">
+                            <div className="widget-content p-0">
+                                <div className="widget-content-wrapper">
+                                    <div className="widget-content-left">
+                                        <div className="btn-group">
+                                            <Dropdown overlay={menu()} trigger={['click']} >
+                                                <a className="p-0 btn" onClick={e => e.preventDefault()}>
+                                                    <img width="42" className="rounded-circle"
+                                                        src={ "/img/anonimo.jpg"} alt=""
+                                                    />
+                                                    <i className="fa fa-angle-down ml-2 opacity-8"></i>
+                                                </a>
+                                            </Dropdown>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </>

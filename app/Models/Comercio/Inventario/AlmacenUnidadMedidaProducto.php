@@ -17,26 +17,37 @@ class AlmacenUnidadMedidaProducto extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+    protected $attributes = [
+        'estado' => 'A',  'isdelete' => 'A',
         'stockactual' => 0, 'stockminimo' => 0, 'stockmaximo' => 0,
         'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'ventas' => 0, 'compras' => 0,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidunidadmedidaproducto', 'fkidalmacen', 'stockactual', 'stockminimo', 'stockmaximo',
         'ingresos', 'salidas', 'traspasos', 'ventas', 'compras',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
+
+    public function existAlmUndMedProd( $query, $idalmacen, $idunidadmedidaproducto ) {
+
+        $almacenunidadmedidaproducto = $query
+            ->where( 'fkidalmacen', '=', $idalmacen )
+            ->where( 'fkidunidadmedidaproducto', '=', $idunidadmedidaproducto )
+            ->whereNull( 'deleted_at' )
+            ->get();
+
+        return ( sizeof( $almacenunidadmedidaproducto ) > 0 );
+    }
 
     public function firstAlmUndMedProd( $query, $idalmacen, $idunidadmedidaproducto ) {
 
         $almacenunidadmedidaproducto = $query
             ->where( 'fkidalmacen', '=', $idalmacen )
             ->where( 'fkidunidadmedidaproducto', '=', $idunidadmedidaproducto )
-            ->whereNull('deleted_at')
+            ->whereNull( 'deleted_at' )
             ->first();
-        
+
         return $almacenunidadmedidaproducto;
     }
 

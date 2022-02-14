@@ -31,6 +31,10 @@ export const treeMenu = [
                                 children: [],
                             },
                             {
+                                key: "seccioninventario", title: "SECCIÓN INVENTARIO",
+                                children: [],
+                            },
+                            {
                                 key: "producto", title: "PRODUCTO",
                                 children: [],
                             },
@@ -55,11 +59,11 @@ export const treeMenu = [
                                 children: [],
                             },
                             {
-                                key: "productosubgrupo", title: "SUB GRUPO PRODUCTO",
+                                key: "productogrupo", title: "GRUPO PRODUCTO",
                                 children: [],
                             },
                             {
-                                key: "productogrupo", title: "GRUPO PRODUCTO",
+                                key: "productosubgrupo", title: "SUB GRUPO PRODUCTO",
                                 children: [],
                             },
                             {
@@ -70,16 +74,12 @@ export const treeMenu = [
                                 key: "ciudadclasificacion", title: "CIUDAD CLASIFICACIÓN",
                                 children: [],
                             },
-                            {
-                                key: "seccioninventario", title: "SECCIÓN INVENTARIO",
-                                children: [],
-                            },
                         ],
                     },
                     {
                         key: "INFORMES", title: "INFORMES",
                         children: [
-                            
+
                         ],
                     },
                 ],

@@ -19,13 +19,13 @@ class Producto extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A', 'isdelete' => 'A', 'codigo' => null, 'descripcion' => null,
         'stockactual' => 0, 'nivel' => 0,
         'imagen' => null, 'extension' => null, 'abreviatura' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidciudadorigen', 'fkidcategoria', 'fkidproductomarca', 'fkidproductotipo', 'fkidproductogrupo', 'fkidproductosubgrupo',
         'codigo', 'nombre', 'descripcion', 'stockactual', 'nivel', 'abreviatura',
         'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
@@ -95,7 +95,7 @@ class Producto extends Model
                     ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->select( [
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
+                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
                         'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
@@ -107,7 +107,8 @@ class Producto extends Model
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
                         'prov.nombre as proveedor', 'proveedorproducto.fkidproveedor',
-                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto', 
+                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
             } ] )
@@ -169,7 +170,7 @@ class Producto extends Model
                     ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->select( [
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
+                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
                         'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
@@ -181,7 +182,8 @@ class Producto extends Model
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
                         'prov.nombre as proveedor', 'proveedorproducto.fkidproveedor',
-                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto', 
+                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
             } ] )
@@ -315,7 +317,7 @@ class Producto extends Model
                     ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->select( [
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
+                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
                         'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
@@ -327,14 +329,15 @@ class Producto extends Model
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
                         'prov.nombre as proveedor', 'proveedorproducto.fkidproveedor',
-                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto', 
+                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
             } ] )
             ->whereNull('producto.deleted_at')
             ->orderBy('producto.idproducto', 'DESC')
             ->first();
-        
+
         return $producto;
     }
 
@@ -381,7 +384,7 @@ class Producto extends Model
                     ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->select( [
                         'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto', 
+                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
                         'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
                         'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
                         'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
@@ -393,7 +396,8 @@ class Producto extends Model
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
                         'prov.nombre as proveedor', 'proveedorproducto.fkidproveedor',
-                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto', 
+                        'proveedorproducto.fkidproducto','proveedorproducto.idproveedorproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
             } ] )
@@ -410,7 +414,7 @@ class Producto extends Model
             ->where( 'producto.fkidciudadorigen', '=', $idciudadorigen )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
 
@@ -420,7 +424,7 @@ class Producto extends Model
             ->where( 'producto.fkidproductotipo', '=', $idproductotipo )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
 
@@ -430,7 +434,7 @@ class Producto extends Model
             ->where( 'producto.fkidproductomarca', '=', $idproductomarca )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
 
@@ -440,7 +444,7 @@ class Producto extends Model
             ->where( 'producto.fkidcategoria', '=', $idcategoria )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
 
@@ -450,7 +454,7 @@ class Producto extends Model
             ->where( 'producto.fkidproductogrupo', '=', $idproductogrupo )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
 
@@ -460,8 +464,8 @@ class Producto extends Model
             ->where( 'producto.fkidproductosubgrupo', '=', $idproductosubgrupo )
             ->whereNull('producto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $producto ) > 0 );
     }
-    
+
 }

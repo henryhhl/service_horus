@@ -22,19 +22,28 @@ class SeccionInventarioSeeder extends Seeder
     public function _getdata() {
 
         $mytime = Carbon::now( 'America/La_paz' );
-        
+
         return [
+            [
+                'descripcion' => 'Ninguno',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'estado'      => 'A',
+                'isdelete'    => 'N',
+            ],
             [
                 'descripcion' => 'Comercial',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
+                'isdelete'    => 'A',
             ],
             [
                 'descripcion' => 'Taller',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
+                'isdelete'    => 'A',
             ],
         ];
     }

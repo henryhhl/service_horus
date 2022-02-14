@@ -22,8 +22,14 @@ class ProveedorGrupoSeeder extends Seeder
     public function _getdata() {
 
         $mytime = Carbon::now( 'America/La_paz' );
-        
+
         return [
+            [
+                'descripcion' => 'Ninguno',
+                'fecha'       => $mytime->toDateString(),
+                'hora'        => $mytime->toTimeString(),
+                'estado'      => 'A',
+            ],
             [
                 'descripcion' => 'Local',
                 'fecha'       => $mytime->toDateString(),
@@ -38,5 +44,5 @@ class ProveedorGrupoSeeder extends Seeder
             ],
         ];
     }
-    
+
 }

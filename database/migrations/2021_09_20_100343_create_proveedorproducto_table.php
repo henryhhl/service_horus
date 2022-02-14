@@ -15,11 +15,12 @@ class CreateProveedorproductoTable extends Migration
     {
         Schema::create('proveedorproducto', function (Blueprint $table) {
             $table->increments('idproveedorproducto');
-            
+
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidproducto')->unsigned();
 
             $table->decimal('costounitario', 24, 8)->default(0);
+            $table->integer('stock')->default(0);
 
             $table->date('fecha');
             $table->time('hora');

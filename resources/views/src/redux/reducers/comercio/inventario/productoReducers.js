@@ -21,7 +21,7 @@ const initialState = {
 
     fkidciudadorigen: "",
     ciudadorigen: "",
-    
+
     fkidcategoria: "",
     categoria: "",
 
@@ -102,7 +102,7 @@ export const ProductoReducer = ( state = initialState, action = { payload, type}
             state.productotipo     = arrayProductoTipo.length === 0 ? "" : arrayProductoTipo[0].descripcion;
 
             state.arrayUnidadMedidaProducto = loadUnidadMedida();
-            state.arrayProveedor    = loadProveedor();
+            state.arrayProveedor = loadProveedor();
 
             // let arrayUnidadMedidaProducto = action.payload.arrayUnidadMedidaProducto;
 
@@ -137,7 +137,7 @@ export const ProductoReducer = ( state = initialState, action = { payload, type}
         case Strings.producto_setLimpiar:
             cleanObejct( state );
             state.arrayUnidadMedidaProducto = loadUnidadMedida( false );
-            state.arrayProveedor    = loadProveedor();
+            state.arrayProveedor = loadProveedor();
             state = Object.assign( {}, state );
             return state;
 
@@ -147,7 +147,7 @@ export const ProductoReducer = ( state = initialState, action = { payload, type}
             state = Object.assign( {}, state );
             return state;
 
-        case Strings.producto_setImprimir: 
+        case Strings.producto_setImprimir:
             return {
                 ...state,
                 reporte: action.payload,
@@ -162,16 +162,16 @@ export const ProductoReducer = ( state = initialState, action = { payload, type}
             state.focusInput = false;
             state = Object.assign( {}, state );
             return state;
-    
+
         default:
             return state;
     }
 };
 
 function onSetData( state, payload ) {
-    
+
     state.idproducto   = payload.idproducto;
-    
+
     state.codigo = payload.codigo;
     state.nombre = payload.nombre;
     state.descripcion = payload.descripcion;
@@ -181,7 +181,7 @@ function onSetData( state, payload ) {
 
     state.fkidciudadorigen = payload.fkidciudadorigen;
     state.ciudadorigen = payload.ciudadorigen;
-    
+
     state.fkidcategoria = payload.fkidcategoria;
     state.categoria = payload.categoria;
 
@@ -261,8 +261,10 @@ function onSetData( state, payload ) {
     for ( let index = 0; index < payload.proveedorproducto.length; index++ ) {
         let element = {
             idproveedorproducto: payload.proveedorproducto[index].idproveedorproducto,
-            fkidproveedor:       payload.proveedorproducto[index].fkidproveedor,
-            proveedor:           payload.proveedorproducto[index].proveedor,
+            fkidproveedor: payload.proveedorproducto[index].fkidproveedor,
+            proveedor: payload.proveedorproducto[index].proveedor,
+            costounitario: parseFloat( payload.proveedorproducto[index].costounitario ).toFixed(2),
+            stock: payload.proveedorproducto[index].stock,
         };
         array = [ ...array, element];
     }
@@ -272,6 +274,8 @@ function onSetData( state, payload ) {
             idproveedorproducto: null,
             fkidproveedor: null,
             proveedor: "",
+            costounitario: 0,
+            stock: 0,
         };
         array = [ ...array, element];
     }
@@ -331,11 +335,13 @@ function loadUnidadMedida( bandera = true ) {
 
 function loadProveedor( ) {
     let array = [];
-    for (let index = 0; index < 3; index++) {
+    for (let index = 0; index < 2; index++) {
         const element = {
             idproveedorproducto: null,
             fkidproveedor: null,
             proveedor: "",
+            costounitario: 0,
+            stock: 0,
         };
         array = [ ...array, element];
     }

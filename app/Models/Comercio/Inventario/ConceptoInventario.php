@@ -19,13 +19,13 @@ class ConceptoInventario extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A', 'codigo' => null,
+    protected $attributes = [
+        'estado' => 'A', 'isdelete' => 'A', 'codigo' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'codigo', 'descripcion',
-        'estado', 'fecha', 'hora',
+        'estado', 'isdelete', 'fecha', 'hora',
     ];
 
     public function get_data( $query, $request )
@@ -116,7 +116,7 @@ class ConceptoInventario extends Model
             } )
             ->whereNull('deleted_at')
             ->get();
-        
+
         return ( sizeof( $conceptoinventario ) > 0 );
     }
 
@@ -174,7 +174,7 @@ class ConceptoInventario extends Model
             ->whereNull('conceptoinventario.deleted_at')
             ->orderBy('conceptoinventario.idconceptoinventario', 'DESC')
             ->first();
-        
+
         return $conceptoinventario;
     }
 
@@ -209,5 +209,5 @@ class ConceptoInventario extends Model
 
         return $conceptoinventario;
     }
-    
+
 }

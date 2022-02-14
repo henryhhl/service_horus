@@ -11,7 +11,7 @@ function M_TreeCiudad( props ) {
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
             maskStyle={{ background: "transparent", }}
-            width={props.width}  zIndex={ props.zIndex }  
+            width={props.width}  zIndex={ props.zIndex }
             title={ props.title }
         >
             <C_ListadoCiudad
@@ -24,6 +24,7 @@ function M_TreeCiudad( props ) {
                 showChildren={props.showChildren}
                 selectedPadre={props.selectedPadre}
                 fkiddata={props.fkiddata}
+                showExpanded={false}
             />
         </C_ModalDraggable>
     );

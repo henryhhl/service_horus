@@ -118,7 +118,7 @@ function C_Form( props ) {
         proveedor.diascredito = value;
         onChange( proveedor );
     };
-    
+
     function onChangeFormaPago( value ) {
         proveedor.formadepago = value;
         onChange( proveedor );
@@ -391,7 +391,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 0, }} sm={{ span: 0, }} md={{ span: 0, }} lg={{ span: 4, }}></Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }} md={{ span: 4, }} lg={{ span: 3, }}>
-                    <C_Input 
+                    <C_Input
                         label={"Nro Orden"}
                         value={ proveedor.nroorden }
                         onChange={ onChangeNroOrden }
@@ -399,7 +399,7 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }} md={{ span: 4, }} lg={{ span: 3, }}>
-                    <C_Date 
+                    <C_Date
                         label={"Alta"}
                         value={ proveedor.fechaalta }
                         onChange={ onChangeFechaAlta }
@@ -407,7 +407,7 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }} md={{ span: 4, }} lg={{ span: 3, }}>
-                    <C_Date 
+                    <C_Date
                         label={"Baja"}
                         value={ proveedor.fechabaja }
                         onChange={ onChangeFechaBaja }
@@ -626,7 +626,7 @@ function C_Form( props ) {
                                         select={true}
                                         suffix={ ( !disabled.data ) && ( key !== 0 ) &&
                                             <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
-                                                <DeleteOutlined 
+                                                <DeleteOutlined
                                                     className="icon-table-horus"
                                                     onClick={ () => DeleteRowProductoTipo(key) }
                                                 />
@@ -646,7 +646,7 @@ function C_Form( props ) {
                     }
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                    <div className="card-header card-subtitle" style={{ height: "2.2rem" }}>
+                    <div className="card-header card-subtitle" style={{ height: "2.2rem", marginTop: 2, }}>
                         Personal de la Empresa
                     </div>
                     <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
@@ -707,7 +707,7 @@ function C_Form( props ) {
                                                 error={ item.error.fkidproveedorcargo }
                                                 suffix={ ( !disabled.data ) && ( item.fkidproveedorcargo !== null ) &&
                                                     <Tooltip title="QUITAR" placement="top" color={'#2db7f5'}>
-                                                        <CloseOutlined 
+                                                        <CloseOutlined
                                                             className="icon-table-horus"
                                                             style={{ marginLeft: -20, }}
                                                             onClick={ () => {
@@ -749,7 +749,7 @@ function C_Form( props ) {
                                     </Row>
                                     { ( !disabled.data ) && ( key !== 0 ) &&
                                         <Row gutter={ [12, 8] } justify={"end"} className="mt-1">
-                                            <C_Button color={"danger"} 
+                                            <C_Button color={"danger"}
                                                 onClick={ () => DeleteRowProveedorPersonal(key) }
                                             >
                                                 Eliminar
@@ -757,7 +757,7 @@ function C_Form( props ) {
                                         </Row>
                                     }
                                 </div>
-                            ) 
+                            )
                         } ) }
                     </div>
                     { ( !disabled.data ) &&
