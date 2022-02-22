@@ -12,6 +12,8 @@ import M_TreeCiudad from '../../../../inventario/data/ciudad/modal/listado';
 
 import M_ListadoProductoTipo from '../../../../inventario/data/productotipo/modal/listado';
 import M_ListadoProveedorCargo from '../../proveedorcargo/modal/listado';
+import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
+import { Functions } from '../../../../../../../utils/functions';
 
 function C_Form( props ) {
 
@@ -23,6 +25,9 @@ function C_Form( props ) {
     const [ visible_proveedorgrupo, setVisibleProveedorGrupo ] = useState( false );
     const [ visible_ciudadpais, setVisibleCiudadPais ] = useState( false );
     const [ visible_ciudad, setVisibleCiudad ] = useState( false );
+
+    const [ visible_proveedorproducto, setVisibleProveedorProducto ] = useState( false );
+    const [ proveedorproductodetalle, setProveedorProductoDetalle ] = useState( null );
 
     const [ visible_productotipo, setVisibleProductoTipo ] = useState( false );
     const [ productotipodetalle, setProductoTipoDetalle ] = useState( null );
@@ -43,8 +48,11 @@ function C_Form( props ) {
     };
 
     function onChangeNroOrden( value ) {
-        proveedor.nroorden = value;
-        onChange( proveedor );
+        if ( value === "" ) value = 0;
+        if ( !isNaN( value ) ) {
+            proveedor.nroorden = parseInt(value);
+            onChange( proveedor );
+        }
     };
 
     function onChangeFechaAlta( value ) {
@@ -286,6 +294,78 @@ function C_Form( props ) {
         );
     };
 
+    function AddRowProveedorProducto() {
+        const element = {
+            idproveedorproducto: null,
+            fkidproveedor: null,
+            fkidproducto: null,
+            producto: "",
+            costounitario: '',
+            stock: '',
+        };
+        proveedor.arrayProveedorProducto = [ ...proveedor.arrayProveedorProducto, element];
+        onChange( proveedor );
+    };
+    function DeleteRowProveedorProducto( pos ) {
+        if ( proveedor.arrayProveedorProducto.length > 1 ) {
+            let arrayProveedorProducto = proveedor.arrayProveedorProducto;
+            let idproveedorproducto = arrayProveedorProducto[pos].idproveedorproducto;
+            if ( idproveedorproducto !== null ) {
+                proveedor.arrayDeleteProveedorProducto = [ ...proveedor.arrayDeleteProveedorProducto, idproveedorproducto];
+            }
+            proveedor.arrayProveedorProducto = arrayProveedorProducto.filter( ( item, index ) => index !== pos );
+            onChange( proveedor );
+        } else {
+            C_Message( "warning", "Acción no permitida" );
+        }
+    };
+
+    function onShowProveedorProducto( proveedorproducto ) {
+        if ( !disabled.data ) {
+            setProveedorProductoDetalle( proveedorproducto );
+            setVisibleProveedorProducto(true);
+        };
+    };
+
+    function existProveedorProducto( value ) {
+        for (let index = 0; index < proveedor.arrayProveedorProducto.length; index++) {
+            const element = proveedor.arrayProveedorProducto[index];
+            if ( element.fkidproducto === value ) return true;
+        }
+        return false;
+    };
+
+    function onFKIDUnidadMedidaProducto( data ) {
+        if ( !existProveedorProducto( data.idproducto ) ) {
+            proveedor.arrayProveedorProducto[proveedorproductodetalle.index].fkidproducto = data.idproducto;
+            proveedor.arrayProveedorProducto[proveedorproductodetalle.index].producto = data.producto;
+            proveedor.arrayProveedorProducto[proveedorproductodetalle.index].costounitario = parseFloat(data.costo).toFixed(2);
+            proveedor.arrayProveedorProducto[proveedorproductodetalle.index].stock = '0';
+            onChange( proveedor );
+            setProveedorProductoDetalle(null);
+            setVisibleProveedorProducto(false);
+        } else {
+            C_Message( "warning", "Producto ya seleccionado" );
+        }
+    };
+
+    function componentProveedorProducto() {
+        if ( !visible_proveedorproducto ) return null;
+        return (
+            <>
+                <M_ListadoUnidadMedidaProducto
+                    visible={ visible_proveedorproducto }
+                    onClose={ () => {
+                        setProveedorProductoDetalle(null);
+                        setVisibleProveedorProducto(false);
+                    } }
+                    value={proveedorproductodetalle.fkidproducto}
+                    onChange={ onFKIDUnidadMedidaProducto }
+                />
+            </>
+        );
+    };
+
     function AddRowProveedorPersonal() {
         const element = {
             idproveedorpersonal: null,
@@ -374,6 +454,7 @@ function C_Form( props ) {
             { componentCiudadPais() }
 
             { componentProductoTipo() }
+            { componentProveedorProducto() }
             { componentProveedorCargo() }
 
             <Row gutter={ [12, 8] }>
@@ -436,7 +517,7 @@ function C_Form( props ) {
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                     <C_Input
-                        label={ "Nombre"}
+                        label={ "Nombre*"}
                         placeholder={ "INGRESAR NOMBRE..." }
                         value={ nombre }
                         onChange={ onChangeNombre }
@@ -473,7 +554,7 @@ function C_Form( props ) {
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
-                        label={ "Tipo"}
+                        label={ "Tipo*"}
                         placeholder={ "SELECCIONAR TIPO..." }
                         value={ proveedor.proveedortipo }
                         onClick={onShowProveedorTipo}
@@ -485,7 +566,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
-                        label={ "Grupo"}
+                        label={ "Grupo*"}
                         placeholder={ "SELECCIONAR GRUPO..." }
                         value={ proveedor.proveedorgrupo }
                         onClick={onShowProveedorGrupo}
@@ -497,7 +578,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
-                        label={ "Pais"}
+                        label={ "Pais*"}
                         placeholder={ "SELECCIONAR PAIS..." }
                         value={ proveedor.ciudadpais }
                         onClick={onShowCiudadPais}
@@ -509,7 +590,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
-                        label={ "Ciudad"}
+                        label={ "Ciudad*"}
                         placeholder={ "SELECCIONAR CIUDAD..." }
                         value={ proveedor.ciudad }
                         onClick={onShowCiudad}
@@ -608,7 +689,7 @@ function C_Form( props ) {
             </div>
             <Row gutter={ [12, 8] } className="mb-1">
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
-                    <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
+                    {/* <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
                         style={{ maxHeight: 160, overflowX: 'hidden', overflowY: 'auto', }}
                     >
                         { proveedor.arrayProductoTipo.map( (item, key) => {
@@ -643,6 +724,87 @@ function C_Form( props ) {
                                 Agregar Tipo Producto
                             </C_Button>
                         </Row>
+                    } */}
+                    <div className="card-header card-subtitle" style={{ height: "2.2rem", marginTop: 2, }}>
+                        Productos de la empresa
+                    </div>
+                    <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
+                        style={{ maxHeight: 210, overflowX: 'hidden', overflowY: 'auto', }}
+                    >
+                        { proveedor.arrayProveedorProducto.map( (item, key) => {
+                            return (
+                                <div key={key} className="main-card card pl-1 pr-1 pb-1 pt-0 mb-2">
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                            <C_Input
+                                                label={ "Producto" }
+                                                placeholder={ "SELECCIONAR PRODUCTO..." }
+                                                value={ item.producto }
+                                                onClick={ () => {
+                                                    item.index = key;
+                                                    onShowProveedorProducto(item);
+                                                } }
+                                                disabled={ disabled.data }
+                                                select={true}
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} md={{ span: 24, }}>
+                                            <C_Input
+                                                label={"Costo unit."}
+                                                placeholder={ "INGRESAR COSTO UNITARIO..." }
+                                                value={ item.costounitario }
+                                                onChange={ ( value ) => {
+                                                    item.index = key;
+                                                    if ( value === "" ) value = 0;
+                                                    if ( !isNaN( value ) ) {
+                                                        if ( Functions.esDecimal( value, 2 ) ) {
+                                                            let costounitario = Functions.onChangeNumberDecimal(value);
+                                                            proveedor.arrayProveedorProducto[key].costounitario = costounitario;
+                                                            onChange( proveedor );
+                                                        }
+                                                    };
+                                                } }
+                                                disabled={ disabled.data || item.fkidproducto == null }
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} md={{ span: 24, }}>
+                                            <C_Input
+                                                label={"Stock"}
+                                                placeholder={ "INGRESAR STOCK..." }
+                                                value={ item.stock }
+                                                onChange={ ( value ) => {
+                                                    item.index = key;
+                                                    if ( value === "" ) value = 0;
+                                                    if ( !isNaN( value ) ) {
+                                                        if ( parseInt( value ) >= 0 ) {
+                                                            proveedor.arrayProveedorProducto[key].stock = parseInt( value );
+                                                            onChange( proveedor );
+                                                        }
+                                                    };
+                                                } }
+                                                disabled={ disabled.data || item.fkidproducto == null }
+                                            />
+                                        </Col>
+                                        { ( !disabled.data ) && ( key !== 0 ) &&
+                                            <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                                <C_Button color={"danger"}
+                                                    onClick={ () => DeleteRowProveedorProducto(key) }
+                                                >
+                                                    Eliminar
+                                                </C_Button>
+                                            </Col>
+                                        }
+                                    </Row>
+                                </div>
+                            );
+                        } ) }
+                    </div>
+                    { ( !disabled.data ) &&
+                        <Row gutter={ [12, 8] } justify={"end"} className={"mt-1"}>
+                            <C_Button color={"link"} onClick={AddRowProveedorProducto}>
+                                Agregar Producto
+                            </C_Button>
+                        </Row>
                     }
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 16, }}>
@@ -650,7 +812,7 @@ function C_Form( props ) {
                         Personal de la Empresa
                     </div>
                     <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-0"
-                        style={{ maxHeight: 130, overflowX: 'hidden', overflowY: 'auto', }}
+                        style={{ maxHeight: 210, overflowX: 'hidden', overflowY: 'auto', }}
                     >
                         { proveedor.arrayProveedorPersonal.map( (item, key) => {
                             return (

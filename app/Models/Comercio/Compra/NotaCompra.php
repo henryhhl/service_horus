@@ -19,16 +19,16 @@ class NotaCompra extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A', 'isdelete' => 'A', 'fkidordencompra' => null,
         'codigo' => null, 'nrorefprov' => null, 'impuesto' => 0, 'tipocambio' => 0, 'tipomoneda' => 'N',
         'fechavencimiento' => null, 'diascredito' => 0, 'esingresado' => 'N', 'impuestototal' => 0,
-        'cantidadtotal' => 0, 'montosubtotal' => 0, 'descuento' => 0, 'montodescuento' => 0, 'montototal' => 0, 
+        'cantidadtotal' => 0, 'montosubtotal' => 0, 'descuento' => 0, 'montodescuento' => 0, 'montototal' => 0,
         'fletes' => 0, 'internacion' => 0, 'otrosgastos' => 0, 'nrocajastotal' => 0, 'volumentotal' => 0, 'pesototal' => 0,
         'nota' => null, 'tipocompra' => 'L', 'issolicitudcompra' => 'N', 'isordencompra' => 'N', 'isdevolucioncompra' => 'N'
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidordencompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidproveedor', 'fkidmoneda',
         'codigo', 'nrorefprov', 'impuesto', 'tipocambio', 'tipomoneda', 'fechanotacompra', 'fechavencimiento', 'diascredito',
         'cantidadtotal', 'montosubtotal', 'descuento', 'montodescuento', 'montototal', 'impuestototal',
@@ -72,9 +72,9 @@ class NotaCompra extends Model
             ->leftJoin('ordencompra as ordcomp', 'notacompra.fkidordencompra', '=', 'ordcomp.idordencompra')
             ->select( [
                 'notacompra.idnotacompra', 'notacompra.codigo', 'notacompra.nrorefprov', 'notacompra.tipocambio', 'notacompra.impuestototal',
-                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito', 
-                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal', 
-                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal', 
+                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito',
+                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal',
+                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal',
                 'notacompra.volumentotal', 'notacompra.pesototal', 'notacompra.esingresado', 'notacompra.nota', 'notacompra.fkidordencompra',
                 'notacompra.tipocompra', 'notacompra.isdevolucioncompra', 'notacompra.isordencompra', 'notacompra.issolicitudcompra',
                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -104,17 +104,17 @@ class NotaCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompradetalle',
-                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada', 
+                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
                         'notacompradetalle.cantidadrecibida', 'notacompradetalle.cantidadfaltante','notacompradetalle.cantidadsobrante', 'notacompradetalle.nota',
-                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal', 
+                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
-                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
+                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra',
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -150,9 +150,9 @@ class NotaCompra extends Model
             ->leftJoin('ordencompra as ordcomp', 'notacompra.fkidordencompra', '=', 'ordcomp.idordencompra')
             ->select( [
                 'notacompra.idnotacompra', 'notacompra.codigo', 'notacompra.nrorefprov', 'notacompra.tipocambio', 'notacompra.impuestototal',
-                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito', 
-                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal', 
-                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal', 
+                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito',
+                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal',
+                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal',
                 'notacompra.volumentotal', 'notacompra.pesototal', 'notacompra.esingresado', 'notacompra.nota', 'notacompra.fkidordencompra',
                 'notacompra.tipocompra', 'notacompra.isdevolucioncompra', 'notacompra.isordencompra', 'notacompra.issolicitudcompra',
                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -182,17 +182,17 @@ class NotaCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompradetalle',
-                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada', 
+                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
                         'notacompradetalle.cantidadrecibida', 'notacompradetalle.cantidadfaltante','notacompradetalle.cantidadsobrante', 'notacompradetalle.nota',
-                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal', 
+                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
-                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
+                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra',
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -308,9 +308,9 @@ class NotaCompra extends Model
             ->leftJoin('ordencompra as ordcomp', 'notacompra.fkidordencompra', '=', 'ordcomp.idordencompra')
             ->select( [
                 'notacompra.idnotacompra', 'notacompra.codigo', 'notacompra.nrorefprov', 'notacompra.tipocambio', 'notacompra.impuestototal',
-                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito', 
-                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal', 
-                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal', 
+                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito',
+                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal',
+                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal',
                 'notacompra.volumentotal', 'notacompra.pesototal', 'notacompra.esingresado', 'notacompra.nota', 'notacompra.fkidordencompra',
                 'notacompra.tipocompra', 'notacompra.isdevolucioncompra', 'notacompra.isordencompra', 'notacompra.issolicitudcompra',
                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -330,17 +330,17 @@ class NotaCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompradetalle',
-                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada', 
+                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
                         'notacompradetalle.cantidadrecibida', 'notacompradetalle.cantidadfaltante','notacompradetalle.cantidadsobrante', 'notacompradetalle.nota',
-                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal', 
+                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
-                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
+                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra',
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -349,7 +349,7 @@ class NotaCompra extends Model
             ->whereNull('notacompra.deleted_at')
             ->orderBy('notacompra.idnotacompra', 'DESC')
             ->first();
-        
+
         return $notacompra;
     }
 
@@ -368,7 +368,7 @@ class NotaCompra extends Model
     public function remove( $query, $request )
     {
         $idnotacompra = $request->idnotacompra;
-        $query->where('idnotacompra', '=', $idnotacompra)->delete();
+        return $query->where('idnotacompra', '=', $idnotacompra)->delete();
     }
 
     public function searchByID( $query, $idnotacompra ) {
@@ -382,9 +382,9 @@ class NotaCompra extends Model
             ->leftJoin('ordencompra as ordcomp', 'notacompra.fkidordencompra', '=', 'ordcomp.idordencompra')
             ->select( [
                 'notacompra.idnotacompra', 'notacompra.codigo', 'notacompra.nrorefprov', 'notacompra.tipocambio', 'notacompra.impuestototal',
-                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito', 
-                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal', 
-                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal', 
+                'notacompra.tipomoneda', 'notacompra.impuesto', 'notacompra.fechanotacompra', 'notacompra.fechavencimiento', 'notacompra.diascredito',
+                'notacompra.cantidadtotal', 'notacompra.montosubtotal', 'notacompra.descuento', 'notacompra.montodescuento', 'notacompra.montototal',
+                'notacompra.fletes', 'notacompra.internacion', 'notacompra.otrosgastos', 'notacompra.nrocajastotal',
                 'notacompra.volumentotal', 'notacompra.pesototal', 'notacompra.esingresado', 'notacompra.nota', 'notacompra.fkidordencompra',
                 'notacompra.tipocompra', 'notacompra.isdevolucioncompra', 'notacompra.isordencompra', 'notacompra.issolicitudcompra',
                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -404,17 +404,17 @@ class NotaCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompradetalle',
-                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada', 
+                        'notacompradetalle.fkidunidadmedidaproducto', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
                         'notacompradetalle.cantidadrecibida', 'notacompradetalle.cantidadfaltante','notacompradetalle.cantidadsobrante', 'notacompradetalle.nota',
-                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal', 
+                        'notacompradetalle.nrocajas', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
                         'notacompradetalle.peso', 'notacompradetalle.pesosubtotal', 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
-                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra', 
+                        'notacompradetalle.isdevolucioncompra', 'notacompradetalle.isordencompra', 'notacompradetalle.issolicitudcompra',
                         'notacompradetalle.fechavencimiento', 'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica', 'notacompradetalle.estado',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -423,8 +423,18 @@ class NotaCompra extends Model
             ->whereNull('notacompra.deleted_at')
             ->orderBy('notacompra.idnotacompra', 'DESC')
             ->first();
-        
+
         return $notacompra;
+    }
+
+    public function existsOrdenCompra( $query, $fkidordencompra ) {
+        $notacompra = $query
+            ->where('notacompra.fkidordencompra', '=', $fkidordencompra)
+            ->whereNull('notacompra.deleted_at')
+            ->orderBy('notacompra.idnotacompra')
+            ->get();
+
+        return ( sizeof( $notacompra ) > 0 );
     }
 
     public function tieneProveedor( $query, $idproveedor ) {
@@ -433,7 +443,7 @@ class NotaCompra extends Model
             ->where( 'notacompra.fkidproveedor', '=', $idproveedor )
             ->whereNull('notacompra.deleted_at')
             ->get();
-        
+
         return ( sizeof( $notacompra ) > 0 );
     }
 
@@ -443,8 +453,8 @@ class NotaCompra extends Model
             ->where( 'notacompra.fkidconceptocompra', '=', $idconceptocompra )
             ->whereNull('notacompra.deleted_at')
             ->get();
-        
+
         return ( sizeof( $notacompra ) > 0 );
     }
-    
+
 }

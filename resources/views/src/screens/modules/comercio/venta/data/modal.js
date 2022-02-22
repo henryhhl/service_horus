@@ -8,6 +8,8 @@ import IndexUnionSucursal from './unionsucursal';
 import IndexSucursal from './sucursal';
 import IndexListaPrecio from './listaprecio';
 import IndexClienteTipo from './clientetipo';
+import IndexCliente from './cliente';
+import IndexConceptoVenta from './conceptoventa';
 
 function ModalDatoGeneral( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -25,7 +27,36 @@ function ModalDatoGeneral( props ) {
                         title="LISTA PRECIO"
                         width={"85%"} style={{ top: 40, }}
                     >
-                        <IndexListaPrecio 
+                        <IndexListaPrecio
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "conceptoventa":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="CONCEPTO VENTA"
+                        width={650}
+                    >
+                        <IndexConceptoVenta
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "cliente":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="CLIENTE"
+                        width={'95%'} style={{ top: 5, }}
+                        bodyStyle={{ paddingLeft: 12, paddingRight: 12, }}
+                    >
+                        <IndexCliente
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -39,7 +70,7 @@ function ModalDatoGeneral( props ) {
                         title="TIPO CLIENTE"
                         width={650}
                     >
-                        <IndexClienteTipo 
+                        <IndexClienteTipo
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -51,9 +82,9 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="SUCURSAL"
-                        width={650}
+                        width={800}
                     >
-                        <IndexSucursal 
+                        <IndexSucursal
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -67,12 +98,12 @@ function ModalDatoGeneral( props ) {
                         title="UNIÓN SUCURSAL"
                         width={650}
                     >
-                        <IndexUnionSucursal 
+                        <IndexUnionSucursal
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
                 );
-        
+
             default:
                 return null;
         }

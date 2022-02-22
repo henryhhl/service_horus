@@ -15,28 +15,45 @@ class CreateClienteTable extends Migration
     {
         Schema::create('cliente', function (Blueprint $table) {
             $table->increments('idcliente');
-            
+
+            $table->integer('x_idusuario')->unsigned()->nullable();
+
+            $table->integer('fkidciudadpais')->unsigned();
             $table->integer('fkidciudad')->unsigned();
+
             $table->integer('fkidclientetipo')->unsigned();
-            $table->integer('fkidciudadclasificacion')->unsigned();
-            $table->integer('fkidlistaprecio')->unsigned();
-            $table->integer('fkidconceptoventa')->unsigned();
-            $table->integer('fkidsucursal')->unsigned();
+            $table->integer('fkidlistaprecio')->unsigned()->nullable();
+            $table->integer('fkidconceptoventa')->unsigned()->nullable();
+            $table->integer('fkidsucursal')->unsigned()->nullable();
 
             $table->string('codigo', 150)->nullable();
             $table->string('nombre', 150);
             $table->string('apellido', 250);
-            $table->string('razonsocial', 300)->nullable();
+            $table->string('razonsocial', 300);
 
             $table->string('nit', 100)->nullable();
             $table->text('email')->nullable();
             $table->text('casilla')->nullable();
             $table->text('fax')->nullable();
+            $table->text('telefono')->nullable();
+            $table->text('celular')->nullable();
             $table->text('contacto')->nullable();
             $table->text('direccion')->nullable();
-            
+
             $table->integer('diascredito')->default(0);
             $table->decimal('limitecredito', 24, 8)->default(0);
+
+            $table->integer('descuento')->default(0);
+            $table->integer('cantidaditems')->default(0);
+            $table->integer('descuentoxcantidaditems')->default(0);
+            $table->integer('descuentoinicial')->default(0);
+            $table->integer('descuentofinal')->default(0);
+
+            $table->decimal('montototaladeudado', 24, 8)->default(0);
+            $table->date('fechaultimopago')->nullable();
+            $table->decimal('montototaladeudadoultimopago', 24, 8)->default(0);
+            $table->date('fechaultimaventa')->nullable();
+            $table->decimal('montototalultimaventa', 24, 8)->default(0);
 
             $table->longText('imagen')->nullable();
             $table->string('extension', 20)->nullable();

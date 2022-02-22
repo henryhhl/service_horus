@@ -17,17 +17,34 @@ class SolicitudCompraDetalle extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A',  'isdelete' => 'A', 'costounitario' => 0, 'costosubtotal' => 0,
         'stockactual' => 0, 'cantidadpendiente' => 0, 'cantidadsolicitada' => 0, 'nota' => null,
         'isordencompra' => 'N', 'fechasolicitada' => null, 'fechafinalizada' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidsolicitudcompra', 'fkidunidadmedidaproducto', 'costounitario', 'costosubtotal',
         'stockactual', 'cantidadpendiente', 'cantidadsolicitada', 'nota', 'fechasolicitada', 'fechafinalizada',
         'isordencompra', 'isdelete', 'estado', 'fecha', 'hora',
     ];
+
+    public function getSolicitudCompraDetalle( $query, $fkidsolicitudcompra ) {
+        $solicitudcompradetalle = $query
+            ->select( [
+                'solicitudcompradetalle.idsolicitudcompradetalle', 'solicitudcompradetalle.stockactual',
+                'solicitudcompradetalle.cantidadpendiente', 'solicitudcompradetalle.cantidadsolicitada',
+                'solicitudcompradetalle.costounitario', 'solicitudcompradetalle.costosubtotal',
+                'solicitudcompradetalle.nota', 'solicitudcompradetalle.fechasolicitada', 'solicitudcompradetalle.fechafinalizada',
+                'solicitudcompradetalle.fecha', 'solicitudcompradetalle.hora', 'solicitudcompradetalle.estado',
+            ] )
+            ->where('solicitudcompradetalle.fkidsolicitudcompra', '=', $fkidsolicitudcompra)
+            ->whereNull('solicitudcompradetalle.deleted_at')
+            ->orderBy('solicitudcompradetalle.idsolicitudcompradetalle')
+            ->get();
+
+        return $solicitudcompradetalle;
+    }
 
     public function store( $query, $request, $detalle )
     {

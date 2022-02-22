@@ -172,6 +172,10 @@ export const treeMenu = [
                                 children: [],
                             },
                             {
+                                key: "conceptoventa", title: "CONCEPTO VENTA",
+                                children: [],
+                            },
+                            {
                                 key: "cliente", title: "CLIENTE",
                                 children: [],
                             },

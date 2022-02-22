@@ -33,7 +33,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
 };
 
 const onCreate = async () => {
-    
+
     return httpRequest( 'get', webservices.wscomerciocompraproveedor_create, {
 
     } ) . then ( ( result ) => {
@@ -73,9 +73,10 @@ const onGrabar = async ( proveedor ) => {
         fkidproveedorgrupo:  proveedor.fkidproveedorgrupo,
         arrayProductoTipo: JSON.stringify(proveedor.arrayProductoTipo),
         arrayProveedorPersonal: JSON.stringify(proveedor.arrayProveedorPersonal),
+        arrayProveedorProducto: JSON.stringify(proveedor.arrayProveedorProducto),
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 0 ) {
             C_Message( "warning", result.message );
             var errors = result.errors;
@@ -138,6 +139,7 @@ const onUpdate = async ( proveedor ) => {
         arrayDeleteProductoTipo: JSON.stringify(proveedor.arrayDeleteProductoTipo),
         arrayProveedorPersonal: JSON.stringify(proveedor.arrayProveedorPersonal),
         arrayDeleteProveedorPersonal: JSON.stringify(proveedor.arrayDeleteProveedorPersonal),
+        arrayProveedorProducto: JSON.stringify(proveedor.arrayProveedorProducto),
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {
@@ -209,7 +211,7 @@ const onSearchData = async ( proveedor ) => {
 
 const onImprimir = async () => {
     return httpRequest( "post", webservices.wscomerciocompraproveedor_reporte, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 1 ) {

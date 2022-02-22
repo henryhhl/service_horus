@@ -16,6 +16,8 @@ class CreateConceptoventaTable extends Migration
         Schema::create('conceptoventa', function (Blueprint $table) {
             $table->increments('idconceptoventa');
 
+            $table->integer('x_idusuario')->unsigned()->nullable();
+
             $table->string('codigo', 150)->nullable();
             $table->string('descripcion', 200);
             $table->string('abreviatura', 50)->nullable();

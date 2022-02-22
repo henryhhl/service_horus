@@ -19,17 +19,17 @@ class OrdenCompra extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A', 'isdelete' => 'A', 'fkidsolicitudcompra' => null,
         'codigo' => null, 'nrofactura' => null, 'tipocambio' => 0, 'diasplazo' => 0, 'fechavencimiento' => null,
         'cantidadtotal' => 0, 'montosubtotal' => 0, 'montototal' => 0, 'fletes' => 0, 'internacion' => 0, 'otrosgastos' => 0,
-        'nota' => null, 'tiposolicitud' => 'L', 'issolicitudcompra' => 'N', 
+        'nota' => null, 'tiposolicitud' => 'L', 'issolicitudcompra' => 'N',
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidsolicitudcompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidseccioninventario', 'fkidproveedor', 'fkidmoneda',
         'codigo', 'nrofactura', 'tipocambio', 'fechasolicitada', 'fechavencimiento', 'diasplazo',
-        'cantidadtotal', 'montosubtotal', 'montototal', 'fletes', 'internacion', 'otrosgastos', 'nota', 
+        'cantidadtotal', 'montosubtotal', 'montototal', 'fletes', 'internacion', 'otrosgastos', 'nota',
         'tiposolicitud', 'issolicitudcompra', 'iscompra', 'estado', 'fecha', 'hora', 'isdelete',
     ];
 
@@ -90,15 +90,15 @@ class OrdenCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
                         'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
-                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
+                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -163,15 +163,15 @@ class OrdenCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
                         'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
-                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
+                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -292,15 +292,15 @@ class OrdenCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
                         'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
-                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
+                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -309,7 +309,7 @@ class OrdenCompra extends Model
             ->whereNull('ordencompra.deleted_at')
             ->orderBy('ordencompra.idordencompra', 'DESC')
             ->first();
-        
+
         return $ordencompra;
     }
 
@@ -361,15 +361,15 @@ class OrdenCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
                         'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
-                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento', 
+                        'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock', 
-                        'prod.idproducto', 'prod.nombre', 
+                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
+                        'prod.idproducto', 'prod.nombre',
                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                     )
@@ -388,7 +388,7 @@ class OrdenCompra extends Model
             ->where( 'ordencompra.fkidproveedor', '=', $idproveedor )
             ->whereNull('ordencompra.deleted_at')
             ->get();
-        
+
         return ( sizeof( $ordencompra ) > 0 );
     }
 
@@ -398,7 +398,7 @@ class OrdenCompra extends Model
             ->where( 'ordencompra.fkidconceptocompra', '=', $idconceptocompra )
             ->whereNull('ordencompra.deleted_at')
             ->get();
-        
+
         return ( sizeof( $ordencompra ) > 0 );
     }
 
@@ -408,8 +408,18 @@ class OrdenCompra extends Model
             ->where( 'ordencompra.fkidseccioninventario', '=', $idseccioninventario )
             ->whereNull('ordencompra.deleted_at')
             ->get();
-        
+
         return ( sizeof( $ordencompra ) > 0 );
     }
-    
+
+    public function existsSolicitudCompra( $query, $fkidsolicitudcompra ) {
+        $ordencompra = $query
+            ->where('ordencompra.fkidsolicitudcompra', '=', $fkidsolicitudcompra)
+            ->whereNull('ordencompra.deleted_at')
+            ->orderBy('ordencompra.idordencompra')
+            ->get();
+
+        return ( sizeof( $ordencompra ) > 0 );
+    }
+
 }

@@ -56,6 +56,9 @@ const initialState = {
     arrayProductoTipo: [],
     arrayDeleteProductoTipo: [],
 
+    arrayProveedorProducto: [],
+    arrayDeleteProveedorProducto: [],
+
     arrayProveedorPersonal: [],
     arrayDeleteProveedorPersonal: [],
 
@@ -114,6 +117,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
             state.arrayProductoTipo = loadProductoTipo();
             state.arrayProveedorPersonal = loadProveedorPersonal();
             state.arrayProducto = loadProducto();
+            state.arrayProveedorProducto = loadProveedorProducto();
 
             let arrayProductoTipo = action.payload.arrayProductoTipo;
             state.arrayProductoTipo[0].fkidproductotipo = arrayProductoTipo.length == 0 ? null : arrayProductoTipo[0].idproductotipo;
@@ -145,6 +149,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
             cleanObejct( state );
             state.arrayProductoTipo = loadProductoTipo();
             state.arrayProveedorPersonal = loadProveedorPersonal();
+            state.arrayProveedorProducto = loadProveedorProducto();
             state = Object.assign( {}, state );
             return state;
 
@@ -154,7 +159,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
             state = Object.assign( {}, state );
             return state;
 
-        case Strings.proveedor_setImprimir: 
+        case Strings.proveedor_setImprimir:
             return {
                 ...state,
                 reporte: action.payload,
@@ -169,7 +174,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
             state.focusInput = false;
             state = Object.assign( {}, state );
             return state;
-    
+
         default:
             return state;
     }
@@ -177,7 +182,7 @@ export const ProveedorReducer = ( state = initialState, action = { payload, type
 
 function onSetData( state, payload ) {
     state.idproveedor   = payload.idproveedor;
-    
+
     state.fkidciudadpais = payload.fkidciudadpais;
     state.ciudadpais = payload.ciudadpais;
 
@@ -302,6 +307,32 @@ function onSetData( state, payload ) {
     }
     state.arrayProveedorPersonal = array;
 
+    array = [];
+    for ( let index = 0; index < payload.arrayproveedorproducto.length; index++ ) {
+        const detalle = payload.arrayproveedorproducto[index];
+        let element = {
+            idproveedorproducto: detalle.idproveedorproducto,
+            fkidproveedor: detalle.fkidproveedor,
+            fkidproducto: detalle.fkidproducto,
+            producto: detalle.producto,
+            costounitario: parseFloat(detalle.costounitario).toFixed(2),
+            stock: detalle.stock,
+        };
+        array = [ ...array, element];
+    }
+    if ( array.length === 0 ) {
+        let element = {
+            idproveedorproducto: null,
+            fkidproveedor: null,
+            fkidproducto: null,
+            producto: "",
+            costounitario: '',
+            stock: '',
+        };
+        array = [ ...array, element];
+    }
+    state.arrayProveedorProducto = array;
+
 }
 
 function loadProductoTipo( ) {
@@ -378,3 +409,20 @@ function loadProducto() {
     }
     return array;
 };
+
+function loadProveedorProducto() {
+    let array = [];
+    for ( let index = 0; index < 2; index++ ) {
+        const element = {
+            idproveedorproducto: null,
+            fkidproveedor: null,
+            fkidproducto: null,
+            producto: "",
+            costounitario: '',
+            stock: '',
+        };
+        array = [ ...array, element];
+    }
+    return array;
+};
+

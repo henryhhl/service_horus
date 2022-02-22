@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\NotaCompraRequest;
+use App\Models\Comercio\Compra\DevolucionCompra;
 use App\Models\Comercio\Compra\LibroCompra;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\NotaCompraDetalle;
 use App\Models\Comercio\Compra\OrdenCompra;
+use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\ProveedorProducto;
 use App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto;
 use App\Models\Comercio\Inventario\Producto;
@@ -129,6 +131,13 @@ class NotaCompraController extends Controller
                 $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
                 $ordencompra->iscompra = "A";
                 $ordencompra->update();
+            }
+
+            $prov = new Proveedor();
+            $proveedor = $prov->find( $notacompra->fkidproveedor );
+            if ( !is_null( $proveedor ) ) {
+                $proveedor->nroorden = intval( $proveedor->nroorden ) + 1;
+                $proveedor->update();
             }
 
             $arrayNotaCompraDetalle = json_decode($request->input('arrayNotaCompraDetalle', '[]'));
@@ -356,9 +365,24 @@ class NotaCompraController extends Controller
 
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
+            $devcomp = new DevolucionCompra();
+            if ( !$devcomp->existsNotaCompra( $devcomp, $request->idnotacompra ) ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'No se puede eliminar, ya que se encuentra registrado en una devolución.',
+                ] );
+            }
+
             //
 
             /* fin de restriccion */
+
+            $prov = new Proveedor();
+            $proveedor = $prov->find( $notacompra->fkidproveedor );
+            if ( !is_null( $proveedor ) ) {
+                $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
+                $proveedor->update();
+            }
 
             if ( !is_null( $notacompra->fkidordencompra ) ) {
                 $ordcomp = new OrdenCompra();
@@ -369,7 +393,41 @@ class NotaCompraController extends Controller
                 }
             }
 
-            $result = $obj->remove( $obj, $request );
+            $notacompradelete = $obj->remove( $obj, $request );
+
+            if ( $notacompradelete ) {
+                $ntacompdet = new NotaCompraDetalle();
+                $arrayNotaCompraDetalle = $ntacompdet->getCompraDetalle( $ntacompdet, $request->idnotacompra );
+
+                foreach ( $arrayNotaCompraDetalle as $detalle ) {
+                    $notacompradetalle = $ntacompdet->find( $detalle->idnotacompradetalle );
+                    if ( !is_null( $notacompradetalle ) ) {
+                        $almundmedprod = new AlmacenUnidadMedidaProducto();
+                        $almacenunidadmedidaproducto = $almundmedprod->find($notacompradetalle->fkidalmacenunidadmedidaproducto);
+                        if ( !is_null( $almacenunidadmedidaproducto ) ) {
+                            $almacenunidadmedidaproducto->stockactual = intval( $almacenunidadmedidaproducto->stockactual ) - intval( $notacompradetalle->cantidad );
+                            $almacenunidadmedidaproducto->compras = intval( $almacenunidadmedidaproducto->compras ) - 1;
+                            $almacenunidadmedidaproducto->update();
+                        }
+
+                        $undmedprod = new UnidadMedidaProducto();
+                        $unidadmedidaproducto = $undmedprod->find($notacompradetalle->fkidunidadmedidaproducto);
+                        if ( !is_null( $unidadmedidaproducto ) ) {
+                            $unidadmedidaproducto->stock = intval( $unidadmedidaproducto->stock ) - intval( $notacompradetalle->cantidad );
+                            $unidadmedidaproducto->update();
+
+                            $prod = new Producto();
+                            $producto = $prod->find($unidadmedidaproducto->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
+                                $producto->update();
+                            }
+                        }
+                        $notacompradetalle->delete();
+                    }
+                }
+            }
+
             DB::commit();
             return response()->json( [
                 'response' => 1,

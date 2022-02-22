@@ -17,19 +17,39 @@ class NotaCompraDetalle extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A',  'isdelete' => 'A', 'cantidad' => 0, 'costounitario' => 0, 'costosubtotal' => 0,
         'cantidadsolicitada' => 0, 'cantidadrecibida' => 0, 'cantidadfaltante' => 0, 'cantidadsobrante' => 0,
         'nrocajas' => 0, 'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null,
         'isdevolucioncompra' => 'N', 'isordencompra' => 'N', 'issolicitudcompra' => 'N', 'fechavencimiento' => null, 'nrolote' => 0, 'nrofabrica' => 0,
     ];
 
-    protected $fillable = [ 
-        'fkidnotacompra', 'fkidalmacenunidadmedidaproducto', 'fkidunidadmedidaproducto', 'fkidordencompradetalle', 
+    protected $fillable = [
+        'fkidnotacompra', 'fkidalmacenunidadmedidaproducto', 'fkidunidadmedidaproducto', 'fkidordencompradetalle',
         'cantidadsolicitada', 'cantidadrecibida', 'cantidadfaltante', 'cantidadsobrante', 'cantidad', 'costounitario', 'costosubtotal',
         'nrocajas', 'peso', 'pesosubtotal', 'volumen', 'volumensubtotal', 'nota', 'fechavencimiento', 'nrolote', 'nrofabrica',
         'isdevolucioncompra', 'isordencompra', 'issolicitudcompra', 'isdelete', 'estado', 'fecha', 'hora',
     ];
+
+    public function getCompraDetalle( $query, $idnotacompra ) {
+        $compra = $query
+            ->select( [
+                'notacompradetalle.idnotacompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.nrocajas',
+                'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
+                'notacompradetalle.peso', 'notacompradetalle.pesosubtotal',
+                'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
+                'notacompradetalle.nota', 'notacompradetalle.fechavencimiento',
+                'notacompradetalle.nrolote', 'notacompradetalle.nrofabrica',
+                'notacompradetalle.fecha', 'notacompradetalle.hora', 'notacompradetalle.estado',
+                'notacompradetalle.fkidalmacenunidadmedidaproducto', 'notacompradetalle.fkidunidadmedidaproducto'
+            ] )
+            ->where('notacompradetalle.fkidnotacompra', '=', $idnotacompra)
+            ->whereNull('notacompradetalle.deleted_at')
+            ->orderBy('notacompradetalle.idnotacompradetalle')
+            ->get();
+
+        return $compra;
+    }
 
     public function store( $query, $request, $detalle )
     {

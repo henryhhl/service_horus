@@ -211,6 +211,16 @@ Route::post($submodulocomercioventa . '/clientetipo/delete', 'Comercio\Venta\Cli
 Route::get($submodulocomercioventa  . '/clientetipo/searchByID', 'Comercio\Venta\ClienteTipoController@searchByID');
 Route::post($submodulocomercioventa . '/clientetipo/reporte', 'Comercio\Venta\ClienteTipoController@reporte');
 
+Route::get($submodulocomercioventa  . '/cliente/index', 'Comercio\Venta\ClienteController@index');
+Route::get($submodulocomercioventa  . '/cliente/create', 'Comercio\Venta\ClienteController@create');
+Route::get($submodulocomercioventa  . '/cliente/editar/{idcliente}', 'Comercio\Venta\ClienteController@edit');
+Route::post($submodulocomercioventa . '/cliente/store', 'Comercio\Venta\ClienteController@store');
+Route::post($submodulocomercioventa . '/cliente/update', 'Comercio\Venta\ClienteController@update');
+Route::get($submodulocomercioventa  . '/cliente/show/{idcliente}', 'Comercio\Venta\ClienteController@show');
+Route::post($submodulocomercioventa . '/cliente/delete', 'Comercio\Venta\ClienteController@delete');
+Route::get($submodulocomercioventa  . '/cliente/searchByID', 'Comercio\Venta\ClienteController@searchByID');
+Route::post($submodulocomercioventa . '/cliente/reporte', 'Comercio\Venta\ClienteController@reporte');
+
 Route::get($submodulocomercioventa  . '/conceptoventa/index', 'Comercio\Venta\ConceptoVentaController@index');
 Route::get($submodulocomercioventa  . '/conceptoventa/create', 'Comercio\Venta\ConceptoVentaController@create');
 Route::get($submodulocomercioventa  . '/conceptoventa/editar/{idconceptoventa}', 'Comercio\Venta\ConceptoVentaController@edit');

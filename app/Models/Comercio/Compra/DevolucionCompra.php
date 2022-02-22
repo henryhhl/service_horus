@@ -19,14 +19,14 @@ class DevolucionCompra extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A', 'isdelete' => 'A', 'fkidnotacompra' => null,
         'codigo' => null, 'nrofactura' => null, 'tipocambio' => 0, 'tipomoneda' => 'N',
         'cantidadtotal' => 0, 'montosubtotal' => 0, 'descuento' => 0, 'montodescuento' => 0, 'montototal' => 0,
         'nota' => null, 'tipocompra' => 'L', 'issolicitudcompra' => 'N', 'isordencompra' => 'N', 'isnotacompra' => 'N'
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidnotacompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidproveedor', 'fkidmoneda',
         'codigo', 'nrofactura', 'tipocambio', 'tipomoneda', 'fechadevolucioncompra',
         'cantidadtotal', 'montosubtotal', 'descuento', 'montodescuento', 'montototal', 'nota',
@@ -60,8 +60,8 @@ class DevolucionCompra extends Model
             ->leftJoin('notacompra as notcomp', 'devolucioncompra.fkidnotacompra', '=', 'notcomp.idnotacompra')
             ->select( [
                 'devolucioncompra.iddevolucioncompra', 'devolucioncompra.codigo', 'devolucioncompra.tipocambio', 'devolucioncompra.nrofactura',
-                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra', 
-                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento', 
+                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra',
+                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento',
                 'devolucioncompra.montototal', 'devolucioncompra.nota', 'devolucioncompra.fkidnotacompra',
                 'devolucioncompra.isordencompra', 'devolucioncompra.isnotacompra', 'devolucioncompra.issolicitudcompra',
                 'devolucioncompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -89,12 +89,12 @@ class DevolucionCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
                         'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
                         'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
-                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
+                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
                         'unidmedprod.stock', 'unidmedprod.valorequivalente',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -133,8 +133,8 @@ class DevolucionCompra extends Model
             ->leftJoin('notacompra as notcomp', 'devolucioncompra.fkidnotacompra', '=', 'notcomp.idnotacompra')
             ->select( [
                 'devolucioncompra.iddevolucioncompra', 'devolucioncompra.codigo', 'devolucioncompra.tipocambio', 'devolucioncompra.nrofactura',
-                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra', 
-                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento', 
+                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra',
+                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento',
                 'devolucioncompra.montototal', 'devolucioncompra.nota', 'devolucioncompra.fkidnotacompra',
                 'devolucioncompra.isordencompra', 'devolucioncompra.isnotacompra', 'devolucioncompra.issolicitudcompra',
                 'devolucioncompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -162,12 +162,12 @@ class DevolucionCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
                         'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
                         'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
-                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
+                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
                         'unidmedprod.stock', 'unidmedprod.valorequivalente',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -262,8 +262,8 @@ class DevolucionCompra extends Model
             ->leftJoin('notacompra as notcomp', 'devolucioncompra.fkidnotacompra', '=', 'notcomp.idnotacompra')
             ->select( [
                 'devolucioncompra.iddevolucioncompra', 'devolucioncompra.codigo', 'devolucioncompra.tipocambio', 'devolucioncompra.nrofactura',
-                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra', 
-                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento', 
+                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra',
+                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento',
                 'devolucioncompra.montototal', 'devolucioncompra.nota', 'devolucioncompra.fkidnotacompra',
                 'devolucioncompra.isordencompra', 'devolucioncompra.isnotacompra', 'devolucioncompra.issolicitudcompra',
                 'devolucioncompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -281,12 +281,12 @@ class DevolucionCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
                         'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
                         'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
-                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
+                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
                         'unidmedprod.stock', 'unidmedprod.valorequivalente',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -299,7 +299,7 @@ class DevolucionCompra extends Model
             ->whereNull('devolucioncompra.deleted_at')
             ->orderBy('devolucioncompra.iddevolucioncompra', 'DESC')
             ->first();
-        
+
         return $devolucioncompra;
     }
 
@@ -331,8 +331,8 @@ class DevolucionCompra extends Model
             ->leftJoin('notacompra as notcomp', 'devolucioncompra.fkidnotacompra', '=', 'notcomp.idnotacompra')
             ->select( [
                 'devolucioncompra.iddevolucioncompra', 'devolucioncompra.codigo', 'devolucioncompra.tipocambio', 'devolucioncompra.nrofactura',
-                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra', 
-                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento', 
+                'devolucioncompra.tipomoneda', 'devolucioncompra.fechadevolucioncompra', 'devolucioncompra.tipocompra',
+                'devolucioncompra.cantidadtotal', 'devolucioncompra.montosubtotal', 'devolucioncompra.descuento', 'devolucioncompra.montodescuento',
                 'devolucioncompra.montototal', 'devolucioncompra.nota', 'devolucioncompra.fkidnotacompra',
                 'devolucioncompra.isordencompra', 'devolucioncompra.isnotacompra', 'devolucioncompra.issolicitudcompra',
                 'devolucioncompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -350,12 +350,12 @@ class DevolucionCompra extends Model
                     ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
+                    ->select(
                         'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
                         'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
                         'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
                         'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
-                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra', 
+                        'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
                         'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
                         'unidmedprod.stock', 'unidmedprod.valorequivalente',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
@@ -368,8 +368,18 @@ class DevolucionCompra extends Model
             ->whereNull('devolucioncompra.deleted_at')
             ->orderBy('devolucioncompra.iddevolucioncompra', 'DESC')
             ->first();
-        
+
         return $devolucioncompra;
     }
-    
+
+    public function existsNotaCompra( $query, $fkidnotacompra ) {
+        $devolucioncompra = $query
+            ->where('devolucioncompra.fkidnotacompra', '=', $fkidnotacompra)
+            ->whereNull('devolucioncompra.deleted_at')
+            ->orderBy('devolucioncompra.iddevolucioncompra')
+            ->get();
+
+        return ( sizeof( $devolucioncompra ) > 0 );
+    }
+
 }

@@ -1,6 +1,6 @@
 
 const moduleInventario = {
-    
+
     ciudadclasificacion_setLimpiar:   '[Ciudad Clasificacion] Set Limpiar',
     ciudadclasificacion_onChange:     '[Ciudad Clasificacion] On Change',
     ciudadclasificacion_setImprimir:  '[Ciudad Clasificacion] Set Imprimir',
@@ -160,6 +160,17 @@ const moduleVenta = {
     clientetipo_onShow:       '[Cliente Tipo] on Show',
     clientetipo_onFocus:      '[Cliente Tipo] On Focus',
     clientetipo_offFocus:     '[Cliente Tipo] Off Focus',
+
+    cliente_setLimpiar:   '[Cliente] Set Limpiar',
+    cliente_setLoad:      '[Cliente] Set Load',
+    cliente_onChange:     '[Cliente] On Change',
+    cliente_setImprimir:  '[Cliente] Set Imprimir',
+    cliente_setState:     '[Cliente] Set [Cliente',
+    cliente_onCreate:     '[Cliente] on Create',
+    cliente_onEditar:     '[Cliente] on Editar',
+    cliente_onShow:       '[Cliente] on Show',
+    cliente_onFocus:      '[Cliente] On Focus',
+    cliente_offFocus:     '[Cliente] Off Focus',
 
     conceptoventa_setLimpiar:   '[Concepto Venta] Set Limpiar',
     conceptoventa_setLoad:      '[Concepto Venta] Set Load',
@@ -330,7 +341,7 @@ const config = {
 
     setArchivoOption:   '[Archivo Option] Set Archivo Option',
     resetArchivoOption: '[Archivo Option] Reset Archivo Option',
-    
+
 };
 
 // let sistema = {};

@@ -143,7 +143,7 @@ const webservices = {
     wscomercioinventarionotaingreso_delete:     module.comercio.inventario + '/notaingreso/delete',
     wscomercioinventarionotaingreso_reporte:    module.comercio.inventario + '/notaingreso/reporte',
     wscomercioinventarionotaingreso_searchByID: module.comercio.inventario + '/notaingreso/searchByID',
-    
+
 
 
     wscomercioventaunionsucursal_index:      module.comercio.venta + '/unionsucursal/index',
@@ -196,7 +196,17 @@ const webservices = {
     wscomercioventaclientetipo_reporte:    module.comercio.venta + '/clientetipo/reporte',
     wscomercioventaclientetipo_searchByID: module.comercio.venta + '/clientetipo/searchByID',
 
-    
+    wscomercioventacliente_index:      module.comercio.venta + '/cliente/index',
+    wscomercioventacliente_create:     module.comercio.venta + '/cliente/create',
+    wscomercioventacliente_store:      module.comercio.venta + '/cliente/store',
+    wscomercioventacliente_editar:     module.comercio.venta + '/cliente/editar',
+    wscomercioventacliente_update:     module.comercio.venta + '/cliente/update',
+    wscomercioventacliente_show:       module.comercio.venta + '/cliente/show',
+    wscomercioventacliente_delete:     module.comercio.venta + '/cliente/delete',
+    wscomercioventacliente_reporte:    module.comercio.venta + '/cliente/reporte',
+    wscomercioventacliente_searchByID: module.comercio.venta + '/cliente/searchByID',
+
+
 
     wscomerciocompraproveedortipo_index:      module.comercio.compra + '/proveedortipo/index',
     wscomerciocompraproveedortipo_create:     module.comercio.compra + '/proveedortipo/create',

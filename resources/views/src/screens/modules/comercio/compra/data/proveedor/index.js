@@ -22,7 +22,7 @@ import ProveedorPDF from './report/proveedorPDF';
 
 function IndexProveedor( props ) {
     const { archivo, proveedor, disabled, option, paginations } = props;
-    
+
     const [ visible_pdf, setVisiblePDF ] = useState( false );
     const [ visible_action, setVisibleAction ] = useState( false );
 
@@ -39,8 +39,19 @@ function IndexProveedor( props ) {
     }
 
     function onGrabarData() {
-        if( proveedor.update )  props.onUpdate( proveedor );
-        else props.onGrabar( proveedor )
+        if( proveedor.update ) {
+            let onUpdate = () => props.onUpdate( proveedor );
+            C_Confirm( {
+                title: "Editar Proveedor", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
+            } );
+        } else {
+            let ongrabar = () => props.onGrabar( proveedor );
+            C_Confirm( {
+                title: "Registrar Proveedor", onOk: ongrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
+            } );
+        }
     };
 
     function onConfirmarDelete() {
@@ -100,7 +111,7 @@ function IndexProveedor( props ) {
 
     function componentOption() {
         return (
-            <OptionProveedor 
+            <OptionProveedor
                 option={option}
                 onChange={props.setPrintOption}
                 onSubmit={ onSubmitOption }
@@ -133,7 +144,7 @@ function IndexProveedor( props ) {
 
     function componentArchivo() {
         return (
-            <ArchivoProveedor 
+            <ArchivoProveedor
                 archivo={archivo}
                 onChange={props.setArchivoOption}
                 onSubmit={ onSubmitArchivo }
@@ -146,17 +157,17 @@ function IndexProveedor( props ) {
         return (
             <>
                 <C_ModalDraggable
-                    visible={ visible_pdf } 
+                    visible={ visible_pdf }
                     onClose={ () => {
                         setVisiblePDF( false );
                     } }
                     maskStyle={{ background: "transparent", }}
-                    width={"90%"}  zIndex={ 1200 }  
+                    width={"90%"}  zIndex={ 1200 }
                     title={ "REPORTE PROVEEDOR" }
                     bodyStyle={{ padding: '5px 4px', }}
                     style={{ top: 10, }}
                 >
-                    <ProveedorPDF 
+                    <ProveedorPDF
                         proveedor={proveedor.reporte}
                     />
                 </C_ModalDraggable>
@@ -180,14 +191,14 @@ function IndexProveedor( props ) {
             />
 
             <div className="pt-2 pb-3 pl-4 pr-4" style={{ flexGrow: 1, width: "100%", }}>
-                <C_Form 
+                <C_Form
                     proveedor={ proveedor }
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
                 />
             </div>
-            <C_Footer 
+            <C_Footer
                 disabled={disabled}
 
                 onCreate={props.onCreate}

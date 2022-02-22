@@ -17,7 +17,7 @@ class OrdenCompraDetalle extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A',  'isdelete' => 'A', 'fkidsolicitudcompradetalle' => null,
         'cantidad' => 0, 'cantidadsolicitada' => 0, 'costounitario' => 0, 'costosubtotal' => 0,
         'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null,
@@ -25,11 +25,29 @@ class OrdenCompraDetalle extends Model
         'issolicitudcompra' => 'N', 'iscompra' => 'N',
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidordencompra', 'fkidunidadmedidaproducto', 'fkidsolicitudcompradetalle', 'costounitario', 'costosubtotal',
         'peso', 'pesosubtotal', 'cantidad', 'cantidadsolicitada', 'volumen', 'volumensubtotal',
         'nota', 'fechasolicitada', 'fechavencimiento', 'iscompra', 'issolicitudcompra', 'isdelete', 'estado', 'fecha', 'hora',
     ];
+
+    public function getOrdenCompraDetalle( $query, $fkidordencompra ) {
+        $ordencompradetalle = $query
+            ->select( [
+                'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada',
+                'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal',
+                'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal',
+                'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
+                'ordencompradetalle.nota', 'ordencompradetalle.fechavencimiento',
+                'ordencompradetalle.fecha', 'ordencompradetalle.hora', 'ordencompradetalle.estado',
+            ] )
+            ->where('ordencompradetalle.fkidordencompra', '=', $fkidordencompra)
+            ->whereNull('ordencompradetalle.deleted_at')
+            ->orderBy('ordencompradetalle.idordencompradetalle')
+            ->get();
+
+        return $ordencompradetalle;
+    }
 
     public function store( $query, $request, $detalle )
     {

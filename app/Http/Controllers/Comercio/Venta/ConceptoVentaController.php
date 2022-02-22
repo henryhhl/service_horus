@@ -34,7 +34,7 @@ class ConceptoVentaController extends Controller
             }
 
             $conceptoventa = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'conceptoventa'  => $conceptoventa->getCollection(),
@@ -78,7 +78,7 @@ class ConceptoVentaController extends Controller
                 'response' => 1,
                 'idconceptoventa'  => $idconceptoventa,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -120,7 +120,7 @@ class ConceptoVentaController extends Controller
                 'conceptoventa' => $conceptoventa,
                 'message'  => 'Concepto Venta registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -275,7 +275,7 @@ class ConceptoVentaController extends Controller
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Concepto Venta.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response()->json( [
@@ -338,11 +338,12 @@ class ConceptoVentaController extends Controller
 
             /* fin de restriccion */
 
-            $result = $obj->remove( $obj, $request );
+            $conceptoventadelete = $conceptoventa->delete();
 
             return response()->json( [
                 'response' => 1,
                 'message'  => 'Concepto Venta eliminado éxitosamente.',
+                'conceptoventadelete' => $conceptoventadelete,
             ] );
 
         } catch (\Exception $th) {
@@ -381,7 +382,7 @@ class ConceptoVentaController extends Controller
             }
 
             $idconceptoventa = $request->input('idconceptoventa');
-            
+
             $obj = new ConceptoVenta();
             $conceptoventa = $obj->searchByID( $obj, $idconceptoventa );
 
@@ -396,7 +397,7 @@ class ConceptoVentaController extends Controller
                 'response'  => 1,
                 'conceptoventa' => $conceptoventa,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -432,16 +433,16 @@ class ConceptoVentaController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayConceptoVenta' => $conceptoventa,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

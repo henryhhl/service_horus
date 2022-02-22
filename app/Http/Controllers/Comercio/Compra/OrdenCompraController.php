@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\OrdenCompraRequest;
+use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\OrdenCompraDetalle;
 use App\Models\Comercio\Compra\SolicitudCompra;
@@ -38,7 +39,7 @@ class OrdenCompraController extends Controller
             }
 
             $ordencompra = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'ordencompra'  => $ordencompra->getCollection(),
@@ -86,7 +87,7 @@ class OrdenCompraController extends Controller
                 'idordencompra' => $idordencompra,
                 'arrayMoneda'   => $moneda,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -130,7 +131,7 @@ class OrdenCompraController extends Controller
                     $detalle->fkidordencompra = $ordencompra->idordencompra;
                     $ordencompradetalle = new OrdenCompraDetalle();
                     $ordencompradetalle->store($ordencompradetalle, $request, $detalle);
-                    
+
                 }
             }
 
@@ -140,7 +141,7 @@ class OrdenCompraController extends Controller
                 'ordencompra' => $ordencompra,
                 'message'  => 'Orden Compra registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
             DB::rollBack();
             return response( )->json( [
@@ -273,7 +274,7 @@ class OrdenCompraController extends Controller
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
             if ( $validator->fails() ) {
-
+                DB::rollBack();
                 return response()->json( [
                     'response'  => 0,
                     'errors'    => $validator->errors(),
@@ -285,7 +286,7 @@ class OrdenCompraController extends Controller
             $ordencompra = $obj->find( $request->idordencompra );
 
             if ( is_null( $ordencompra ) ) {
-
+                DB::rollBack();
                 return response()->json( [
                     'response'  => -1,
                     'message'   => 'Orden Compra no existe.',
@@ -293,6 +294,15 @@ class OrdenCompraController extends Controller
             }
 
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
+
+            $ntacomp = new NotaCompra();
+            if ( $ntacomp->existsOrdenCompra( $ntacomp, $request->idordencompra ) ) {
+                DB::rollBack();
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'No se puede eliminar, ya que se encuentra registrado en una nota de compra.',
+                ] );
+            }
 
             //
 
@@ -307,7 +317,20 @@ class OrdenCompraController extends Controller
                 }
             }
 
-            $result = $obj->remove( $obj, $request );
+            $ordencompradelete = $obj->remove( $obj, $request );
+
+            if ( $ordencompradelete ) {
+                $ordcompdet = new OrdenCompraDetalle();
+                $arrayOrdenCompraDetalle = $ordcompdet->getOrdenCompraDetalle( $ordcompdet, $request->idordencompra );
+
+                foreach ( $arrayOrdenCompraDetalle as $detalle ) {
+                    $ordencompradetalle = $ordcompdet->find($detalle->idordencompradetalle);
+                    if ( !is_null( $ordencompradetalle ) ) {
+                        $ordencompradetalle->delete();
+                    }
+                }
+            }
+
             DB::commit();
             return response()->json( [
                 'response' => 1,
@@ -351,7 +374,7 @@ class OrdenCompraController extends Controller
             }
 
             $idordencompra = $request->input('idordencompra');
-            
+
             $obj = new OrdenCompra();
             $ordencompra = $obj->searchByID( $obj, $idordencompra );
 
@@ -366,7 +389,7 @@ class OrdenCompraController extends Controller
                 'response'  => 1,
                 'ordencompra' => $ordencompra,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -402,16 +425,16 @@ class OrdenCompraController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayOrdenCompra' => $ordencompra,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

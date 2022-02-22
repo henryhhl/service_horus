@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\SolicitudCompraRequest;
+use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\SolicitudCompra;
 use App\Models\Comercio\Compra\SolicitudCompraDetalle;
 use App\Models\Configuracion\Moneda;
@@ -38,7 +39,7 @@ class SolicitudCompraController extends Controller
             }
 
             $solicitudcompra = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'solicitudcompra'  => $solicitudcompra->getCollection(),
@@ -86,7 +87,7 @@ class SolicitudCompraController extends Controller
                 'idsolicitudcompra' => $idsolicitudcompra,
                 'arrayMoneda'       => $moneda,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -123,7 +124,7 @@ class SolicitudCompraController extends Controller
                     $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
                     $solicitudcompradetalle = new SolicitudCompraDetalle();
                     $solicitudcompradetalle->store($solicitudcompradetalle, $request, $detalle);
-                    
+
                 }
             }
 
@@ -133,7 +134,7 @@ class SolicitudCompraController extends Controller
                 'solicitudcompra' => $solicitudcompra,
                 'message'  => 'Solicitud Compra registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
             DB::rollBack();
             return response( )->json( [
@@ -281,7 +282,7 @@ class SolicitudCompraController extends Controller
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Solicitud Compra.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response()->json( [
@@ -311,6 +312,8 @@ class SolicitudCompraController extends Controller
     {
         try {
 
+            DB::beginTransaction();
+
             $regla = [
                 'idsolicitudcompra' => 'required',
             ];
@@ -321,7 +324,7 @@ class SolicitudCompraController extends Controller
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
             if ( $validator->fails() ) {
-
+                DB::rollBack();
                 return response()->json( [
                     'response'  => 0,
                     'errors'    => $validator->errors(),
@@ -333,7 +336,7 @@ class SolicitudCompraController extends Controller
             $solicitudcompra = $obj->find( $request->idsolicitudcompra );
 
             if ( is_null( $solicitudcompra ) ) {
-
+                DB::rollBack();
                 return response()->json( [
                     'response'  => -1,
                     'message'   => 'Solicitud Compra no existe.',
@@ -342,18 +345,42 @@ class SolicitudCompraController extends Controller
 
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
+            $ordcomp = new OrdenCompra();
+            if ( $ordcomp->existsSolicitudCompra( $ordcomp, $request->idsolicitudcompra ) ) {
+                DB::rollBack();
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'No se puede eliminar, ya que se encuentra registrado en una orden de compra.',
+                ] );
+            }
+
             //
 
             /* fin de restriccion */
 
-            $result = $obj->remove( $obj, $request );
+            $solicitudcompradelete = $obj->remove( $obj, $request );
 
+            if ( $solicitudcompradelete ) {
+                $solcompdet = new SolicitudCompraDetalle();
+                $arraySolicitudCompraDetalle = $solcompdet->getSolicitudCompraDetalle( $solcompdet, $request->idsolicitudcompra );
+
+                foreach ( $arraySolicitudCompraDetalle as $detalle ) {
+                    $solicitudcompradetalle = $solcompdet->find($detalle->idsolicitudcompradetalle);
+                    if ( !is_null( $solicitudcompradetalle ) ) {
+                        $solicitudcompradetalle->delete();
+                    }
+                }
+            }
+
+            DB::commit();
             return response()->json( [
                 'response' => 1,
                 'message'  => 'Solicitud Compra eliminado éxitosamente.',
+                'solicitudcompradelete' => $solicitudcompradelete,
             ] );
 
         } catch (\Exception $th) {
+            DB::rollBack();
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud.',
@@ -389,7 +416,7 @@ class SolicitudCompraController extends Controller
             }
 
             $idsolicitudcompra = $request->input('idsolicitudcompra');
-            
+
             $obj = new SolicitudCompra();
             $solicitudcompra = $obj->searchByID( $obj, $idsolicitudcompra );
 
@@ -404,7 +431,7 @@ class SolicitudCompraController extends Controller
                 'response'  => 1,
                 'solicitudcompra' => $solicitudcompra,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -440,16 +467,16 @@ class SolicitudCompraController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arraySolicitudCompra' => $solicitudcompra,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

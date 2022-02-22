@@ -19,15 +19,16 @@ class ConceptoVenta extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+    protected $attributes = [
+        'estado' => 'A',  'isdelete' => 'A',
         'codigo' => null, 'abreviatura' => null,
         'imagen' => null, 'extension' => null,
+        'x_idusuario' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'codigo', 'descripcion', 'abreviatura', 'imagen', 'extension',
-        'fecha', 'hora', 'estado', 'isdelete',
+        'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
 
     public function get_data( $query, $request )
@@ -116,7 +117,7 @@ class ConceptoVenta extends Model
             } )
             ->whereNull('deleted_at')
             ->get();
-        
+
         return ( sizeof( $conceptoventa ) > 0 );
     }
 
@@ -189,7 +190,7 @@ class ConceptoVenta extends Model
             ->whereNull('conceptoventa.deleted_at')
             ->orderBy('conceptoventa.idconceptoventa', 'DESC')
             ->first();
-        
+
         return $conceptoventa;
     }
 

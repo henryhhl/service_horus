@@ -19,7 +19,7 @@ class Proveedor extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
+    protected $attributes = [
         'estado' => 'A', 'codigo' => null, 'direccion' => null, 'nit' => null,
         'telefono' => null, 'celular' => null, 'fax' => null, 'email' => null,
         'sitioweb' => null, 'nroorden' => '0', 'diascredito' => '0', 'formadepago' => null,
@@ -27,7 +27,7 @@ class Proveedor extends Model
         'contacto' => null,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidciudadpais', 'fkidciudad', 'fkidproveedortipo', 'fkidproveedorgrupo',
         'codigo', 'nombre', 'direccion', 'nit', 'telefono', 'celular', 'fax', 'email',
         'sitioweb', 'nroorden', 'diascredito', 'formadepago', 'tipopersoneria',
@@ -54,6 +54,14 @@ class Proveedor extends Model
     public function arrayproveedorpersonal() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\ProveedorPersonal',
+            'fkidproveedor',
+            'idproveedor'
+        );
+    }
+
+    public function arrayproveedorproducto() {
+        return $this->hasMany(
+            'App\Models\Comercio\Compra\ProveedorProducto',
             'fkidproveedor',
             'idproveedor'
         );
@@ -98,12 +106,22 @@ class Proveedor extends Model
                 }
                 return;
             } )
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
+                $query
+                    ->leftJoin('producto as prod', 'proveedorproducto.fkidproducto', '=', 'prod.idproducto')
+                    ->select( [
+                        'prod.idproducto', 'prod.nombre as producto',
+                        'proveedorproducto.idproveedorproducto', 'proveedorproducto.fkidproveedor', 'proveedorproducto.fkidproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock',
+                    ] )
+                    ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
             ->with( [ 'arrayproveedorproductotipo' => function( $query ) {
                 $query
                     ->leftJoin('productotipo as prodtipo', 'proveedorproductotipo.fkidproductotipo', '=', 'prodtipo.idproductotipo')
                     ->select( [
                         'prodtipo.descripcion as productotipo', 'proveedorproductotipo.fkidproductotipo',
-                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo', 
+                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo',
                     ] )
                     ->orderBy('proveedorproductotipo.idproveedorproductotipo');
             } ] )
@@ -112,9 +130,9 @@ class Proveedor extends Model
                     ->leftJoin('proveedorcargo as provcargo', 'proveedorpersonal.fkidproveedorcargo', '=', 'provcargo.idproveedorcargo')
                     ->select( [
                         'provcargo.descripcion as proveedorcargo', 'proveedorpersonal.fkidproveedorcargo',
-                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular', 
+                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular',
                         'proveedorpersonal.telefono', 'proveedorpersonal.email', 'proveedorpersonal.imagen', 'proveedorpersonal.extension',
-                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal', 
+                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal',
                     ] )
                     ->orderBy('proveedorpersonal.idproveedorpersonal');
             } ] )
@@ -167,12 +185,22 @@ class Proveedor extends Model
                 }
                 return;
             } )
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
+                $query
+                    ->leftJoin('producto as prod', 'proveedorproducto.fkidproducto', '=', 'prod.idproducto')
+                    ->select( [
+                        'prod.idproducto', 'prod.nombre as producto',
+                        'proveedorproducto.idproveedorproducto', 'proveedorproducto.fkidproveedor', 'proveedorproducto.fkidproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock',
+                    ] )
+                    ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
             ->with( [ 'arrayproveedorproductotipo' => function( $query ) {
                 $query
                     ->leftJoin('productotipo as prodtipo', 'proveedorproductotipo.fkidproductotipo', '=', 'prodtipo.idproductotipo')
                     ->select( [
                         'prodtipo.descripcion as productotipo', 'proveedorproductotipo.fkidproductotipo',
-                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo', 
+                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo',
                     ] )
                     ->orderBy('proveedorproductotipo.idproveedorproductotipo');
             } ] )
@@ -181,9 +209,9 @@ class Proveedor extends Model
                     ->leftJoin('proveedorcargo as provcargo', 'proveedorpersonal.fkidproveedorcargo', '=', 'provcargo.idproveedorcargo')
                     ->select( [
                         'provcargo.descripcion as proveedorcargo', 'proveedorpersonal.fkidproveedorcargo',
-                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular', 
+                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular',
                         'proveedorpersonal.telefono', 'proveedorpersonal.email', 'proveedorpersonal.imagen', 'proveedorpersonal.extension',
-                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal', 
+                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal',
                     ] )
                     ->orderBy('proveedorpersonal.idproveedorpersonal');
             } ] )
@@ -240,24 +268,24 @@ class Proveedor extends Model
             'codigo'    => $codigo,
             'nombre'    => $nombre,
             'direccion' => $direccion,
-            'fkidciudadpais'     => $fkidciudadpais, 
-            'fkidciudad'         => $fkidciudad, 
-            'fkidproveedortipo'  => $fkidproveedortipo, 
-            'fkidproveedorgrupo' => $fkidproveedorgrupo, 
-            'nit' => $nit, 
-            'telefono' => $telefono, 
-            'celular'  => $celular, 
-            'fax'      => $fax, 
-            'contacto' => $contacto, 
+            'fkidciudadpais'     => $fkidciudadpais,
+            'fkidciudad'         => $fkidciudad,
+            'fkidproveedortipo'  => $fkidproveedortipo,
+            'fkidproveedorgrupo' => $fkidproveedorgrupo,
+            'nit' => $nit,
+            'telefono' => $telefono,
+            'celular'  => $celular,
+            'fax'      => $fax,
+            'contacto' => $contacto,
             'email'    => $email,
-            'sitioweb' => $sitioweb, 
-            'nroorden'       => $nroorden, 
-            'diascredito'    => $diascredito, 
-            'formadepago'    => $formadepago, 
+            'sitioweb' => $sitioweb,
+            'nroorden'       => $nroorden,
+            'diascredito'    => $diascredito,
+            'formadepago'    => $formadepago,
             'tipopersoneria' => $tipopersoneria,
-            'imagen'    => $imagen, 
-            'extension' => $extension, 
-            'fechaalta' => $fechaalta, 
+            'imagen'    => $imagen,
+            'extension' => $extension,
+            'fechaalta' => $fechaalta,
             'fechabaja' => $fechabaja,
             'fecha'  => $fecha,
             'hora'   => $hora,
@@ -269,7 +297,7 @@ class Proveedor extends Model
     public function upgrade( $query, $request )
     {
         $idproveedor = isset( $request->idproveedor ) ? $request->idproveedor : null;
-        
+
         $codigo    = isset( $request->codigo )    ? $request->codigo : null;
         $nombre    = isset( $request->nombre )    ? $request->nombre : null;
         $direccion = isset( $request->direccion ) ? $request->direccion : null;
@@ -302,24 +330,24 @@ class Proveedor extends Model
                 'codigo'    => $codigo,
                 'nombre'    => $nombre,
                 'direccion' => $direccion,
-                'fkidciudadpais'     => $fkidciudadpais, 
-                'fkidciudad'         => $fkidciudad, 
-                'fkidproveedortipo'  => $fkidproveedortipo, 
-                'fkidproveedorgrupo' => $fkidproveedorgrupo, 
-                'nit' => $nit, 
-                'telefono' => $telefono, 
-                'celular'  => $celular, 
-                'fax'      => $fax, 
-                'contacto' => $contacto, 
+                'fkidciudadpais'     => $fkidciudadpais,
+                'fkidciudad'         => $fkidciudad,
+                'fkidproveedortipo'  => $fkidproveedortipo,
+                'fkidproveedorgrupo' => $fkidproveedorgrupo,
+                'nit' => $nit,
+                'telefono' => $telefono,
+                'celular'  => $celular,
+                'fax'      => $fax,
+                'contacto' => $contacto,
                 'email'    => $email,
-                'sitioweb' => $sitioweb, 
-                'nroorden'       => $nroorden, 
-                'diascredito'    => $diascredito, 
-                'formadepago'    => $formadepago, 
+                'sitioweb' => $sitioweb,
+                'nroorden'       => $nroorden,
+                'diascredito'    => $diascredito,
+                'formadepago'    => $formadepago,
                 'tipopersoneria' => $tipopersoneria,
-                'imagen'    => $imagen, 
-                'extension' => $extension, 
-                'fechaalta' => $fechaalta, 
+                'imagen'    => $imagen,
+                'extension' => $extension,
+                'fechaalta' => $fechaalta,
                 'fechabaja' => $fechabaja,
             ] );
 
@@ -345,12 +373,22 @@ class Proveedor extends Model
                 'proveedor.estado', 'proveedor.fecha', 'proveedor.hora'
             ] )
             ->where( 'proveedor.idproveedor', '=', $idproveedor )
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
+                $query
+                    ->leftJoin('producto as prod', 'proveedorproducto.fkidproducto', '=', 'prod.idproducto')
+                    ->select( [
+                        'prod.idproducto', 'prod.nombre as producto',
+                        'proveedorproducto.idproveedorproducto', 'proveedorproducto.fkidproveedor', 'proveedorproducto.fkidproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock',
+                    ] )
+                    ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
             ->with( [ 'arrayproveedorproductotipo' => function( $query ) {
                 $query
                     ->leftJoin('productotipo as prodtipo', 'proveedorproductotipo.fkidproductotipo', '=', 'prodtipo.idproductotipo')
                     ->select( [
                         'prodtipo.descripcion as productotipo', 'proveedorproductotipo.fkidproductotipo',
-                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo', 
+                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo',
                     ] )
                     ->orderBy('proveedorproductotipo.idproveedorproductotipo');
             } ] )
@@ -359,16 +397,16 @@ class Proveedor extends Model
                     ->leftJoin('proveedorcargo as provcargo', 'proveedorpersonal.fkidproveedorcargo', '=', 'provcargo.idproveedorcargo')
                     ->select( [
                         'provcargo.descripcion as proveedorcargo', 'proveedorpersonal.fkidproveedorcargo',
-                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular', 
+                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular',
                         'proveedorpersonal.telefono', 'proveedorpersonal.email', 'proveedorpersonal.imagen', 'proveedorpersonal.extension',
-                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal', 
+                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal',
                     ] )
                     ->orderBy('proveedorpersonal.idproveedorpersonal');
             } ] )
             ->whereNull('proveedor.deleted_at')
             ->orderBy('proveedor.idproveedor', 'DESC')
             ->first();
-        
+
         return $proveedor;
     }
 
@@ -408,12 +446,22 @@ class Proveedor extends Model
                 'proveedor.estado', 'proveedor.fecha', 'proveedor.hora'
             ] )
             ->where('proveedor.idproveedor', '=', $idproveedor)
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
+                $query
+                    ->leftJoin('producto as prod', 'proveedorproducto.fkidproducto', '=', 'prod.idproducto')
+                    ->select( [
+                        'prod.idproducto', 'prod.nombre as producto',
+                        'proveedorproducto.idproveedorproducto', 'proveedorproducto.fkidproveedor', 'proveedorproducto.fkidproducto',
+                        'proveedorproducto.costounitario', 'proveedorproducto.stock',
+                    ] )
+                    ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
             ->with( [ 'arrayproveedorproductotipo' => function( $query ) {
                 $query
                     ->leftJoin('productotipo as prodtipo', 'proveedorproductotipo.fkidproductotipo', '=', 'prodtipo.idproductotipo')
                     ->select( [
                         'prodtipo.descripcion as productotipo', 'proveedorproductotipo.fkidproductotipo',
-                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo', 
+                        'proveedorproductotipo.fkidproveedor','proveedorproductotipo.idproveedorproductotipo',
                     ] )
                     ->orderBy('proveedorproductotipo.idproveedorproductotipo');
             } ] )
@@ -422,9 +470,9 @@ class Proveedor extends Model
                     ->leftJoin('proveedorcargo as provcargo', 'proveedorpersonal.fkidproveedorcargo', '=', 'provcargo.idproveedorcargo')
                     ->select( [
                         'provcargo.descripcion as proveedorcargo', 'proveedorpersonal.fkidproveedorcargo',
-                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular', 
+                        'proveedorpersonal.codigo', 'proveedorpersonal.nombre', 'proveedorpersonal.apellido', 'proveedorpersonal.celular',
                         'proveedorpersonal.telefono', 'proveedorpersonal.email', 'proveedorpersonal.imagen', 'proveedorpersonal.extension',
-                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal', 
+                        'proveedorpersonal.fkidproveedor','proveedorpersonal.idproveedorpersonal',
                     ] )
                     ->orderBy('proveedorpersonal.idproveedorpersonal');
             } ] )
@@ -445,7 +493,7 @@ class Proveedor extends Model
             } )
             ->whereNull('proveedor.deleted_at')
             ->get();
-        
+
         return ( sizeof( $proveedor ) > 0 );
     }
 
@@ -455,7 +503,7 @@ class Proveedor extends Model
             ->where( 'proveedor.fkidproveedorgrupo', '=', $idproveedorgrupo )
             ->whereNull('proveedor.deleted_at')
             ->get();
-        
+
         return ( sizeof( $proveedor ) > 0 );
     }
 
@@ -465,8 +513,8 @@ class Proveedor extends Model
             ->where( 'proveedor.fkidproveedortipo', '=', $idproveedortipo )
             ->whereNull('proveedor.deleted_at')
             ->get();
-        
+
         return ( sizeof( $proveedor ) > 0 );
     }
-    
+
 }

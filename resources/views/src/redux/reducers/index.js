@@ -40,13 +40,14 @@ import { DevolucionCompraCompraReducer } from './comercio/compra/devolucionCompr
 import { InformeCompraReducer } from './comercio/compra/informeCompraReducers';
 import { ClienteTipoReducer } from './comercio/venta/clienteTipoReducers';
 import { ConceptoVentaReducer } from './comercio/venta/conceptoVentaReducers';
+import { ClienteReducer } from './comercio/venta/clienteReducers';
 
 const rootReducer = combineReducers( {
     visible:     VisibleReducer,
     disabled:    DisabledReducer,
     loading:     LoadingReducer,
     paginations: PaginationReducers,
-    
+
     printOption:   PrintOptionReducer,
     archivoOption: ArhivoOptionReducer,
 
@@ -68,6 +69,7 @@ const rootReducer = combineReducers( {
     sucursal:      SucursalReducer,
     listaPrecio:   ListaPrecioReducer,
     clienteTipo:   ClienteTipoReducer,
+    cliente:   ClienteReducer,
     conceptoVenta: ConceptoVentaReducer,
 
     proveedorTipo:    ProveedorTipoReducer,

@@ -9,6 +9,7 @@ use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\ProveedorPersonal;
+use App\Models\Comercio\Compra\ProveedorProducto;
 use App\Models\Comercio\Compra\ProveedorProductoTipo;
 use App\Models\Comercio\Compra\SolicitudCompra;
 use App\Models\Comercio\Inventario\ProductoTipo;
@@ -41,7 +42,7 @@ class ProveedorController extends Controller
             }
 
             $proveedor = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'proveedor'  => $proveedor->getCollection(),
@@ -80,7 +81,7 @@ class ProveedorController extends Controller
 
             $obj = new Proveedor();
             $idproveedor = $obj->newID();
-            
+
             $prodtipo = new ProductoTipo();
             $productotipo = $prodtipo->get_data( $prodtipo, $request );
 
@@ -89,7 +90,7 @@ class ProveedorController extends Controller
                 'idproveedor' => $idproveedor,
                 'arrayProductoTipo'  => $productotipo,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -129,6 +130,15 @@ class ProveedorController extends Controller
                 }
             }
 
+            $arrayProveedorProducto = json_decode($request->input('arrayProveedorProducto', '[]'));
+            foreach ( $arrayProveedorProducto as $proveedorProducto ) {
+                if ( !is_null( $proveedorProducto->fkidproducto ) ) {
+                    $proveedorProducto->fkidproveedor = $proveedor->idproveedor;
+                    $provprod = new ProveedorProducto();
+                    $provprod->store( $provprod, $request, $proveedorProducto );
+                }
+            }
+
             $array_proveedorpersonal = json_decode($request->input('arrayProveedorPersonal', '[]'));
 
             foreach ( $array_proveedorpersonal as $proveedorpersonal ) {
@@ -145,7 +155,7 @@ class ProveedorController extends Controller
                 'proveedor' => $proveedor,
                 'message'  => 'Proveedor registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
             DB::rollBack();
 
@@ -284,6 +294,19 @@ class ProveedorController extends Controller
 
             if ( $result ) {
 
+                $arrayProveedorProducto = json_decode($request->input('arrayProveedorProducto', '[]'));
+                foreach ( $arrayProveedorProducto as $proveedorProducto ) {
+                    if ( !is_null( $proveedorProducto->fkidproducto ) ) {
+                        $proveedorProducto->fkidproveedor = $proveedor->idproveedor;
+                        $provprod = new ProveedorProducto();
+                        if ( is_null( $proveedorProducto->idproveedorproducto ) ) {
+                            $provprod->store( $provprod, $request, $proveedorProducto );
+                        } else {
+                            $provprod->upgrade( $provprod, $proveedorProducto );
+                        }
+                    }
+                }
+
                 $array_productotipo = json_decode($request->input('arrayProductoTipo', '[]'));
 
                 foreach ( $array_productotipo as $productotipo ) {
@@ -334,7 +357,7 @@ class ProveedorController extends Controller
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Proveedor.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response()->json( [
@@ -467,7 +490,7 @@ class ProveedorController extends Controller
             }
 
             $idproveedor = $request->input('idproveedor');
-            
+
             $obj = new Proveedor();
             $proveedor = $obj->searchByID( $obj, $idproveedor );
 
@@ -482,7 +505,7 @@ class ProveedorController extends Controller
                 'response'  => 1,
                 'proveedor' => $proveedor,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -518,16 +541,16 @@ class ProveedorController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayProveedor' => $proveedor,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',
