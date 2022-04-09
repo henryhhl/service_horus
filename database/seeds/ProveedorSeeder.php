@@ -26,7 +26,7 @@ class ProveedorSeeder extends Seeder
         return [
             [
                 'fkidciudadpais'     => 1,
-                'fkidciudad'         => 2,
+                'fkidciudad'         => 6,
                 'fkidproveedortipo'  => 2,
                 'fkidproveedorgrupo' => 3,
                 'tipopersoneria'     => 'J',

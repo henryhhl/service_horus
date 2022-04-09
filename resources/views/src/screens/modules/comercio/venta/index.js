@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ModalDatoGeneral from './data/modal';
+import ModalVentaNota from './notas/modal';
 
 function IndexModuleVenta( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -12,11 +13,17 @@ function IndexModuleVenta( props ) {
         let submenu = array.pop();
         switch ( submenu ) {
             case "NOTAS":
-                return null;
+                return (
+                    <ModalVentaNota
+                        visible={ visible }
+                        onClose={ onClose }
+                        arrayMenu={ array }
+                    />
+                );
 
             case "DATO_GENERAL":
                 return (
-                    <ModalDatoGeneral 
+                    <ModalDatoGeneral
                         visible={ visible }
                         onClose={ onClose }
                         arrayMenu={ array }
@@ -25,7 +32,7 @@ function IndexModuleVenta( props ) {
 
             case "INFORMES":
                 return null;
-        
+
             default:
                 return null;
         }
@@ -36,7 +43,7 @@ function IndexModuleVenta( props ) {
             { onValidarModule() }
         </>
     );
-    
+
 };
 
 IndexModuleVenta.propTypes = {

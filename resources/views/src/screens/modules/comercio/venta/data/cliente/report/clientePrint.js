@@ -117,31 +117,31 @@ class ClienteComponent extends Component {
                         { cliente.arrayCliente.map(
                             ( item, key ) => (
                                 <tr key={key}>
-                                    <th style={ Object.assign( tbody, { paddingLeft: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingLeft: 5, } ) }>
                                         { key + 1 }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.nombre }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.apellido }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.razonsocial }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.nit ? item.nit : "" }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.tipocliente }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.ciudadpais + '-' + item.ciudad }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.telefono ? item.telefono : "" }
                                     </th>
-                                    <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
+                                    <th style={ Object.assign( tbody, { paddingRight: 5, } ) }>
                                         { item.celular ? item.celular : "" }
                                     </th>
                                 </tr>

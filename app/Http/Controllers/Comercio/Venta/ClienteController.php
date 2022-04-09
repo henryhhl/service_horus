@@ -401,6 +401,31 @@ class ClienteController extends Controller
         }
     }
 
+    public function searchByNit( Request $request ) {
+        try {
+
+            $nitcliente = isset( $request->nitcliente ) ? $request->nitcliente : "";
+            $clte = new Cliente();
+            $arrayCliente = $clte->searchByNit( $clte, $nitcliente );
+
+            return response()->json( [
+                'response'  => 1,
+                'arrayCliente' => $arrayCliente,
+            ] );
+
+        } catch (\Exception $th) {
+            return response()->json( [
+                'response' => -4,
+                'message' => 'Error al procesar la solicitud.',
+                'error' => [
+                    'file'    => $th->getFile(),
+                    'line'    => $th->getLine(),
+                    'message' => $th->getMessage(),
+                ],
+            ] );
+        }
+    }
+
     public function reporte(Request $request)
     {
         try {

@@ -12,7 +12,6 @@ import M_ListadoSucursal from '../../../../venta/data/sucursal/modal/listado';
 import M_ListadoAlmacen from '../../../../inventario/data/almacen/modal/listado';
 import M_ListadoConceptoCompra from '../../../data/conceptocompra/modal/listado';
 import M_ListadoProveedor from '../../../data/proveedor/modal/listado';
-import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
 import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 import M_ListadoOrdenCompra from '../../ordencompra/modal/listado';
 
@@ -92,7 +91,7 @@ function C_Form( props ) {
                 let montodescuento = parseFloat( ( descuento/100 ) * montosubtotal );
                 let impuesto = parseFloat(notaCompra.impuesto);
                 notaCompra.montodescuento = montodescuento.toFixed(2);
-                
+
                 let nrofactura = notaCompra.nrofactura;
                 let impuestototal = nrofactura > 0 ? parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) ) : 0;
                 notaCompra.impuestototal = impuestototal.toFixed(2);
@@ -118,11 +117,11 @@ function C_Form( props ) {
                     let descuento = parseInt( (montodescuento / montosubtotal) * 100 );
                     let impuesto = parseFloat(notaCompra.impuesto);
                     notaCompra.descuento = descuento;
-                    
+
                     let nrofactura = notaCompra.nrofactura;
                     let impuestototal = nrofactura > 0 ? parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) ) : 0;
                     notaCompra.impuestototal = impuestototal.toFixed(2);
-                
+
                     notaCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos - montodescuento - impuestototal).toFixed(2);
                     onChange( notaCompra );
                 }
@@ -146,7 +145,7 @@ function C_Form( props ) {
             }
         };
     };
-    
+
     function onChangeInternacion( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
@@ -200,11 +199,11 @@ function C_Form( props ) {
                 let otrosgastos = parseFloat(notaCompra.otrosgastos);
                 let montosubtotal = parseFloat(notaCompra.montosubtotal);
                 let montodescuento = parseFloat(notaCompra.montodescuento);
-                
+
                 let impuesto = parseFloat(notaCompra.impuesto);
 
                 if ( parseInt(value) > 0 ) {
-                    
+
                     let impuestototal = parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) );
                     notaCompra.impuestototal = impuestototal.toFixed(2);
                     notaCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos - montodescuento - impuestototal).toFixed(2);
@@ -435,7 +434,7 @@ function C_Form( props ) {
         let montosubtotal = parseFloat(notaCompra.montosubtotal);
         let montodescuento = parseFloat(notaCompra.montodescuento);
         let impuesto = parseFloat(notaCompra.impuesto);
-        
+
         let nrofactura = notaCompra.nrofactura;
         let impuestototal = nrofactura > 0 ? parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) ) : 0;
         notaCompra.impuestototal = impuestototal.toFixed(2);
@@ -489,7 +488,7 @@ function C_Form( props ) {
         let nrofactura = notaCompra.nrofactura;
         let impuestototal = nrofactura > 0 ? parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) ) : 0;
         notaCompra.impuestototal = impuestototal.toFixed(2);
-        
+
         notaCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos - montodescuento - impuestototal).toFixed(2);
 
         let array = [];
@@ -522,7 +521,7 @@ function C_Form( props ) {
 
                 fechavencimiento: detalle.fechavencimiento,
                 fvencimiento: Functions.convertYMDToDMY(detalle.fechavencimiento),
-                
+
                 nrolote: "0.00",
                 nrofabrica: "0.00",
                 nrocajas: "0",
@@ -586,14 +585,14 @@ function C_Form( props ) {
                 </Col>
                 <Col sm={{ span: 6, }}></Col>
                 <Col xs={{ span: 24, }} sm={{ span: 3, }}>
-                    <C_Input 
+                    <C_Input
                         label={"Moneda"}
                         value={ notaCompra.moneda }
                         disabled={ true }
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 3, }}>
-                    <C_Input 
+                    <C_Input
                         label={"T. C."}
                         value={ notaCompra.tipocambio }
                         onChange={ onChangeTipoCambio }
@@ -627,7 +626,7 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 3, }}>
-                    <C_Date 
+                    <C_Date
                         label={"Fecha"}
                         value={ notaCompra.fechanotacompra }
                         onChange={ onChangeFechaNotaCompra }
@@ -662,7 +661,7 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 3, }}>
-                    <C_Input 
+                    <C_Input
                         label={"Impuesto"}
                         value={ notaCompra.impuesto }
                         onChange={ onChangeImpuesto }
@@ -681,7 +680,7 @@ function C_Form( props ) {
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 3, }}>
-                    <C_Date 
+                    <C_Date
                         label={"Vcmto."}
                         value={ notaCompra.fechavencimiento }
                         onChange={ onChangeFechaVencimiento }
@@ -767,10 +766,10 @@ function C_Form( props ) {
                 </Col>
             </Row>
             <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
-                <Table 
+                <Table
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
-                    columns={ columns( notaCompra, disabled, onChange, onVisibleProducto  ) } 
+                    columns={ columns( notaCompra, disabled, onChange, onVisibleProducto  ) }
                     dataSource={notaCompra.arrayNotaCompraDetalle}
                     scroll={{ x: 2500, y: notaCompra.arrayNotaCompraDetalle.length == 0 ? 40 : 150 }}
                 />
@@ -907,7 +906,7 @@ function C_Form( props ) {
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
+                        <C_Input
                             label={"Fletes"}
                             value={ notaCompra.fletes }
                             onChange={ onChangeFletes }
@@ -915,7 +914,7 @@ function C_Form( props ) {
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
+                        <C_Input
                             label={"Internación"}
                             value={ notaCompra.internacion }
                             onChange={ onChangeInternacion }
@@ -923,7 +922,7 @@ function C_Form( props ) {
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
+                        <C_Input
                             label={"Otros gastos"}
                             value={ notaCompra.otrosgastos }
                             onChange={ onChangeOtrosGastos }

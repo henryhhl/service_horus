@@ -41,6 +41,11 @@ import { InformeCompraReducer } from './comercio/compra/informeCompraReducers';
 import { ClienteTipoReducer } from './comercio/venta/clienteTipoReducers';
 import { ConceptoVentaReducer } from './comercio/venta/conceptoVentaReducers';
 import { ClienteReducer } from './comercio/venta/clienteReducers';
+import { ComisionVentaReducer } from './comercio/venta/comisionVentaReducers';
+import { VendedorReducer } from './comercio/venta/vendedorReducers';
+import { ActividadEconomicaReducer } from './comercio/venta/actividadEconomicaReducers';
+import { DosificacionReducer } from './comercio/venta/dosificacionReducers';
+import { NotaVentaReducer } from './comercio/venta/notaVentaReducers';
 
 const rootReducer = combineReducers( {
     visible:     VisibleReducer,
@@ -71,6 +76,12 @@ const rootReducer = combineReducers( {
     clienteTipo:   ClienteTipoReducer,
     cliente:   ClienteReducer,
     conceptoVenta: ConceptoVentaReducer,
+    comisionVenta: ComisionVentaReducer,
+    vendedor: VendedorReducer,
+    actividadEconomica: ActividadEconomicaReducer,
+    dosificacion: DosificacionReducer,
+
+    notaVenta: NotaVentaReducer,
 
     proveedorTipo:    ProveedorTipoReducer,
     proveedorGrupo:   ProveedorGrupoReducer,

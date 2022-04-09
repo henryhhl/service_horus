@@ -22,7 +22,7 @@ class CreateProductoTable extends Migration
             $table->integer('fkidproductotipo')->unsigned();
             $table->integer('fkidproductogrupo')->unsigned();
             $table->integer('fkidproductosubgrupo')->unsigned();
-            
+
             $table->string('codigo', 150)->nullable();
             $table->string('nombre', 250);
             $table->text('descripcion')->nullable();
@@ -33,7 +33,7 @@ class CreateProductoTable extends Migration
             $table->integer('nivel')->default(0);
 
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');

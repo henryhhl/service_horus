@@ -16,25 +16,25 @@ const SucursalXLSX = ( props ) => {
             columns: [
                 { title: "NRO",            style: { font: { sz: "12", bold: true, } }, },
                 { title: "DESCRIPCIÓN",    style: { font: { sz: "12", bold: true, } }, },
-                { title: "DIRECCIÓN",      style: { font: { sz: "12", bold: true, } }, },
                 { title: "CIUDAD",         style: { font: { sz: "12", bold: true, } }, },
+                { title: "DIRECCIÓN",      style: { font: { sz: "12", bold: true, } }, },
                 { title: "UNIÓN SUCURSAL", style: { font: { sz: "12", bold: true, } }, },
             ],
             data: unionSucursal.arrayUnionSucursal.map( ( element, key ) => [
                 { value: ( key + 1 ),         style: { font: { sz: "10", } } },
                 { value: element.descripcion, style: { font: { sz: "10", } } },
-                { value: element.direccion,   style: { font: { sz: "10", } } },
-                { value: element.ciudad,      style: { font: { sz: "10", } } },
+                { value: element.direccion ? element.direccion : '',   style: { font: { sz: "10", } } },
+                { value: `${element.ciudadpais} ${element.ciudad}`,      style: { font: { sz: "10", } } },
                 { value: element.unionsucursal, style: { font: { sz: "10", } } },
             ] ),
         },
     ];
 
     return (
-        <ExcelFile 
-            filename="sucursal" 
+        <ExcelFile
+            filename="sucursal"
             element={
-                <button type="button" id="buttonsucursal_xlsx" style={ {display: 'none', } } 
+                <button type="button" id="buttonsucursal_xlsx" style={ {display: 'none', } }
                 >
                     Export Data
                 </button>

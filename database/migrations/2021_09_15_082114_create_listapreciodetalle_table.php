@@ -16,15 +16,19 @@ class CreateListapreciodetalleTable extends Migration
         Schema::create('listapreciodetalle', function (Blueprint $table) {
             $table->increments('idlistapreciodetalle');
 
+            $table->integer('x_idusuario')->unsigned()->nullable();
+
             $table->integer('fkidlistaprecio')->unsigned();
             $table->integer('fkidproducto')->unsigned();
-            $table->integer('fkidmoneda')->unsigned();
-            
+            $table->integer('fkidunidadmedidaproducto')->unsigned();
+            $table->integer('fkidmoneda')->unsigned()->nullable();
+
             $table->decimal('preciobase', 24, 8)->default(0);
             $table->decimal('preciopivote', 24, 8)->default(0);
             $table->decimal('precioventa', 24, 8)->default(0);
             $table->integer('descuento')->default(0);
             $table->decimal('montodescuento', 24, 8)->default(0);
+
             $table->text('nota')->nullable();
 
             $table->date('fecha');

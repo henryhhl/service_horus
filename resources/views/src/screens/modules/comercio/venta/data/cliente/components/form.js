@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 
 import { Col, Row } from 'antd';
 import { C_Date, C_Input, C_Select } from '../../../../../../../components';
+
 import M_TreeCiudad from '../../../../inventario/data/ciudad/modal/listado';
+import M_ListadoClienteTipo from '../../clientetipo/modal/listado';
 
 import { Functions } from '../../../../../../../utils/functions';
-import M_ListadoClienteTipo from '../../clientetipo/modal/listado';
 
 function C_Form( props ) {
     const { cliente, disabled, onChange } = props;
@@ -332,6 +333,7 @@ function C_Form( props ) {
                         placeholder={ "INGRESAR CÓDIGO..." }
                         value={ cliente.codigo }
                         onChange={ onChangeCodigo }
+                        disabled={ disabled.data }
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>

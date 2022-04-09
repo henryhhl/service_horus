@@ -32,7 +32,7 @@ const styles = StyleSheet.create( {
         color: 'grey',
     },
     thead: {
-        fontSize: 10, fontFamily: 'Oswald,Roboto,sans-serif', paddingLeft: 15,
+        fontSize: 10, fontFamily: 'Oswald,Roboto,sans-serif', paddingLeft: 5,
     },
     tbody: {
         fontSize: 9, color: 'grey', paddingLeft: 8,
@@ -62,32 +62,32 @@ function SucursalPDF( props ) {
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, }}>
                         <View style={styles.header}>
-                            <Text style={{ paddingBottom: 2, }}> 
-                                HORUS S.R.L. 
+                            <Text style={{ paddingBottom: 2, }}>
+                                HORUS S.R.L.
                             </Text>
-                            <Text style={{ paddingBottom: 2, }}> 
-                                Av. El Trompillo Nro. 1029 
+                            <Text style={{ paddingBottom: 2, }}>
+                                Av. El Trompillo Nro. 1029
                             </Text>
-                            <Text style={{ paddingBottom: 2, }}> 
-                                Telf. 
+                            <Text style={{ paddingBottom: 2, }}>
+                                Telf.
                             </Text>
-                            <Text style={{ paddingBottom: 2, }}> 
-                                N.I.T. 317672026 
+                            <Text style={{ paddingBottom: 2, }}>
+                                N.I.T. 317672026
                             </Text>
                         </View>
-                        
+
                         <View style={styles.header}>
-                            <Text style={{ paddingBottom: 1, fontSize: 10, fontFamily: 'Oswald,Roboto,sans-serif', color: 'black', }}> 
+                            <Text style={{ paddingBottom: 1, fontSize: 10, fontFamily: 'Oswald,Roboto,sans-serif', color: 'black', }}>
                                 RAL. 01.01.02
                             </Text>
-                            <Text style={{ paddingBottom: 2, paddingLeft: 5, }}> 
-                                { sucursal.fecha } 
+                            <Text style={{ paddingBottom: 2, paddingLeft: 5, }}>
+                                { sucursal.fecha }
                             </Text>
-                            <Text style={{ paddingBottom: 3, paddingLeft: 10, }}> 
-                                { sucursal.hora } 
+                            <Text style={{ paddingBottom: 3, paddingLeft: 10, }}>
+                                { sucursal.hora }
                             </Text>
-                            {/* <Text style={{ paddingBottom: 2, }}> 
-                                Pag: 
+                            {/* <Text style={{ paddingBottom: 2, }}>
+                                Pag:
                             </Text> */}
                             <Text style={{ paddingBottom: 2, }} render={({ pageNumber, totalPages }) => (
                                 `Pag: ${ pageNumber } / ${ totalPages }`
@@ -96,28 +96,28 @@ function SucursalPDF( props ) {
                     </View>
 
                     <View style={ [{ flexDirection: 'row', marginTop: 5, }, styles.borderBottomColor] }>
-                        <View style={{ width: '10%', }}>
-                            <Text style={ styles.thead }> 
+                        <View style={{ width: '5%', }}>
+                            <Text style={ styles.thead }>
                                 NRO
                             </Text>
                         </View>
                         <View style={{ width: '25%', }}>
-                            <Text style={ styles.thead }> 
+                            <Text style={ styles.thead }>
                                 DESCRIPCIÓN
                             </Text>
                         </View>
-                        <View style={{ width: '40%', }}>
-                            <Text style={ styles.thead }> 
-                                DIRECCIÓN
-                            </Text>
-                        </View>
-                        <View style={{ width: '10%', }}>
-                            <Text style={ styles.thead }> 
+                        <View style={{ width: '15%', }}>
+                            <Text style={ styles.thead }>
                                 CIUDAD
                             </Text>
                         </View>
+                        <View style={{ width: '40%', }}>
+                            <Text style={ styles.thead }>
+                                DIRECCIÓN
+                            </Text>
+                        </View>
                         <View style={{ width: '15%', }}>
-                            <Text style={ styles.thead }> 
+                            <Text style={ styles.thead }>
                                 UNIÓN SUCURSAL
                             </Text>
                         </View>
@@ -126,30 +126,30 @@ function SucursalPDF( props ) {
                     { sucursal.arraySucursal.map( ( item, key ) => {
                         return (
                             <View key={key} style={ { flexDirection: 'row', marginTop: 5, } }>
-                                <View style={{ width: '10%', }}>
-                                    <Text style={ styles.tbody }> 
+                                <View style={{ width: '5%', }}>
+                                    <Text style={ styles.tbody }>
                                         {/* { item.idciudadclasificacion }  */}
-                                        { key + 1 } 
+                                        { key + 1 }
                                     </Text>
                                 </View>
                                 <View style={{ width: '25%', }}>
-                                    <Text style={ styles.tbody }> 
-                                        { item.descripcion } 
-                                    </Text>
-                                </View>
-                                <View style={{ width: '40%', }}>
-                                    <Text style={ styles.tbody }> 
-                                        { item.direccion } 
+                                    <Text style={ styles.tbody }>
+                                        { item.descripcion }
                                     </Text>
                                 </View>
                                 <View style={{ width: '10%', }}>
-                                    <Text style={ styles.tbody }> 
-                                        { item.ciudad } 
+                                    <Text style={ styles.tbody }>
+                                        { item.ciudadpais } { item.ciudad }
+                                    </Text>
+                                </View>
+                                <View style={{ width: '40%', }}>
+                                    <Text style={ styles.tbody }>
+                                        { item.direccion ? item.direccion : '' }
                                     </Text>
                                 </View>
                                 <View style={{ width: '15%', }}>
-                                    <Text style={ styles.tbody }> 
-                                        { item.unionsucursal } 
+                                    <Text style={ styles.tbody }>
+                                        { item.unionsucursal }
                                     </Text>
                                 </View>
                             </View>

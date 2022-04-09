@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import ReactHTMLTableToExcel from 'react-html-table-to-excel';
 
 const SucursalXLS = ( props ) => {
-    
+
     const { sucursal } = props;
 
     return (
@@ -31,8 +31,8 @@ const SucursalXLS = ( props ) => {
                         <tr>
                             <th style={{ fontWeight: 'bolder', }}>NRO</th>
                             <th style={{ fontWeight: 'bolder', }}>DESCRIPCIÓN</th>
-                            <th style={{ fontWeight: 'bolder', }}>DIRECCIÓN</th>
                             <th style={{ fontWeight: 'bolder', }}>CIUDAD</th>
+                            <th style={{ fontWeight: 'bolder', }}>DIRECCIÓN</th>
                             <th style={{ fontWeight: 'bolder', }}>UNIÓN SUCURSAL</th>
                         </tr>
                     </thead>
@@ -47,10 +47,10 @@ const SucursalXLS = ( props ) => {
                                         { item.descripcion }
                                     </td>
                                     <td style={{ padding: "5px" }}>
-                                        { item.direccion }
+                                        { item.ciudadpais } { item.ciudad }
                                     </td>
                                     <td style={{ padding: "5px" }}>
-                                        { item.ciudad }
+                                        { item.direccion ? item.direccion : '' }
                                     </td>
                                     <td style={{ padding: "5px" }}>
                                         { item.unionsucursal }

@@ -77,7 +77,7 @@ function C_ListadoSucursal( props ) {
         return (
             <div className="card-header">
                 {/* <div className="card-header-title font-size-lg text-capitalize font-weight-normal">
-                    
+
                 </div> */}
                 <div className="btn-actions-pane-right">
                     <button type="button" className="btn-icon btn-wide btn-shadow btn-outline-2x btn btn-outline-primary btn-sm d-flex"
@@ -124,10 +124,10 @@ function C_ListadoSucursal( props ) {
                                         Descripción
                                     </th>
                                     <th className="text-left">
-                                        Dirección
+                                        Ciudad
                                     </th>
                                     <th className="text-left">
-                                        Ciudad
+                                        Dirección
                                     </th>
                                     <th className="text-left">
                                         Unión Sucursal
@@ -159,10 +159,12 @@ function C_ListadoSucursal( props ) {
                                                 { item.descripcion }
                                             </td>
                                             <td className="text-left">
-                                                { item.direccion }
-                                            </td><td className="text-left">
-                                                { item.ciudad }
-                                            </td><td className="text-left">
+                                                { item.ciudadpais } { item.ciudad }
+                                            </td>
+                                            <td className="text-left">
+                                                { item.direccion && item.direccion }
+                                            </td>
+                                            <td className="text-left">
                                                 { item.unionsucursal }
                                             </td>
                                         </tr>
@@ -181,7 +183,7 @@ function C_ListadoSucursal( props ) {
 C_ListadoSucursal.propTypes = {
     value:  PropTypes.any,
     create: PropTypes.bool,
-    
+
     onCreate:  PropTypes.func,
     onChecked: PropTypes.func,
 }

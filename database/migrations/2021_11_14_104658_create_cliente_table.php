@@ -56,7 +56,7 @@ class CreateClienteTable extends Migration
             $table->decimal('montototalultimaventa', 24, 8)->default(0);
 
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
             $table->enum("tipopersoneria",["N","J", "S"])->default("S");
 
             $table->date('fecha');

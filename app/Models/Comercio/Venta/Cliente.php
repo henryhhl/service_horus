@@ -407,4 +407,32 @@ class Cliente extends Model
 
         return $cliente;
     }
+
+    public function searchByNit( $query, $nit ) {
+        $islike =  Functions::isLikeAndIlike();
+
+        $cliente = $query
+            ->select( [
+                'cliente.fkidciudadpais', 'cliente.fkidciudad', 'cliente.fkidclientetipo', 'cliente.fkidlistaprecio', 'cliente.fkidconceptoventa', 'cliente.fkidsucursal',
+                'cliente.codigo', 'cliente.nombre', 'cliente.apellido', 'cliente.razonsocial', 'cliente.nit', 'cliente.email', 'cliente.casilla', 'cliente.fax', 'cliente.telefono', 'cliente.celular',
+                'cliente.contacto', 'cliente.direccion', 'cliente.diascredito', 'cliente.limitecredito',
+                'cliente.descuento', 'cliente.cantidaditems', 'cliente.descuentoxcantidaditems', 'cliente.descuentoinicial', 'cliente.descuentofinal',
+                'cliente.montototaladeudado', 'cliente.fechaultimopago', 'cliente.montototaladeudadoultimopago', 'cliente.fechaultimaventa', 'cliente.montototalultimaventa',
+                'cliente.imagen', 'cliente.extension', 'cliente.tipopersoneria',
+                'cliente.estado', 'cliente.isdelete', 'cliente.fecha', 'cliente.hora',
+                'ciupais.idciudad as idciudadpais', 'ciupais.descripcion as ciudadpais',
+                'ciu.idciudad', 'ciu.descripcion as ciudad',
+                'tipo.idclientetipo', 'tipo.descripcion as tipocliente',
+                'cliente.idcliente',
+            ] )
+            ->leftJoin('ciudad as ciupais', 'cliente.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('ciudad as ciu', 'cliente.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('clientetipo as tipo', 'cliente.fkidclientetipo', '=', 'tipo.idclientetipo')
+            ->where( 'cliente.nit', $islike, $nit )
+            ->whereNull('cliente.deleted_at')
+            ->orderBy('cliente.idcliente', 'DESC')
+            ->get();
+
+        return $cliente;
+    }
 }

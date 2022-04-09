@@ -14,6 +14,7 @@ function C_Form( props ) {
     const { focusInput, error, message } = sucursal;
 
     const [ visible_unionsucursal, setVisibleUnionSucursal ] = useState( false );
+    const [ visible_ciudadpais, setVisibleCiudadPais ] = useState( false );
     const [ visible_ciudad, setVisibleCiudad ] = useState( false );
 
     function onChangeID( value ) {
@@ -58,8 +59,32 @@ function C_Form( props ) {
         );
     };
 
+    function onShowCiudadPais() {
+        if ( !disabled.data ) setVisibleCiudadPais(true);
+    };
+
     function onShowCiudad() {
-        if ( !disabled.data ) setVisibleCiudad(true);
+        if ( ( !disabled.data ) && ( typeof sucursal.fkidciudadpais === "number"  ) ) setVisibleCiudad(true);
+    };
+
+    function componentCiudadPais() {
+        if ( !visible_ciudadpais ) return null;
+        return (
+            <M_TreeCiudad
+                showChildren={false}
+                visible={visible_ciudadpais}
+                onClose={ () => setVisibleCiudadPais(false) }
+                onSelect={ ( data ) => {
+                    sucursal.fkidciudadpais  = data.idciudad;
+                    sucursal.ciudadpais      = data.descripcion;
+                    sucursal.error.fkidciudadpais   = false;
+                    sucursal.message.fkidciudadpais = "";
+                    onChange( sucursal );
+                    setVisibleCiudadPais(false);
+                } }
+                title="Pais"
+            />
+        );
     };
 
     function componentCiudad() {
@@ -76,6 +101,9 @@ function C_Form( props ) {
                     onChange( sucursal );
                     setVisibleCiudad(false);
                 } }
+                selectedPadre={false}
+                fkiddata={sucursal.fkidciudadpais}
+                expanded={true}
             />
         );
     };
@@ -83,10 +111,11 @@ function C_Form( props ) {
     return (
         <>
             { componentUnionSucursal() }
+            { componentCiudadPais() }
             { componentCiudad() }
             <Row gutter={ [12, 8] }>
-                <Col sm={{ span: 8, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 9, }}></Col>
+                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
                         label={ "Código"}
                         placeholder={ "INGRESAR CÓDIGO..." }
@@ -100,18 +129,6 @@ function C_Form( props ) {
                 </Col>
             </Row>
             <Row gutter={ [12, 8] }>
-                <Col sm={{ span: 2, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                    <C_Input
-                        label={ "Descripción"}
-                        placeholder={ "INGRESAR DESCRIPCIÓN..." }
-                        value={ descripcion }
-                        onChange={ onChangeDescripcion }
-                        disabled={ disabled.data }
-                        error={error.descripcion}
-                        message={message.descripcion}
-                    />
-                </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
                         label={ "Unión Sucursal"}
@@ -124,21 +141,32 @@ function C_Form( props ) {
                         select={true}
                     />
                 </Col>
-            </Row>
-            <Row gutter={ [12, 8] }>
-                <Col sm={{ span: 2, }}></Col>
                 <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                     <C_Input
-                        label={ "Dirección"}
-                        placeholder={ "INGRESAR DIRECCIÓN..." }
-                        value={ direccion }
-                        onChange={ onChangeDireccion }
+                        label={ "Descripción"}
+                        placeholder={ "INGRESAR DESCRIPCIÓN..." }
+                        value={ descripcion }
+                        onChange={ onChangeDescripcion }
                         disabled={ disabled.data }
-                        error={error.direccion}
-                        message={message.direccion}
+                        error={error.descripcion}
+                        message={message.descripcion}
                     />
                 </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+            </Row>
+            <Row gutter={ [12, 8] }>
+                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
+                    <C_Input
+                        label={ "Pais*"}
+                        placeholder={ "SELECCIONAR PAIS..." }
+                        value={ sucursal.ciudadpais }
+                        onClick={onShowCiudadPais}
+                        disabled={ disabled.data }
+                        error={error.fkidciudadpais}
+                        message={message.fkidciudadpais}
+                        select={true}
+                    />
+                </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <C_Input
                         label={ "Ciudad"}
                         placeholder={ "SELECCIONAR CIUDAD..." }
@@ -150,6 +178,18 @@ function C_Form( props ) {
                         select={true}
                     />
                 </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                    <C_Input
+                        label={ "Dirección"}
+                        placeholder={ "INGRESAR DIRECCIÓN..." }
+                        value={ direccion }
+                        onChange={ onChangeDireccion }
+                        disabled={ disabled.data }
+                        error={error.direccion}
+                        message={message.direccion}
+                    />
+                </Col>
+
             </Row>
         </>
     );

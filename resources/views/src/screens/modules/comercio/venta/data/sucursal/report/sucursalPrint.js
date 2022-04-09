@@ -21,7 +21,7 @@ class SucursalPrint extends Component {
                 </ReactToPrint>
                 <div style={{ display: 'none' }}>
                     <SucursalComponent
-                        sucursal={sucursal} 
+                        sucursal={sucursal}
                         ref={ el => (this.componentSucursalRef = el) }
                     />
                 </div>
@@ -47,14 +47,14 @@ class SucursalComponent extends Component {
             fontSize: 9, color: 'grey', paddingLeft: 8, paddingTop: 10,
         };
         const ttitle = {
-            fontSize: 15, textAlign: 'center', fontFamily: 'Oswald,Roboto,sans-serif', 
+            fontSize: 15, textAlign: 'center', fontFamily: 'Oswald,Roboto,sans-serif',
             paddingTop: 40, paddingLeft: 40, paddingRight: 40,
         };
 
         return (
             <>
                 <table style={{ width: '100%', paddingLeft: 40, paddingRight: 40, }}>
-    
+
                     <tbody>
                         <tr>
                             <th colSpan='5' style={ ttitle }>
@@ -62,7 +62,7 @@ class SucursalComponent extends Component {
                             </th>
                         </tr>
                     </tbody>
-    
+
                     <tbody>
                         <tr>
                             <th colSpan='5' style={{ fontSize: 10, paddingTop: 5, color: 'grey', }}>
@@ -81,9 +81,9 @@ class SucursalComponent extends Component {
                                 </div>
                             </th>
                         </tr>
-    
+
                     </tbody>
-                    
+
                     <tbody>
                         <tr>
                             <th style={{ paddingTop: 10, paddingLeft: 40, borderBottom: '1px solid #E8E8E8', }}>
@@ -93,10 +93,10 @@ class SucursalComponent extends Component {
                                 <strong style={ thead }> DESCRIPCIÓN </strong>
                             </th>
                             <th style={{ paddingTop: 10, paddingRight: 40, borderBottom: '1px solid #E8E8E8', }}>
-                                <strong style={ thead }> DIRECCIÓN </strong>
+                                <strong style={ thead }> CIUDAD </strong>
                             </th>
                             <th style={{ paddingTop: 10, paddingRight: 40, borderBottom: '1px solid #E8E8E8', }}>
-                                <strong style={ thead }> CIUDAD </strong>
+                                <strong style={ thead }> DIRECCIÓN </strong>
                             </th>
                             <th style={{ paddingTop: 10, paddingRight: 40, borderBottom: '1px solid #E8E8E8', }}>
                                 <strong style={ thead }> UNIÓN SUCURSAL </strong>
@@ -112,10 +112,10 @@ class SucursalComponent extends Component {
                                         { item.descripcion }
                                     </th>
                                     <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
-                                        { item.direccion }
+                                        { item.ciudadpais } { item.ciudad }
                                     </th>
                                     <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
-                                        { item.ciudad }
+                                        { item.direccion ? item.direccion : '' }
                                     </th>
                                     <th style={ Object.assign( tbody, { paddingRight: 40, } ) }>
                                         { item.unionsucursal }
@@ -124,7 +124,7 @@ class SucursalComponent extends Component {
                                 </tr>
                             )
                         ) }
-                        
+
                     </tbody>
                 </table>
             </>

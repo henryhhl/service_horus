@@ -13,7 +13,7 @@ function C_ModalDraggable( props ) {
     const [ draggable, setDraggable ] = useState( true );
     const [ bounds, setBounds ] = useState( { left: 0, top: 0, bottom: 0, right: 0, } );
 
-    let bodyStyle = { padding: '2px 3px 6px 3px', };
+    let bodyStyle = { padding: '2px 3px 6px 3px', paddingLeft: 8, paddingRight: 8, };
     bodyStyle = Object.assign( bodyStyle, props.bodyStyle );
 
     let draggleRef = React.createRef();
@@ -23,7 +23,7 @@ function C_ModalDraggable( props ) {
             <Modal
 
                 footer={ footer }
-                
+
                 onOk={ onOK }
                 onCancel={ onClose }
 
@@ -37,9 +37,9 @@ function C_ModalDraggable( props ) {
                 closable={ props.closable }
                 confirmLoading={true}
 
-                modalRender={ 
-                    ( modal ) => 
-                        <Draggable 
+                modalRender={
+                    ( modal ) =>
+                        <Draggable
                             disabled={ draggable }
                             bounds={ bounds }
                             onStart={ ( event, uiData ) => {
@@ -53,16 +53,16 @@ function C_ModalDraggable( props ) {
                                     bottom: clientHeight      - ( targetRect?.bottom - uiData?.y ),
                                 } );
                             } }
-                        > 
+                        >
                             <div ref={ draggleRef }>
-                                { modal } 
+                                { modal }
                             </div>
-                        </Draggable> 
+                        </Draggable>
                 }
                 closeIcon={
-                    <CloseOutlined 
-                        style={{ 
-                            padding: 6, borderRadius: 50, background: 'white', fontSize: 12, fontWeight: 'bold', boxShadow: '0 0 7px 0 #222', 
+                    <CloseOutlined
+                        style={{
+                            padding: 6, borderRadius: 50, background: 'white', fontSize: 12, fontWeight: 'bold', boxShadow: '0 0 7px 0 #222',
                             position: 'relative', top: -5, left: 4,
                         }}
                     />
@@ -93,7 +93,7 @@ function C_ModalDraggable( props ) {
 
                 cancelText={ props.cancelText }
                 okText={ props.okText }
-                
+
             >
                 { props.children }
             </Modal>
@@ -144,7 +144,7 @@ C_ModalDraggable.defaultProps = {
     okText:     'OK',
 
     footer: null,
-    
+
     maskStyle: {},
     style:     {},
     bodyStyle: {},

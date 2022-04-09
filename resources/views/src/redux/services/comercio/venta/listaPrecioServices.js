@@ -24,7 +24,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
         search: search,
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 1 ) {
             C_Message( "success", "Servicio realizado exitosamente." );
         }
@@ -33,7 +33,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
 };
 
 const onCreate = async () => {
-    
+
     return httpRequest( 'get', webservices.wscomercioventalistaprecio_create, {
 
     } ) . then ( ( result ) => {
@@ -50,17 +50,23 @@ const onCreate = async () => {
 
 const onGrabar = async ( listaprecio ) => {
     return httpRequest( "post", webservices.wscomercioventalistaprecio_store, {
-        nombre:        listaprecio.nombre,
+        descripcion:   listaprecio.descripcion,
         abreviatura:   listaprecio.abreviatura,
         tipocambio:    listaprecio.tipocambio,
         fechainicio:   Functions.convertDMYToYMD(listaprecio.fechainicio),
         fechafinal:    Functions.convertDMYToYMD(listaprecio.fechafinal),
-        nota:          listaprecio.nota,
-        imagen:        listaprecio.imagen,
-        extension:     listaprecio.extension,
+        fechalistaprecio: Functions.convertDMYToYMD(listaprecio.fechalistaprecio),
+        nota: listaprecio.nota,
+        valor: listaprecio.valor,
+        fijoporcentaje: listaprecio.fijoporcentaje,
+        accion: listaprecio.accion,
+        listapreciodetalle: JSON.stringify( listaprecio.listapreciodetalle ),
+        estado: listaprecio.estado,
+        imagen:  listaprecio.imagen,
+        extension: listaprecio.extension,
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 0 ) {
             C_Message( "warning", result.message );
             var errors = result.errors;
@@ -81,7 +87,7 @@ const onGrabar = async ( listaprecio ) => {
 
 const onEdit = async ( idlistaprecio ) => {
     return httpRequest( "get", webservices.wscomercioventalistaprecio_editar + "/" + idlistaprecio, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {
@@ -98,14 +104,21 @@ const onEdit = async ( idlistaprecio ) => {
 const onUpdate = async ( listaprecio ) => {
     return httpRequest( "post", webservices.wscomercioventalistaprecio_update, {
         idlistaprecio: listaprecio.idlistaprecio,
-        nombre:        listaprecio.nombre,
+        descripcion:   listaprecio.descripcion,
         abreviatura:   listaprecio.abreviatura,
         tipocambio:    listaprecio.tipocambio,
         fechainicio:   Functions.convertDMYToYMD(listaprecio.fechainicio),
         fechafinal:    Functions.convertDMYToYMD(listaprecio.fechafinal),
-        nota:          listaprecio.nota,
-        imagen:        listaprecio.imagen,
-        extension:     listaprecio.extension,
+        fechalistaprecio: Functions.convertDMYToYMD(listaprecio.fechalistaprecio),
+        nota: listaprecio.nota,
+        valor: listaprecio.valor,
+        fijoporcentaje: listaprecio.fijoporcentaje,
+        accion: listaprecio.accion,
+        estado: listaprecio.estado,
+        listapreciodetalle: JSON.stringify( listaprecio.listapreciodetalle ),
+        listapreciodetalledelete: JSON.stringify( listaprecio.listapreciodetalledelete ),
+        imagen:  listaprecio.imagen,
+        extension: listaprecio.extension,
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {
@@ -177,7 +190,7 @@ const onSearchData = async ( listaprecio ) => {
 
 const onImprimir = async () => {
     return httpRequest( "post", webservices.wscomercioventalistaprecio_reporte, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 1 ) {

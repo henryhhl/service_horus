@@ -18,13 +18,13 @@ function C_Date( props ) {
         return (
             <div className={ props.column } style={{ paddingTop: 12, position: 'relative', }}>
                 {
-                    props.label && 
+                    props.label &&
                     <label className={ label }
                     >
                         { props.label }
                     </label>
                 }
-                <DatePicker 
+                <DatePicker
                     size={props.size}
                     popupStyle={{ zIndex: 9999, }}
                     style={ style }
@@ -33,7 +33,7 @@ function C_Date( props ) {
                     allowClear={props.allowClear}
                     picker={props.picker}
                     disabled={props.disabled}
-                    value={ props.value ? moment( props.value, props.format ) : undefined }
+                    value={ ( props.value != null && props.value != "" && props.value != undefined ) ? moment( props.value, props.format ) : undefined }
                     onChange={ ( date, dateString ) => {
                         if ( props.onChange ) {
                             props.onChange( dateString );
@@ -41,7 +41,7 @@ function C_Date( props ) {
                     } }
                     className={ Functions.esBoolean( props.error ) ? "border-danger-error" : "" }
                 />
-                { Functions.esBoolean( props.error ) && 
+                { Functions.esBoolean( props.error ) &&
                     <div className="ant-form-item-explain ant-form-item-explain-error">
                         <div role="alert" style={{ fontSize: 10, }}>
                             {props.message}

@@ -39,7 +39,7 @@ function C_ListadoCliente( props ) {
             resultData( result );
             if ( result.response == 1 ) {
                 C_Message( "success", "Servicio realizado exitosamente." );
-                setArrayData( result.conceptoventa );
+                setArrayData( result.arrayCliente );
             }
         } );
     };

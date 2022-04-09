@@ -22,7 +22,7 @@ import ListaPrecioPDF from './report/listaPrecioPDF';
 
 function IndexListaPrecio( props ) {
     const { archivo, listaPrecio, disabled, option, paginations } = props;
-    
+
     const [ visible_pdf, setVisiblePDF ] = useState( false );
     const [ visible_action, setVisibleAction ] = useState( false );
 
@@ -39,8 +39,19 @@ function IndexListaPrecio( props ) {
     }
 
     function onGrabarData() {
-        if( listaPrecio.update )  props.onUpdate( listaPrecio );
-        else props.onGrabar( listaPrecio )
+        if( listaPrecio.update ) {
+            let onUpdate = () => props.onUpdate( listaPrecio );
+            C_Confirm( {
+                title: "Editar Lista Precio", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
+            } );
+        } else {
+            let ongrabar = () => props.onGrabar( listaPrecio );
+            C_Confirm( {
+                title: "Registrar Lista Precio", onOk: ongrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
+            } );
+        }
     };
 
     function onConfirmarDelete() {
@@ -100,7 +111,7 @@ function IndexListaPrecio( props ) {
 
     function componentOption() {
         return (
-            <OptionListaPrecio 
+            <OptionListaPrecio
                 option={option}
                 onChange={props.setPrintOption}
                 onSubmit={ onSubmitOption }
@@ -133,7 +144,7 @@ function IndexListaPrecio( props ) {
 
     function componentArchivo() {
         return (
-            <ArchivoListaPrecio 
+            <ArchivoListaPrecio
                 archivo={archivo}
                 onChange={props.setArchivoOption}
                 onSubmit={ onSubmitArchivo }
@@ -146,17 +157,17 @@ function IndexListaPrecio( props ) {
         return (
             <>
                 <C_ModalDraggable
-                    visible={ visible_pdf } 
+                    visible={ visible_pdf }
                     onClose={ () => {
                         setVisiblePDF( false );
                     } }
                     maskStyle={{ background: "transparent", }}
-                    width={"90%"}  zIndex={ 1200 }  
+                    width={"90%"}  zIndex={ 1200 }
                     title={ "REPORTE LISTA PRECIO" }
                     bodyStyle={{ padding: '5px 4px', }}
                     style={{ top: 10, }}
                 >
-                    <ListaPrecioPDF 
+                    <ListaPrecioPDF
                         listaPrecio={listaPrecio.reporte}
                     />
                 </C_ModalDraggable>
@@ -180,14 +191,14 @@ function IndexListaPrecio( props ) {
             />
 
             <div className="pt-2 pb-3 pl-4 pr-4" style={{ flexGrow: 1, width: "100%", }}>
-                <C_Form 
+                <C_Form
                     listaPrecio={ listaPrecio }
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
                 />
             </div>
-            <C_Footer 
+            <C_Footer
                 disabled={disabled}
 
                 onCreate={props.onCreate}

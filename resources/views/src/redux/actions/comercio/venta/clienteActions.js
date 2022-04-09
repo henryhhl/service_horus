@@ -291,6 +291,21 @@ function onValidate( cliente ) {
         cliente.message.razonsocial = "Se permite máximo 300 caracteres";
         bandera = false;
     }
+    if ( typeof cliente.fkidciudadpais !== "number" ) {
+        cliente.error.fkidciudadpais   = true;
+        cliente.message.fkidciudadpais = "Campo requerido";
+        bandera = false;
+    }
+    if ( typeof cliente.fkidciudad !== "number" ) {
+        cliente.error.fkidciudad   = true;
+        cliente.message.fkidciudad = "Campo requerido";
+        bandera = false;
+    }
+    if ( typeof cliente.fkidclientetipo !== "number" ) {
+        cliente.error.fkidclientetipo   = true;
+        cliente.message.fkidclientetipo = "Campo requerido";
+        bandera = false;
+    }
     if ( !bandera ) {
         C_Message( "error", "Problemas al registrar" );
     }

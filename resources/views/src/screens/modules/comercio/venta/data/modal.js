@@ -10,6 +10,10 @@ import IndexListaPrecio from './listaprecio';
 import IndexClienteTipo from './clientetipo';
 import IndexCliente from './cliente';
 import IndexConceptoVenta from './conceptoventa';
+import IndexComisionVenta from './comisionventa';
+import IndexVendedor from './vendedor';
+import IndexActividadEconomica from './actividadeconomica';
+import IndexDosificacion from './dosificacion';
 
 function ModalDatoGeneral( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -25,7 +29,7 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="LISTA PRECIO"
-                        width={"85%"} style={{ top: 40, }}
+                        width={"95%"} style={{ top: 10, }}
                     >
                         <IndexListaPrecio
                             onClose={ onClose }
@@ -42,6 +46,34 @@ function ModalDatoGeneral( props ) {
                         width={650}
                     >
                         <IndexConceptoVenta
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "vendedor":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="VENDEDOR"
+                        width={"95%"}
+                    >
+                        <IndexVendedor
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "comisionventa":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="COMISIÓN VENTA"
+                        width={650}
+                    >
+                        <IndexComisionVenta
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>
@@ -82,7 +114,7 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="SUCURSAL"
-                        width={800}
+                        width={850}
                     >
                         <IndexSucursal
                             onClose={ onClose }
@@ -99,6 +131,34 @@ function ModalDatoGeneral( props ) {
                         width={650}
                     >
                         <IndexUnionSucursal
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "dosificacion":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="DOSIFICACIÓN"
+                        width={"95%"} style={{ top: 10, }}
+                    >
+                        <IndexDosificacion
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "actividadeconomica":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="ACTIVIDAD ECONÓMICA"
+                        width={650}
+                    >
+                        <IndexActividadEconomica
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>

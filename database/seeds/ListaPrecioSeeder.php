@@ -22,19 +22,19 @@ class ListaPrecioSeeder extends Seeder
     public function _getdata() {
 
         $mytime = Carbon::now( 'America/La_paz' );
-        
+
         return [
-            [
-                'abreviatura' => 'LP1',
-                'nombre'      => 'Lista de Precios Nro. 1',
-                'tipocambio'  => 6.96,
-                'fechainicio' => '2016-10-06',
-                'fecha'       => $mytime->toDateString(),
-                'hora'        => $mytime->toTimeString(),
-                'isdelete'    => 'N',
-                'estado'      => 'A',
-            ],
+            // [
+            //     'abreviatura' => 'LP1',
+            //     'nombre'      => 'Lista de Precios Nro. 1',
+            //     'tipocambio'  => 6.96,
+            //     'fechainicio' => '2016-10-06',
+            //     'fecha'       => $mytime->toDateString(),
+            //     'hora'        => $mytime->toTimeString(),
+            //     'isdelete'    => 'N',
+            //     'estado'      => 'A',
+            // ],
         ];
     }
-    
+
 }

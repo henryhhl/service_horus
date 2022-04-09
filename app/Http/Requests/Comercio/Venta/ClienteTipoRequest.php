@@ -40,7 +40,7 @@ class ClienteTipoRequest extends FormRequest
     public function messages()
     {
         return [
-            'codigo.max'           => 'Campo :attribute permite máximo de 50 caracteres.',
+            'codigo.max'           => 'Campo :attribute permite máximo de 150 caracteres.',
             'abreviatura.max'      => 'Campo :attribute permite máximo de 50 caracteres.',
             'descripcion.required' => 'Campo :attribute es obligatorio.',
             'descripcion.max'      => 'Campo :attribute permite máximo de 200 caracteres.',

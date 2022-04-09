@@ -258,21 +258,21 @@ const onImprimir = ( ) => {
 };
 
 function onValidate( listaprecio ) {
-    const { abreviatura, nombre } = listaprecio;
+    const { abreviatura, descripcion } = listaprecio;
     let bandera = true;
-    if ( nombre.toString().trim().length === 0 ) {
-        listaprecio.error.nombre   = true;
-        listaprecio.message.nombre = "Campo requerido";
+    if ( descripcion.toString().trim().length === 0 ) {
+        listaprecio.error.descripcion   = true;
+        listaprecio.message.descripcion = "Campo requerido";
         bandera = false;
     }
-    if ( nombre.toString().length > 200 ) {
-        listaprecio.error.nombre   = true;
-        listaprecio.message.nombre = "Se permite máximo 200 caracteres";
+    if ( descripcion.toString().length > 200 ) {
+        listaprecio.error.descripcion   = true;
+        listaprecio.message.descripcion = "Se permite máximo 200 caracteres";
         bandera = false;
     }
     if ( abreviatura?.toString().length > 50 ) {
-        categoria.error.abreviatura   = true;
-        categoria.message.abreviatura = "Se permite máximo 50 caracteres";
+        listaprecio.error.abreviatura   = true;
+        listaprecio.message.abreviatura = "Se permite máximo 50 caracteres";
         bandera = false;
     }
     if ( !bandera ) {

@@ -15,19 +15,26 @@ class CreateListaprecioTable extends Migration
     {
         Schema::create('listaprecio', function (Blueprint $table) {
             $table->increments('idlistaprecio');
-            
+
+            $table->integer('x_idusuario')->unsigned()->nullable();
+
             $table->string('codigo', 150)->nullable();
-            $table->string('nombre', 250);
+            $table->string('descripcion', 250);
 
             $table->string('abreviatura', 50)->nullable();
             $table->decimal('tipocambio', 24, 8)->default(0);
 
-            $table->date('fechainicio');
+            $table->date('fechalistaprecio');
+            $table->date('fechainicio')->nullable();
             $table->date('fechafinal')->nullable();
             $table->text('nota')->nullable();
 
+            $table->decimal('valor', 24, 8)->default(0);
+            $table->enum("fijoporcentaje", ["F", "P", "N"])->default("N");
+            $table->enum("accion", ["D", "I", "N"])->default("N");
+
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');

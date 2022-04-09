@@ -15,12 +15,12 @@ class CreateMonedaTable extends Migration
     {
         Schema::create('moneda', function (Blueprint $table) {
             $table->increments('idmoneda');
-            
+
             $table->string('descripcion', 200);
             $table->string('abreviatura', 50);
-            
+
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');

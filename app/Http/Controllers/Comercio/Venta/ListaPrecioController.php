@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Venta\ListaPrecioRequest;
 use App\Models\Comercio\Venta\ListaPrecio;
+use App\Models\Comercio\Venta\ListaPrecioDetalle;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,7 +35,7 @@ class ListaPrecioController extends Controller
             }
 
             $listaprecio = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
                 'listaprecio'  => $listaprecio->getCollection(),
@@ -78,7 +79,7 @@ class ListaPrecioController extends Controller
                 'response' => 1,
                 'idlistaprecio'  => $idlistaprecio,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -107,12 +108,23 @@ class ListaPrecioController extends Controller
 
             $listaprecio = $obj->store( $obj, $request );
 
+            if ( $listaprecio ) {
+                $arrayListaPrecioDetalle = json_decode( isset( $request->listapreciodetalle ) ? $request->listapreciodetalle : '[]' );
+                foreach ( $arrayListaPrecioDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidunidadmedidaproducto ) ) {
+                        $detalle->fkidlistaprecio = $listaprecio->idlistaprecio;
+                        $listprecdet = new ListaPrecioDetalle();
+                        $listapreciodetalle = $listprecdet->store( $listprecdet, $request, $detalle );
+                    }
+                }
+            }
+
             return response( )->json( [
                 'response'     => 1,
                 'listaprecio' => $listaprecio,
                 'message'      => 'Lista Precio registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -249,6 +261,30 @@ class ListaPrecioController extends Controller
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
+                $arrayListaPrecioDetalle = json_decode( isset( $request->listapreciodetalle ) ? $request->listapreciodetalle : '[]' );
+                foreach ( $arrayListaPrecioDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidunidadmedidaproducto ) ) {
+                        $detalle->fkidlistaprecio = $listaprecio->idlistaprecio;
+                        $listprecdet = new ListaPrecioDetalle();
+                        if ( is_null( $detalle->idlistapreciodetalle ) ) {
+                            $listapreciodetalle = $listprecdet->store( $listprecdet, $request, $detalle );
+                        } else {
+                            $listapreciodetalle = $listprecdet->upgrade( $listprecdet, $detalle );
+                        }
+                    }
+                }
+
+                $arrayListaPrecioDetalleDelete = json_decode( isset( $request->listapreciodetalledelete ) ? $request->listapreciodetalledelete : '[]' );
+                foreach ( $arrayListaPrecioDetalleDelete as $idlistapreciodetalle ) {
+                    $listprecdet = new ListaPrecioDetalle();
+                    $listapreciodetalle = $listprecdet->find( $idlistapreciodetalle );
+                    if ( !is_null( $listapreciodetalle ) ) {
+                        $listapreciodetalle->delete();
+                    }
+                }
+            }
+
+            if ( $result ) {
                 return response()->json( [
                     'response' => 1,
                     'message'  => 'Lista Precio actualizado éxitosamente.',
@@ -259,7 +295,7 @@ class ListaPrecioController extends Controller
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Lista Precio.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response()->json( [
@@ -367,7 +403,7 @@ class ListaPrecioController extends Controller
             }
 
             $idlistaprecio = $request->input('idlistaprecio');
-            
+
             $obj = new ListaPrecio();
             $listaprecio = $obj->searchByID( $obj, $idlistaprecio );
 
@@ -382,7 +418,7 @@ class ListaPrecioController extends Controller
                 'response'  => 1,
                 'listaprecio' => $listaprecio,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -418,16 +454,16 @@ class ListaPrecioController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayListaPrecio' => $listaprecio,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

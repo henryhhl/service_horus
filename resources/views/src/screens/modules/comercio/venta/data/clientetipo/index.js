@@ -23,7 +23,7 @@ import ClienteTipoPDF from './report/clienteTipoPDF';
 
 function IndexClienteTipo( props ) {
     const { archivo, clienteTipo, disabled, option, paginations } = props;
-    
+
     const [ visible_pdf, setVisiblePDF ] = useState( false );
     const [ visible_action, setVisibleAction ] = useState( false );
 
@@ -40,8 +40,19 @@ function IndexClienteTipo( props ) {
     }
 
     function onGrabarData() {
-        if( clienteTipo.update )  props.onUpdate( clienteTipo );
-        else props.onGrabar( clienteTipo )
+        if( clienteTipo.update ) {
+            let onUpdate = () => props.onUpdate( clienteTipo );
+            C_Confirm( {
+                title: "Editar Tipo Cliente", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
+            } );
+        } else {
+            let ongrabar = () => props.onGrabar( clienteTipo );
+            C_Confirm( {
+                title: "Registrar Tipo Cliente", onOk: ongrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
+            } );
+        }
     };
 
     function onConfirmarDelete() {
@@ -101,7 +112,7 @@ function IndexClienteTipo( props ) {
 
     function componentOption() {
         return (
-            <C_Option 
+            <C_Option
                 option={option}
                 onChange={props.setPrintOption}
                 onSubmit={ onSubmitOption }
@@ -134,7 +145,7 @@ function IndexClienteTipo( props ) {
 
     function componentArchivo() {
         return (
-            <C_Archivo 
+            <C_Archivo
                 archivo={archivo}
                 onChange={props.setArchivoOption}
                 onSubmit={ onSubmitArchivo }
@@ -147,17 +158,17 @@ function IndexClienteTipo( props ) {
         return (
             <>
                 <C_ModalDraggable
-                    visible={ visible_pdf } 
+                    visible={ visible_pdf }
                     onClose={ () => {
                         setVisiblePDF( false );
                     } }
                     maskStyle={{ background: "transparent", }}
-                    width={"90%"}  zIndex={ 1200 }  
+                    width={"90%"}  zIndex={ 1200 }
                     title={ "REPORTE TIPO CLIENTE" }
                     bodyStyle={{ padding: '5px 4px', }}
                     style={{ top: 10, }}
                 >
-                    <ClienteTipoPDF 
+                    <ClienteTipoPDF
                         clienteTipo={clienteTipo.reporte}
                     />
                 </C_ModalDraggable>
@@ -181,14 +192,14 @@ function IndexClienteTipo( props ) {
             />
 
             <div className="pt-2 pb-3" style={{ flexGrow: 1, width: "100%", }}>
-                <C_Form 
+                <C_Form
                     clienteTipo={ clienteTipo }
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
                 />
             </div>
-            <C_Footer 
+            <C_Footer
                 disabled={disabled}
 
                 onCreate={props.onCreate}

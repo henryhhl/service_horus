@@ -16,13 +16,15 @@ class CreateSucursalTable extends Migration
         Schema::create('sucursal', function (Blueprint $table) {
             $table->increments('idsucursal');
             $table->integer('fkidunionsucursal')->unsigned();
+
+            $table->integer('fkidciudadpais')->unsigned();
             $table->integer('fkidciudad')->unsigned();
-            
+
             $table->string('codigo', 150)->nullable();
             $table->string('descripcion', 200);
             $table->string('direccion', 250)->nullable();
             $table->string('abreviatura', 50)->nullable();
-            
+
             $table->longText('imagen')->nullable();
             $table->string('extension', 20)->nullable();
 

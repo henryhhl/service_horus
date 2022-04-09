@@ -23,7 +23,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
         search: search,
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 1 ) {
             C_Message( "success", "Servicio realizado exitosamente." );
         }
@@ -32,7 +32,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
 };
 
 const onCreate = async () => {
-    
+
     return httpRequest( 'get', webservices.wscomercioventasucursal_create, {
 
     } ) . then ( ( result ) => {
@@ -52,10 +52,11 @@ const onGrabar = async ( sucursal ) => {
         descripcion: sucursal.descripcion,
         direccion:   sucursal.direccion,
         fkidciudad:  sucursal.fkidciudad,
+        fkidciudadpais:  sucursal.fkidciudadpais,
         fkidunionsucursal: sucursal.fkidunionsucursal,
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 0 ) {
             C_Message( "warning", result.message );
             var errors = result.errors;
@@ -76,7 +77,7 @@ const onGrabar = async ( sucursal ) => {
 
 const onEdit = async ( idsucursal ) => {
     return httpRequest( "get", webservices.wscomercioventasucursal_editar + "/" + idsucursal, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {
@@ -96,6 +97,7 @@ const onUpdate = async ( sucursal ) => {
         descripcion: sucursal.descripcion,
         direccion:   sucursal.direccion,
         fkidciudad:  sucursal.fkidciudad,
+        fkidciudadpais:  sucursal.fkidciudadpais,
         fkidunionsucursal: sucursal.fkidunionsucursal,
     } ) . then ( ( result ) => {
         resultData( result );
@@ -168,7 +170,7 @@ const onSearchData = async ( sucursal ) => {
 
 const onImprimir = async () => {
     return httpRequest( "post", webservices.wscomercioventasucursal_reporte, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 1 ) {

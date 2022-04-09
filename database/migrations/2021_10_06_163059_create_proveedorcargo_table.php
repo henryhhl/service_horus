@@ -15,13 +15,13 @@ class CreateProveedorcargoTable extends Migration
     {
         Schema::create('proveedorcargo', function (Blueprint $table) {
             $table->increments('idproveedorcargo');
-            
+
             $table->string('codigo', 150)->nullable();
             $table->string('descripcion', 200);
             $table->string('abreviatura', 50)->nullable();
 
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');

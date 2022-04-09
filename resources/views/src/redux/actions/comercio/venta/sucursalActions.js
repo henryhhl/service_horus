@@ -290,6 +290,11 @@ function onValidate( sucursal ) {
         sucursal.message.fkidciudad = "Campo requerido";
         bandera = false;
     }
+    if ( typeof fkidciudadpais !== "number" ) {
+        sucursal.error.fkidciudadpais   = true;
+        sucursal.message.fkidciudadpais = "Campo requerido";
+        bandera = false;
+    }
     if ( typeof fkidunionsucursal !== "number" ) {
         sucursal.error.fkidunionsucursal   = true;
         sucursal.message.fkidunionsucursal = "Campo requerido";

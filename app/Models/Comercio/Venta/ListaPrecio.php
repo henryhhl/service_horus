@@ -19,15 +19,17 @@ class ListaPrecio extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+    protected $attributes = [
+        'estado' => 'A',  'isdelete' => 'A', 'x_idusuario' => null,
         'codigo' => null, 'abreviatura' => null, 'imagen' => null, 'extension' => null,
-        'nota' => null, 'tipocambio' => 0, 'fechafinal' => null,
+        'nota' => null, 'tipocambio' => 0, 'fechainicio' => null, 'fechafinal' => null,
+        'valor' => 0, 'fijoporcentaje' => 'N', 'accion' => 'N',
     ];
 
-    protected $fillable = [ 
-        'codigo', 'abreviatura', 'nombre', 'nota', 'tipocambio', 'fechainicio', 'fechafinal',
-        'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
+    protected $fillable = [
+        'codigo', 'abreviatura', 'descripcion', 'nota', 'tipocambio',
+        'fechalistaprecio', 'fechainicio', 'fechafinal', 'valor', 'fijoporcentaje', 'accion',
+        'imagen', 'extension', 'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
     public function listapreciodetalle() {
@@ -48,34 +50,37 @@ class ListaPrecio extends Model
 
         $islike =  Functions::isLikeAndIlike();
 
-        $listaprecio = $query->select( [
-                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.nombre', 
+        $listaprecio = $query
+            ->select( [
+                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.descripcion',
                 'listaprecio.nota', 'listaprecio.tipocambio', 'listaprecio.fechainicio', 'listaprecio.fechafinal',
+                'listaprecio.fechalistaprecio', 'listaprecio.valor', 'listaprecio.fijoporcentaje', 'listaprecio.accion',
                 'listaprecio.abreviatura', 'listaprecio.imagen', 'listaprecio.extension',
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
-                        ->where('listaprecio.idlistaprecio', '=', $search)
-                        ->orWhere('listaprecio.codigo', $islike, '%' . $search . '%')
-                        ->orWhere('listaprecio.nombre', $islike, '%' . $search . '%');
+                        ->where('listaprecio.idlistaprecio', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('listaprecio.codigo', $islike, '%' . $search . '%')
-                        ->orWhere('listaprecio.nombre', $islike, '%' . $search . '%');
+                        ->orWhere('listaprecio.descripcion', $islike, '%' . $search . '%');
                 }
                 return;
             } )
             ->with( [ 'listapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('producto as prod', 'fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
+                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.codigo', 'prod.nombre',
-                        'fkidlistaprecio', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
-                        'descuento', 'montodescuento', 'nota',
+                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
-                    ->orderBy('idlistapreciodetalle');
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
             ->whereNull( 'listaprecio.deleted_at' )
             ->orderBy( $column , $orderBy)
@@ -97,34 +102,37 @@ class ListaPrecio extends Model
 
         $islike =  Functions::isLikeAndIlike();
 
-        $listaprecio = $query->select( [
-                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.nombre', 
+        $listaprecio = $query
+            ->select( [
+                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.descripcion',
                 'listaprecio.nota', 'listaprecio.tipocambio', 'listaprecio.fechainicio', 'listaprecio.fechafinal',
+                'listaprecio.fechalistaprecio', 'listaprecio.valor', 'listaprecio.fijoporcentaje', 'listaprecio.accion',
                 'listaprecio.abreviatura', 'listaprecio.imagen', 'listaprecio.extension',
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
-                        ->where('listaprecio.idlistaprecio', '=', $search)
-                        ->orWhere('listaprecio.codigo', $islike, '%' . $search . '%')
-                        ->orWhere('listaprecio.nombre', $islike, '%' . $search . '%');
+                        ->where('listaprecio.idlistaprecio', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('listaprecio.codigo', $islike, '%' . $search . '%')
-                        ->orWhere('listaprecio.nombre', $islike, '%' . $search . '%');
+                        ->orWhere('listaprecio.descripcion', $islike, '%' . $search . '%');
                 }
                 return;
             } )
             ->with( [ 'listapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('producto as prod', 'fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
+                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.codigo', 'prod.nombre',
-                        'fkidlistaprecio', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
-                        'descuento', 'montodescuento', 'nota',
+                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
-                    ->orderBy('idlistapreciodetalle');
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
             ->whereNull( 'listaprecio.deleted_at' )
             ->orderBy( $column, $orderBy )
@@ -147,11 +155,15 @@ class ListaPrecio extends Model
     {
         $codigo      = isset( $request->codigo )      ? $request->codigo : null;
         $abreviatura = isset( $request->abreviatura ) ? $request->abreviatura : null;
-        $nombre      = isset( $request->nombre )      ? $request->nombre : null;
+        $descripcion      = isset( $request->descripcion )      ? $request->descripcion : null;
         $nota        = isset( $request->nota )        ? $request->nota : null;
         $tipocambio  = isset( $request->tipocambio )  ? $request->tipocambio : null;
+        $fechalistaprecio = isset( $request->fechalistaprecio ) ? $request->fechalistaprecio : null;
         $fechainicio = isset( $request->fechainicio ) ? $request->fechainicio : null;
         $fechafinal  = isset( $request->fechafinal )  ? $request->fechafinal : null;
+        $valor  = isset( $request->valor )  ? $request->valor : 0;
+        $fijoporcentaje  = isset( $request->fijoporcentaje )  ? $request->fijoporcentaje : 'N';
+        $accion  = isset( $request->accion )  ? $request->accion : 'N';
         $imagen      = isset( $request->imagen )      ? $request->imagen : null;
         $extension   = isset( $request->extension )   ? $request->extension : null;
 
@@ -161,13 +173,17 @@ class ListaPrecio extends Model
         $listaprecio = $query->create( [
             'codigo'      => $codigo,
             'abreviatura' => $abreviatura,
-            'nombre'      => $nombre,
+            'descripcion'      => $descripcion,
             'imagen'      => $imagen,
             'extension'   => $extension,
-            'nota'        => $nota, 
-            'tipocambio'  => $tipocambio, 
+            'nota'        => $nota,
+            'tipocambio'  => $tipocambio,
             'fechainicio' => $fechainicio,
             'fechafinal'  => $fechafinal,
+            'fechalistaprecio'  => $fechalistaprecio,
+            'valor'  => $valor,
+            'fijoporcentaje'  => $fijoporcentaje,
+            'accion'  => $accion,
             'fecha'       => $fecha,
             'hora'        => $hora
         ] );
@@ -178,29 +194,35 @@ class ListaPrecio extends Model
     public function upgrade( $query, $request )
     {
         $idlistaprecio = isset( $request->idlistaprecio ) ? $request->idlistaprecio : null;
-        $codigo        = isset( $request->codigo )         ? $request->codigo : null;
-        $abreviatura   = isset( $request->abreviatura )    ? $request->abreviatura : null;
-        $nombre        = isset( $request->nombre )      ? $request->nombre : null;
-        $nota          = isset( $request->nota )        ? $request->nota : null;
-        $tipocambio    = isset( $request->tipocambio )  ? $request->tipocambio : null;
-        $fechainicio   = isset( $request->fechainicio ) ? $request->fechainicio : null;
-        $fechafinal    = isset( $request->fechafinal )  ? $request->fechafinal : null;
-        $imagen        = isset( $request->imagen )      ? $request->imagen : null;
-        $extension     = isset( $request->extension )   ? $request->extension : null;
+        $codigo      = isset( $request->codigo )      ? $request->codigo : null;
+        $abreviatura = isset( $request->abreviatura ) ? $request->abreviatura : null;
+        $descripcion      = isset( $request->descripcion )      ? $request->descripcion : null;
+        $nota        = isset( $request->nota )        ? $request->nota : null;
+        $tipocambio  = isset( $request->tipocambio )  ? $request->tipocambio : null;
+        $fechalistaprecio = isset( $request->fechalistaprecio ) ? $request->fechalistaprecio : null;
+        $fechainicio = isset( $request->fechainicio ) ? $request->fechainicio : null;
+        $fechafinal  = isset( $request->fechafinal )  ? $request->fechafinal : null;
+        $valor  = isset( $request->valor )  ? $request->valor : 0;
+        $fijoporcentaje  = isset( $request->fijoporcentaje )  ? $request->fijoporcentaje : 'N';
+        $accion  = isset( $request->accion )  ? $request->accion : 'N';
+        $imagen      = isset( $request->imagen )      ? $request->imagen : null;
+        $extension   = isset( $request->extension )   ? $request->extension : null;
 
         $listaprecio = $query->where( 'idlistaprecio', '=', $idlistaprecio )
             ->update( [
                 'codigo'      => $codigo,
                 'abreviatura' => $abreviatura,
-                'nombre'      => $nombre,
+                'descripcion'      => $descripcion,
                 'imagen'      => $imagen,
                 'extension'   => $extension,
-                'nota'        => $nota, 
-                'tipocambio'  => $tipocambio, 
+                'nota'        => $nota,
+                'tipocambio'  => $tipocambio,
                 'fechainicio' => $fechainicio,
                 'fechafinal'  => $fechafinal,
-                'imagen'      => $imagen,
-                'extension'   => $extension,
+                'fechalistaprecio'  => $fechalistaprecio,
+                'valor'  => $valor,
+                'fijoporcentaje'  => $fijoporcentaje,
+                'accion'  => $accion,
             ] );
 
         return $listaprecio;
@@ -210,21 +232,25 @@ class ListaPrecio extends Model
 
         $listaprecio = $query
             ->select( [
-                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.nombre', 
+                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.descripcion',
                 'listaprecio.nota', 'listaprecio.tipocambio', 'listaprecio.fechainicio', 'listaprecio.fechafinal',
+                'listaprecio.fechalistaprecio', 'listaprecio.valor', 'listaprecio.fijoporcentaje', 'listaprecio.accion',
                 'listaprecio.abreviatura', 'listaprecio.imagen', 'listaprecio.extension',
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where('listaprecio.idlistaprecio', '=', $idlistaprecio)
             ->with( [ 'listapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('producto as prod', 'fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
+                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.codigo', 'prod.nombre',
-                        'fkidlistaprecio', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
-                        'descuento', 'montodescuento', 'nota',
+                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
-                    ->orderBy('idlistapreciodetalle');
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
             ->whereNull('listaprecio.deleted_at')
             ->orderBy('listaprecio.idlistaprecio', 'DESC')
@@ -252,24 +278,28 @@ class ListaPrecio extends Model
     }
 
     public function searchByID( $query, $idlistaprecio ) {
-        
+
         $listaprecio = $query
             ->select( [
-                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.nombre', 
+                'listaprecio.idlistaprecio', 'listaprecio.codigo', 'listaprecio.descripcion',
                 'listaprecio.nota', 'listaprecio.tipocambio', 'listaprecio.fechainicio', 'listaprecio.fechafinal',
+                'listaprecio.fechalistaprecio', 'listaprecio.valor', 'listaprecio.fijoporcentaje', 'listaprecio.accion',
                 'listaprecio.abreviatura', 'listaprecio.imagen', 'listaprecio.extension',
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where('listaprecio.idlistaprecio', '=', $idlistaprecio)
             ->with( [ 'listapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('producto as prod', 'fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
+                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.codigo', 'prod.nombre',
-                        'fkidlistaprecio', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
-                        'descuento', 'montodescuento', 'nota',
+                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
-                    ->orderBy('idlistapreciodetalle');
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
             ->whereNull('listaprecio.deleted_at')
             ->orderBy('listaprecio.idlistaprecio', 'DESC')
@@ -277,5 +307,5 @@ class ListaPrecio extends Model
 
         return $listaprecio;
     }
-    
+
 }

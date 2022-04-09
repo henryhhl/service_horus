@@ -23,6 +23,9 @@ const initialState = {
     fkidciudad: "",
     ciudad: "",
 
+    fkidciudadpais: "",
+    ciudadpais: "",
+
     estado: "",
     fecha: "",
     hora: "",
@@ -32,6 +35,7 @@ const initialState = {
         descripcion: false,
         direccion:   false,
         fkidciudad:  false,
+        fkidciudadpais:  false,
         fkidunionsucursal: false,
     },
     message: {
@@ -39,6 +43,7 @@ const initialState = {
         descripcion: "",
         direccion:   "",
         fkidciudad:  "",
+        fkidciudadpais: "",
         fkidunionsucursal: "",
     },
 
@@ -92,7 +97,7 @@ export const SucursalReducer = ( state = initialState, action = { payload, type}
             state = Object.assign( {}, state );
             return state;
 
-        case Strings.sucursal_setImprimir: 
+        case Strings.sucursal_setImprimir:
             return {
                 ...state,
                 reporte: action.payload,
@@ -107,7 +112,7 @@ export const SucursalReducer = ( state = initialState, action = { payload, type}
             state.focusInput = false;
             state = Object.assign( {}, state );
             return state;
-    
+
         default:
             return state;
     }
@@ -124,6 +129,9 @@ function onSetData( state, payload ) {
 
     state.fkidciudad = payload.fkidciudad;
     state.ciudad     = payload.ciudad;
+
+    state.fkidciudadpais = payload.fkidciudadpais;
+    state.ciudadpais     = payload.ciudadpais;
 }
 
 

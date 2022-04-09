@@ -22,7 +22,7 @@ import UnionSucursalPDF from './report/unionSucursalPDF';
 
 function IndexUnionSucursal( props ) {
     const { archivo, unionSucursal, disabled, option, paginations } = props;
-    
+
     const [ visible_pdf, setVisiblePDF ] = useState( false );
     const [ visible_action, setVisibleAction ] = useState( false );
 
@@ -39,8 +39,19 @@ function IndexUnionSucursal( props ) {
     }
 
     function onGrabarData() {
-        if( unionSucursal.update )  props.onUpdate( unionSucursal );
-        else props.onGrabar( unionSucursal )
+        if( unionSucursal.update ) {
+            let onUpdate = () => props.onUpdate( unionSucursal );
+            C_Confirm( {
+                title: "Editar Unión Sucursal", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
+            } );
+        } else {
+            let ongrabar = () => props.onGrabar( unionSucursal );
+            C_Confirm( {
+                title: "Registrar Unión sucursal", onOk: ongrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
+            } );
+        }
     };
 
     function onConfirmarDelete() {
@@ -100,7 +111,7 @@ function IndexUnionSucursal( props ) {
 
     function componentOption() {
         return (
-            <OptionUnionSucursal 
+            <OptionUnionSucursal
                 option={option}
                 onChange={props.setPrintOption}
                 onSubmit={ onSubmitOption }
@@ -133,7 +144,7 @@ function IndexUnionSucursal( props ) {
 
     function componentArchivo() {
         return (
-            <ArchivoUnionSucursal 
+            <ArchivoUnionSucursal
                 archivo={archivo}
                 onChange={props.setArchivoOption}
                 onSubmit={ onSubmitArchivo }
@@ -146,17 +157,17 @@ function IndexUnionSucursal( props ) {
         return (
             <>
                 <C_ModalDraggable
-                    visible={ visible_pdf } 
+                    visible={ visible_pdf }
                     onClose={ () => {
                         setVisiblePDF( false );
                     } }
                     maskStyle={{ background: "transparent", }}
-                    width={"90%"}  zIndex={ 1200 }  
+                    width={"90%"}  zIndex={ 1200 }
                     title={ "REPORTE UNIÓN SUCURSAL" }
                     bodyStyle={{ padding: '5px 4px', }}
                     style={{ top: 10, }}
                 >
-                    <UnionSucursalPDF 
+                    <UnionSucursalPDF
                         unionSucursal={unionSucursal.reporte}
                     />
                 </C_ModalDraggable>
@@ -180,14 +191,14 @@ function IndexUnionSucursal( props ) {
             />
 
             <div className="pt-2 pb-3" style={{ flexGrow: 1, width: "100%", }}>
-                <C_Form 
+                <C_Form
                     unionSucursal={ unionSucursal }
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
                 />
             </div>
-            <C_Footer 
+            <C_Footer
                 disabled={disabled}
 
                 onCreate={props.onCreate}

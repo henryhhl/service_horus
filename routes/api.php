@@ -220,6 +220,7 @@ Route::get($submodulocomercioventa  . '/cliente/show/{idcliente}', 'Comercio\Ven
 Route::post($submodulocomercioventa . '/cliente/delete', 'Comercio\Venta\ClienteController@delete');
 Route::get($submodulocomercioventa  . '/cliente/searchByID', 'Comercio\Venta\ClienteController@searchByID');
 Route::post($submodulocomercioventa . '/cliente/reporte', 'Comercio\Venta\ClienteController@reporte');
+Route::post($submodulocomercioventa  . '/cliente/searchByNit', 'Comercio\Venta\ClienteController@searchByNit');
 
 Route::get($submodulocomercioventa  . '/conceptoventa/index', 'Comercio\Venta\ConceptoVentaController@index');
 Route::get($submodulocomercioventa  . '/conceptoventa/create', 'Comercio\Venta\ConceptoVentaController@create');
@@ -230,6 +231,56 @@ Route::get($submodulocomercioventa  . '/conceptoventa/show/{idconceptoventa}', '
 Route::post($submodulocomercioventa . '/conceptoventa/delete', 'Comercio\Venta\ConceptoVentaController@delete');
 Route::get($submodulocomercioventa  . '/conceptoventa/searchByID', 'Comercio\Venta\ConceptoVentaController@searchByID');
 Route::post($submodulocomercioventa . '/conceptoventa/reporte', 'Comercio\Venta\ConceptoVentaController@reporte');
+
+Route::get($submodulocomercioventa  . '/comisionventa/index', 'Comercio\Venta\ComisionVentaController@index');
+Route::get($submodulocomercioventa  . '/comisionventa/create', 'Comercio\Venta\ComisionVentaController@create');
+Route::get($submodulocomercioventa  . '/comisionventa/editar/{idcomisionventa}', 'Comercio\Venta\ComisionVentaController@edit');
+Route::post($submodulocomercioventa . '/comisionventa/store', 'Comercio\Venta\ComisionVentaController@store');
+Route::post($submodulocomercioventa . '/comisionventa/update', 'Comercio\Venta\ComisionVentaController@update');
+Route::get($submodulocomercioventa  . '/comisionventa/show/{idcomisionventa}', 'Comercio\Venta\ComisionVentaController@show');
+Route::post($submodulocomercioventa . '/comisionventa/delete', 'Comercio\Venta\ComisionVentaController@delete');
+Route::get($submodulocomercioventa  . '/comisionventa/searchByID', 'Comercio\Venta\ComisionVentaController@searchByID');
+Route::post($submodulocomercioventa . '/comisionventa/reporte', 'Comercio\Venta\ComisionVentaController@reporte');
+
+Route::get($submodulocomercioventa  . '/vendedor/index', 'Comercio\Venta\VendedorController@index');
+Route::get($submodulocomercioventa  . '/vendedor/create', 'Comercio\Venta\VendedorController@create');
+Route::get($submodulocomercioventa  . '/vendedor/editar/{idvendedor}', 'Comercio\Venta\VendedorController@edit');
+Route::post($submodulocomercioventa . '/vendedor/store', 'Comercio\Venta\VendedorController@store');
+Route::post($submodulocomercioventa . '/vendedor/update', 'Comercio\Venta\VendedorController@update');
+Route::get($submodulocomercioventa  . '/vendedor/show/{idvendedor}', 'Comercio\Venta\VendedorController@show');
+Route::post($submodulocomercioventa . '/vendedor/delete', 'Comercio\Venta\VendedorController@delete');
+Route::get($submodulocomercioventa  . '/vendedor/searchByID', 'Comercio\Venta\VendedorController@searchByID');
+Route::post($submodulocomercioventa . '/vendedor/reporte', 'Comercio\Venta\VendedorController@reporte');
+
+Route::get($submodulocomercioventa  . '/actividadeconomica/index', 'Comercio\Venta\ActividadEconomicaController@index');
+Route::get($submodulocomercioventa  . '/actividadeconomica/create', 'Comercio\Venta\ActividadEconomicaController@create');
+Route::get($submodulocomercioventa  . '/actividadeconomica/editar/{idactividadeconomica}', 'Comercio\Venta\ActividadEconomicaController@edit');
+Route::post($submodulocomercioventa . '/actividadeconomica/store', 'Comercio\Venta\ActividadEconomicaController@store');
+Route::post($submodulocomercioventa . '/actividadeconomica/update', 'Comercio\Venta\ActividadEconomicaController@update');
+Route::get($submodulocomercioventa  . '/actividadeconomica/show/{idactividadeconomica}', 'Comercio\Venta\ActividadEconomicaController@show');
+Route::post($submodulocomercioventa . '/actividadeconomica/delete', 'Comercio\Venta\ActividadEconomicaController@delete');
+Route::get($submodulocomercioventa  . '/actividadeconomica/searchByID', 'Comercio\Venta\ActividadEconomicaController@searchByID');
+Route::post($submodulocomercioventa . '/actividadeconomica/reporte', 'Comercio\Venta\ActividadEconomicaController@reporte');
+
+Route::get($submodulocomercioventa  . '/dosificacion/index', 'Comercio\Venta\DosificacionController@index');
+Route::get($submodulocomercioventa  . '/dosificacion/create', 'Comercio\Venta\DosificacionController@create');
+Route::get($submodulocomercioventa  . '/dosificacion/editar/{iddosificacion}', 'Comercio\Venta\DosificacionController@edit');
+Route::post($submodulocomercioventa . '/dosificacion/store', 'Comercio\Venta\DosificacionController@store');
+Route::post($submodulocomercioventa . '/dosificacion/update', 'Comercio\Venta\DosificacionController@update');
+Route::get($submodulocomercioventa  . '/dosificacion/show/{iddosificacion}', 'Comercio\Venta\DosificacionController@show');
+Route::post($submodulocomercioventa . '/dosificacion/delete', 'Comercio\Venta\DosificacionController@delete');
+Route::get($submodulocomercioventa  . '/dosificacion/searchByID', 'Comercio\Venta\DosificacionController@searchByID');
+Route::post($submodulocomercioventa . '/dosificacion/reporte', 'Comercio\Venta\DosificacionController@reporte');
+
+Route::get($submodulocomercioventa  . '/notaventa/index', 'Comercio\Venta\NotaVentaController@index');
+Route::get($submodulocomercioventa  . '/notaventa/create', 'Comercio\Venta\NotaVentaController@create');
+Route::get($submodulocomercioventa  . '/notaventa/editar/{idnotaventa}', 'Comercio\Venta\NotaVentaController@edit');
+Route::post($submodulocomercioventa . '/notaventa/store', 'Comercio\Venta\NotaVentaController@store');
+Route::post($submodulocomercioventa . '/notaventa/update', 'Comercio\Venta\NotaVentaController@update');
+Route::get($submodulocomercioventa  . '/notaventa/show/{idnotaventa}', 'Comercio\Venta\NotaVentaController@show');
+Route::post($submodulocomercioventa . '/notaventa/delete', 'Comercio\Venta\NotaVentaController@delete');
+Route::get($submodulocomercioventa  . '/notaventa/searchByID', 'Comercio\Venta\NotaVentaController@searchByID');
+Route::post($submodulocomercioventa . '/notaventa/reporte', 'Comercio\Venta\NotaVentaController@reporte');
 
 
 

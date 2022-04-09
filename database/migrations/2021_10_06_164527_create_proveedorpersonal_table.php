@@ -17,7 +17,7 @@ class CreateProveedorpersonalTable extends Migration
             $table->increments('idproveedorpersonal');
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidproveedorcargo')->unsigned();
-            
+
             $table->string('codigo', 150)->nullable();
             $table->string('nombre', 200);
             $table->string('apellido', 300);
@@ -27,7 +27,7 @@ class CreateProveedorpersonalTable extends Migration
             $table->string('email', 300)->nullable();
 
             $table->longText('imagen')->nullable();
-            $table->string('extension', 20)->nullable();
+            $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');

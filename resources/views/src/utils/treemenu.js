@@ -162,6 +162,10 @@ export const treeMenu = [
                     {
                         key: "NOTAS", title: "NOTAS",
                         children: [
+                            {
+                                key: "notaventa", title: "NOTA VENTA",
+                                children: [],
+                            },
                         ],
                     },
                     {
@@ -184,11 +188,27 @@ export const treeMenu = [
                                 children: [],
                             },
                             {
+                                key: "vendedor", title: "VENDEDOR",
+                                children: [],
+                            },
+                            {
+                                key: "comisionventa", title: "COMISIÓN VENTA",
+                                children: [],
+                            },
+                            {
                                 key: "sucursal", title: "SUCURSAL",
                                 children: [],
                             },
                             {
                                 key: "unionsucursal", title: "UNIÓN SUCURSAL",
+                                children: [],
+                            },
+                            {
+                                key: "dosificacion", title: "DOSIFICACIÓN",
+                                children: [],
+                            },
+                            {
+                                key: "actividadeconomica", title: "ACTIVIDAD ECONÓMICA",
                                 children: [],
                             },
                         ],

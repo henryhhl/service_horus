@@ -19,14 +19,14 @@ class Sucursal extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+    protected $attributes = [
+        'estado' => 'A',  'isdelete' => 'A',
         'codigo' => null, 'abreviatura' => null,
         'imagen' => null, 'extension' => null,
     ];
 
-    protected $fillable = [ 
-        'codigo', 'descripcion', 'abreviatura', 'direccion', 'fkidciudad', 'fkidunionsucursal',
+    protected $fillable = [
+        'codigo', 'descripcion', 'abreviatura', 'direccion', 'fkidciudad', 'fkidciudadpais', 'fkidunionsucursal',
         'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
@@ -41,15 +41,17 @@ class Sucursal extends Model
         $islike =  Functions::isLikeAndIlike();
 
         $sucursal = $query
-            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
-            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->select( [
                 'sucursal.idsucursal', 'sucursal.codigo', 'sucursal.descripcion', 'sucursal.direccion',
-                'sucursal.fkidciudad', 'ciu.descripcion as ciudad', 
+                'sucursal.fkidciudad', 'ciu.descripcion as ciudad',
+                'sucursal.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
                 'sucursal.fkidunionsucursal', 'unionsuc.descripcion as unionsucursal',
                 'sucursal.abreviatura', 'sucursal.imagen', 'sucursal.extension',
                 'sucursal.isdelete', 'sucursal.estado', 'sucursal.fecha', 'sucursal.hora'
             ] )
+            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('ciudad as ciupais', 'sucursal.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
@@ -84,15 +86,17 @@ class Sucursal extends Model
         $islike =  Functions::isLikeAndIlike();
 
         $sucursal = $query
-            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
-            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->select( [
                 'sucursal.idsucursal', 'sucursal.codigo', 'sucursal.descripcion', 'sucursal.direccion',
-                'sucursal.fkidciudad', 'ciu.descripcion as ciudad', 
+                'sucursal.fkidciudad', 'ciu.descripcion as ciudad',
+                'sucursal.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
                 'sucursal.fkidunionsucursal', 'unionsuc.descripcion as unionsucursal',
                 'sucursal.abreviatura', 'sucursal.imagen', 'sucursal.extension',
                 'sucursal.isdelete', 'sucursal.estado', 'sucursal.fecha', 'sucursal.hora'
             ] )
+            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('ciudad as ciupais', 'sucursal.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->where( function ( $query ) use ($search, $islike) {
                 if ( is_numeric( $search ) ) {
                     return $query
@@ -130,7 +134,7 @@ class Sucursal extends Model
             ->where( ( is_numeric( $fkidunionsucursal ) ? [ ['fkidunionsucursal', '=', $fkidunionsucursal] ] : [] ) )
             ->whereNull('deleted_at')
             ->get();
-        
+
         return ( sizeof( $sucursal ) > 0 );
     }
 
@@ -151,6 +155,7 @@ class Sucursal extends Model
         $descripcion = isset( $request->descripcion ) ? $request->descripcion : null;
         $direccion   = isset( $request->direccion )   ? $request->direccion : null;
         $fkidciudad  = isset( $request->fkidciudad )   ? $request->fkidciudad : null;
+        $fkidciudadpais  = isset( $request->fkidciudadpais )   ? $request->fkidciudadpais : null;
         $fkidunionsucursal  = isset( $request->fkidunionsucursal )   ? $request->fkidunionsucursal : null;
         $imagen      = isset( $request->imagen )      ? $request->imagen : null;
         $extension   = isset( $request->extension )   ? $request->extension : null;
@@ -163,6 +168,7 @@ class Sucursal extends Model
             'abreviatura' => $abreviatura,
             'descripcion' => $descripcion,
             'direccion'   => $direccion,
+            'fkidciudadpais'  => $fkidciudadpais,
             'fkidciudad'  => $fkidciudad,
             'fkidunionsucursal'  => $fkidunionsucursal,
             'imagen'      => $imagen,
@@ -182,6 +188,7 @@ class Sucursal extends Model
         $descripcion    = isset( $request->descripcion )    ? $request->descripcion : null;
         $direccion      = isset( $request->direccion )   ? $request->direccion : null;
         $fkidciudad     = isset( $request->fkidciudad )   ? $request->fkidciudad : null;
+        $fkidciudadpais     = isset( $request->fkidciudadpais )   ? $request->fkidciudadpais : null;
         $fkidunionsucursal  = isset( $request->fkidunionsucursal )   ? $request->fkidunionsucursal : null;
         $imagen         = isset( $request->imagen )         ? $request->imagen : null;
         $extension      = isset( $request->extension )      ? $request->extension : null;
@@ -193,6 +200,7 @@ class Sucursal extends Model
                 'descripcion' => $descripcion,
                 'direccion'   => $direccion,
                 'fkidciudad'  => $fkidciudad,
+                'fkidciudadpais'  => $fkidciudadpais,
                 'fkidunionsucursal'  => $fkidunionsucursal,
                 'imagen'      => $imagen,
                 'extension'   => $extension,
@@ -204,20 +212,22 @@ class Sucursal extends Model
     public function show( $query, $idsucursal ) {
 
         $sucursal = $query
-            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
-            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->select( [
                 'sucursal.idsucursal', 'sucursal.codigo', 'sucursal.descripcion', 'sucursal.direccion',
-                'sucursal.fkidciudad', 'ciu.descripcion as ciudad', 
+                'sucursal.fkidciudad', 'ciu.descripcion as ciudad',
+                'sucursal.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
                 'sucursal.fkidunionsucursal', 'unionsuc.descripcion as unionsucursal',
                 'sucursal.abreviatura', 'sucursal.imagen', 'sucursal.extension',
                 'sucursal.isdelete', 'sucursal.estado', 'sucursal.fecha', 'sucursal.hora'
             ] )
+            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('ciudad as ciupais', 'sucursal.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->where( 'sucursal.idsucursal', '=', $idsucursal )
             ->whereNull('sucursal.deleted_at')
             ->orderBy('sucursal.idsucursal', 'DESC')
             ->first();
-        
+
         return $sucursal;
     }
 
@@ -227,7 +237,7 @@ class Sucursal extends Model
             ->where( 'sucursal.fkidunionsucursal', '=', $idunionsucursal )
             ->whereNull('sucursal.deleted_at')
             ->get();
-        
+
         return ( sizeof( $sucursal ) > 0 );
     }
 
@@ -251,15 +261,17 @@ class Sucursal extends Model
 
     public function searchByID( $query, $idsucursal ) {
         $sucursal = $query
-            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
-            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->select( [
                 'sucursal.idsucursal', 'sucursal.codigo', 'sucursal.descripcion', 'sucursal.direccion',
-                'sucursal.fkidciudad', 'ciu.descripcion as ciudad', 
+                'sucursal.fkidciudad', 'ciu.descripcion as ciudad',
+                'sucursal.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
                 'sucursal.fkidunionsucursal', 'unionsuc.descripcion as unionsucursal',
                 'sucursal.abreviatura', 'sucursal.imagen', 'sucursal.extension',
                 'sucursal.isdelete', 'sucursal.estado', 'sucursal.fecha', 'sucursal.hora'
             ] )
+            ->leftJoin('ciudad as ciu', 'sucursal.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('ciudad as ciupais', 'sucursal.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('unionsucursal as unionsuc', 'sucursal.fkidunionsucursal', '=', 'unionsuc.idunionsucursal')
             ->where('sucursal.idsucursal', '=', $idsucursal)
             ->whereNull('sucursal.deleted_at')
             ->orderBy('sucursal.idsucursal', 'DESC')

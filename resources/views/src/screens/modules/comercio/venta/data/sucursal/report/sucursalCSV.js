@@ -22,12 +22,12 @@ const SucursalCSV = ( props ) => {
         viewers.push( {
             nro:           index + 1,
             descripcion:   element.descripcion,
-            direccion:     element.direccion,
-            ciudad:        element.ciudad,
+            direccion:     element.direccion ? element.direccion : '',
+            ciudad:        `${element.ciudadpais} ${element.ciudad}`,
             unionsucursal: element.unionsucursal,
         } );
     }
-    
+
     return (
         <>
             <CSVLink style={{ display: 'none', }}

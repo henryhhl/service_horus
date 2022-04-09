@@ -32,9 +32,10 @@ class ListaPrecioRequest extends FormRequest
     {
         return [
             'abreviatura' => 'max:50',
-            'nombre'      => 'required|max:250|min:3',
+            'descripcion'      => 'required|max:250|min:3',
             'tipocambio'  => 'required|numeric',
-            'fechainicio' => 'required|date',
+            'fechalistaprecio' => 'required|date',
+            'valor' => 'required|numeric',
         ];
     }
 
@@ -43,15 +44,18 @@ class ListaPrecioRequest extends FormRequest
         return [
             'abreviatura.max' => 'Campo :attribute permite máximo de 50 caracteres.',
 
-            'nombre.required' => 'Campo :attribute es obligatorio.',
-            'nombre.max'      => 'Campo :attribute permite máximo de 250 caracteres.',
-            'nombre.min'      => 'Campo :attribute permite minimo de 3 caracteres.',
+            'descripcion.required' => 'Campo :attribute es obligatorio.',
+            'descripcion.max'      => 'Campo :attribute permite máximo de 250 caracteres.',
+            'descripcion.min'      => 'Campo :attribute permite minimo de 3 caracteres.',
 
             'tipocambio.required' => 'El :attribute es obligatorio.',
             'tipocambio.numeric'  => 'El :attribute solo se permite numero.',
 
-            'fechainicio.required' => 'El :attribute es obligatorio.',
-            'fechainicio.date'     => 'El :attribute solo se permite fecha.',
+            'fechalistaprecio.required' => 'El :attribute es obligatorio.',
+            'fechalistaprecio.date'     => 'El :attribute solo se permite fecha.',
+
+            'valor.required' => 'El :attribute es obligatorio.',
+            'valor.numeric'  => 'El :attribute solo se permite numero.',
         ];
     }
 
@@ -59,9 +63,10 @@ class ListaPrecioRequest extends FormRequest
     {
         return [
             'abreviatura' => 'abreviatura',
-            'nombre'      => 'nombre',
+            'descripcion'      => 'descripción',
             'tipocambio'  => 'tipo de cambio',
-            'fechainicio' => 'fecha inicio',
+            'fechalistaprecio' => 'fecha',
+            'valor' => 'valor',
         ];
     }
 
