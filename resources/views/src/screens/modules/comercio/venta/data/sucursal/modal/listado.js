@@ -18,7 +18,7 @@ function M_ListadoSucursal( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -39,7 +39,7 @@ M_ListadoSucursal.propTypes = {
 
     value: PropTypes.any,
 
-    width:  PropTypes.number,
+    width:  PropTypes.any,
     zIndex: PropTypes.number,
 
     title:    PropTypes.string,
@@ -55,7 +55,7 @@ M_ListadoSucursal.defaultProps = {
 
     value: null,
 
-    width: 900,
+    width: '80%',
     zIndex: 1200,
 
     title: "SUCURSAL",

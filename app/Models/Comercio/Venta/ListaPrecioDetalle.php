@@ -24,15 +24,39 @@ class ListaPrecioDetalle extends Model
     ];
 
     protected $fillable = [
-        'fkidlistaprecio', 'fkidunidadmedidaproducto', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
+        'fkidlistaprecio', 'fkidproducto', 'fkidmoneda', 'preciobase', 'preciopivote', 'precioventa',
         'descuento', 'montodescuento', 'nota',
         'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
+    public function getListaPrecioDetallePorProducto( $query, $fkidproducto ) {
+        $arrayListaPrecioDetalle = $query
+            ->where('listapreciodetalle.fkidproducto', '=', $fkidproducto)
+            ->whereNull('listapreciodetalle.deleted_at')
+            ->orderBy('listapreciodetalle.idlistapreciodetalle', 'ASC')
+            ->get()->toArray();
+
+        return $arrayListaPrecioDetalle;
+    }
+
+    public function getListaPrecioDetalle( $query, $fkidlistaprecio ) {
+        $arrayListaPrecioDetalle = $query
+            ->select( [
+                'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio', 'listapreciodetalle.fkidproducto', 
+                'listapreciodetalle.fkidmoneda', 'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+            ] )
+            ->where( 'listapreciodetalle.fkidlistaprecio', '=', $fkidlistaprecio )
+            ->whereNull( 'listapreciodetalle.deleted_at' )
+            ->orderBy( 'listapreciodetalle.idlistapreciodetalle', 'ASC' )
+            ->get();
+
+        return $arrayListaPrecioDetalle;
+    }
+
     public function store( $query, $request, $detalle ) {
         $fkidlistaprecio = $detalle->fkidlistaprecio;
         $fkidproducto = $detalle->fkidproducto;
-        $fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
 
         $preciobase = $detalle->preciobase;
         $preciopivote = $detalle->preciopivote;
@@ -47,7 +71,6 @@ class ListaPrecioDetalle extends Model
         $listapreciodetalle = $query->create( [
             'fkidlistaprecio' => $fkidlistaprecio,
             'fkidproducto' => $fkidproducto,
-            'fkidunidadmedidaproducto' => $fkidunidadmedidaproducto,
 
             'preciobase' => $preciobase,
             'preciopivote' => $preciopivote,
@@ -67,7 +90,6 @@ class ListaPrecioDetalle extends Model
 
         $fkidlistaprecio = $detalle->fkidlistaprecio;
         $fkidproducto = $detalle->fkidproducto;
-        $fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
 
         $preciobase = $detalle->preciobase;
         $preciopivote = $detalle->preciopivote;
@@ -80,7 +102,6 @@ class ListaPrecioDetalle extends Model
             ->update( [
                 'fkidlistaprecio' => $fkidlistaprecio,
                 'fkidproducto' => $fkidproducto,
-                'fkidunidadmedidaproducto' => $fkidunidadmedidaproducto,
 
                 'preciobase' => $preciobase,
                 'preciopivote' => $preciopivote,

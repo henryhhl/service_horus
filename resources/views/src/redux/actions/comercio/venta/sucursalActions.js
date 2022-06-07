@@ -258,7 +258,7 @@ const onImprimir = ( ) => {
 };
 
 function onValidate( sucursal ) {
-    const { abreviatura, descripcion, direccion, fkidciudad, fkidunionsucursal } = sucursal;
+    const { abreviatura, descripcion, direccion, fkidciudad, fkidciudadpais, fkidunionsucursal } = sucursal;
     let bandera = true;
     if ( descripcion.toString().trim().length === 0 ) {
         sucursal.error.descripcion   = true;

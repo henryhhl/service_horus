@@ -78,16 +78,19 @@ const initialState = {
 };
 
 export const SolicitudCompraCompraReducer = ( state = initialState, action = { payload, type} ) => {
+    const { payload, type } = action;
 
-    switch ( action.type ) {
+    switch ( type ) {
 
         case Strings.solicitudcompra_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.solicitudcompra_onCreate:
+            const { arrayConceptoCompra, arrayMoneda, arraySeccionInventario, arraySucursal } = payload;
+
             cleanObejct( state );
-            state.idsolicitudcompra = action.payload.idsolicitudcompra;
+            state.idsolicitudcompra = payload.idsolicitudcompra;
 
             state.fechasolicitada   = Functions.dateToString( new Date() );
             state.tipocambio  = "6.95";
@@ -97,10 +100,25 @@ export const SolicitudCompraCompraReducer = ( state = initialState, action = { p
             state.cantidadsolicitadatotal = "0";
             state.montototal = "0.00";
 
-            state.arraySolicitudCompraDetalle = loadDetailBuySolicitude();
+            state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
+            state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;
 
-            state.fkidmoneda  = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].idmoneda;
-            state.moneda      = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].descripcion;
+            state.fkidconceptocompra = Functions.initValueServiceInArray( arrayConceptoCompra, "idconceptocompra" );
+            state.conceptocompra     = Functions.initValueServiceInArray( arrayConceptoCompra, "descripcion" );
+
+            state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
+            state.sucursal     = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
+
+            let arrayAlmacen = ( typeof state.fkidsucursal == "number" ) ? arraySucursal[0].arrayalmacen : [];
+
+            state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
+            state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
+
+            state.fkidseccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "idseccioninventario" );
+            state.seccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "descripcion" );
+
+            state.arraySolicitudCompraDetalle = loadDetailBuySolicitude( state );
+
 
             state.loading = false;
             state = Object.assign( {}, state );
@@ -191,75 +209,81 @@ function onSetData( state, payload ) {
 
     state.estado = payload.estado;
 
-    state.arraySolicitudCompraDetalle = setStateDetailsBuySolicitude(payload.solicitudcompradetalle);
+    state.arraySolicitudCompraDetalle = setStateDetailsBuySolicitude(payload.arraysolicitudcompradetalle, state);
 };
 
-function loadDetailBuySolicitude() {
+function loadDetailBuySolicitude( state ) {
     let array = [];
     for ( let index = 0; index < 10; index++ ) {
-        const element = {
-            key: index,
-
-            codigo: "",
-            producto: "",
-            ciudadorigen: "",
-
-            fkidunidadmedidaproducto: null,
-            unidadmedidaproducto: "",
-
-            stockactual: "",
-            cantidadsolicitada: "",
-            costounitario: "",
-            costosubtotal: "",
-            productomarca: "",
-
-            fechasolicitada: null,
-            fsolicitada: null,
-            
-            nota: null,
-
-            visible_producto: false,
-            fkidproducto: null,
-            idsolicitudcompradetalle: null,
-            error: false,
-        };
+        const element = defaultSolicitudCompraDetalle( index, state );
         array = [ ...array, element];
     }
     return array;
 };
 
-function setStateDetailsBuySolicitude( solicitudcompradetalle ) {
+function setStateDetailsBuySolicitude( solicitudcompradetalle, state ) {
     let array = [];
     for (let index = 0; index < solicitudcompradetalle.length; index++) {
-        let detalle = solicitudcompradetalle[index];
-
-        const element = {
-            key: index,
-
-            codigo: detalle.codigo,
-            producto: detalle.nombre,
-            ciudadorigen: detalle.ciudadorigen,
-
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.unidadmedida,
-
-            stockactual: parseInt(detalle.stockactual),
-            cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
-            costounitario: parseFloat(detalle.costounitario).toFixed(2),
-            costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
-            productomarca: detalle.productomarca,
-
-            fechasolicitada: detalle.fechasolicitada,
-            fsolicitada: Functions.convertYMDToDMY(detalle.fechasolicitada),
-            
-            nota: detalle.nota,
-
-            visible_producto: false,
-            fkidproducto: null,
-            idsolicitudcompradetalle: null,
-            error: false,
-        };
-        array = [ ...array, element];
+        const detalle = solicitudcompradetalle[index];
+        const element = defaultSolicitudCompraDetalle( index, state, detalle );
+        array = [ ...array, element ];
     };
     return array;
 };
+
+function defaultSolicitudCompraDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        producto: detalle ? detalle.producto : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` :  "",
+
+        fkidciudadorigen: detalle ? detalle.fkidciudadorigen : null,
+        ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        fkidproveedor: detalle ? detalle.fkidproveedor : state.fkidproveedor,
+        proveedor: detalle ? detalle.proveedor : state.proveedor,
+
+        fkidseccioninventario: detalle ? detalle.fkidseccioninventario : state.fkidseccioninventario,
+        seccioninventario: detalle ? detalle.seccioninventario : state.seccioninventario,
+
+        stockactual: detalle ? detalle.stockactual : "",
+        cantidadpendiente: detalle ? detalle.cantidadpendiente : "",
+        cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
+
+        costobase: detalle ? parseFloat( detalle.costobase ).toFixed(2) : "",
+        costounitario: detalle ? parseFloat( detalle.costounitario ).toFixed(2) : "",
+        costosubtotal: detalle ? parseFloat( detalle.costosubtotal ).toFixed(2) : "",
+
+        fechafinalizada: detalle ? detalle.fechafinalizada : null,
+        ffinalizada: detalle ? Functions.convertYMDToDMY( detalle.fechafinalizada ) : null,
+
+        fechasolicitada: detalle ? detalle.fechasolicitada : null,
+        fsolicitada: detalle ? Functions.convertYMDToDMY( detalle.fechasolicitada ) : null,
+        
+        nota: detalle ? detalle.nota : null,
+        isordencompra: detalle ? detalle.isordencompra : "N",
+
+        idsolicitudcompradetalle: detalle ? detalle.idsolicitudcompradetalle : null,
+        visible_producto: false,
+        visible_sucursal: false,
+        visible_almacen: false,
+        visible_seccioninventario: false,
+        errorcantidad: false,
+        errorcostounitario: false,
+    };
+}

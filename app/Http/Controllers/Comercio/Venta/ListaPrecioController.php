@@ -8,6 +8,7 @@ use App\Http\Requests\Comercio\Venta\ListaPrecioRequest;
 use App\Models\Comercio\Venta\ListaPrecio;
 use App\Models\Comercio\Venta\ListaPrecioDetalle;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ListaPrecioController extends Controller
@@ -104,6 +105,7 @@ class ListaPrecioController extends Controller
     {
         try {
 
+            DB::beginTransaction();
             $obj = new ListaPrecio();
 
             $listaprecio = $obj->store( $obj, $request );
@@ -111,22 +113,30 @@ class ListaPrecioController extends Controller
             if ( $listaprecio ) {
                 $arrayListaPrecioDetalle = json_decode( isset( $request->listapreciodetalle ) ? $request->listapreciodetalle : '[]' );
                 foreach ( $arrayListaPrecioDetalle as $detalle ) {
-                    if ( !is_null( $detalle->fkidunidadmedidaproducto ) ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
                         $detalle->fkidlistaprecio = $listaprecio->idlistaprecio;
                         $listprecdet = new ListaPrecioDetalle();
                         $listapreciodetalle = $listprecdet->store( $listprecdet, $request, $detalle );
                     }
                 }
+
+                DB::commit();
+                return response( )->json( [
+                    'response'     => 1,
+                    'listaprecio' => $listaprecio,
+                    'message'      => 'Lista Precio registrado éxitosamente.',
+                ] );
             }
 
+            DB::rollBack();
             return response( )->json( [
-                'response'     => 1,
+                'response' => -1,
                 'listaprecio' => $listaprecio,
-                'message'      => 'Lista Precio registrado éxitosamente.',
+                'message'  => 'Lista Precio no registrado, intentar nuevamente.',
             ] );
 
         } catch ( \Exception $th ) {
-
+            DB::rollBack();
             return response( )->json( [
                 'response' => -4,
                 'message'  => 'Error al procesar la solicitud.',
@@ -263,7 +273,7 @@ class ListaPrecioController extends Controller
             if ( $result ) {
                 $arrayListaPrecioDetalle = json_decode( isset( $request->listapreciodetalle ) ? $request->listapreciodetalle : '[]' );
                 foreach ( $arrayListaPrecioDetalle as $detalle ) {
-                    if ( !is_null( $detalle->fkidunidadmedidaproducto ) ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
                         $detalle->fkidlistaprecio = $listaprecio->idlistaprecio;
                         $listprecdet = new ListaPrecioDetalle();
                         if ( is_null( $detalle->idlistapreciodetalle ) ) {
@@ -325,6 +335,8 @@ class ListaPrecioController extends Controller
     {
         try {
 
+            DB::beginTransaction();
+
             $regla = [
                 'idlistaprecio' => 'required',
             ];
@@ -354,13 +366,47 @@ class ListaPrecioController extends Controller
                 ] );
             }
 
+            if ( $listaprecio->isdelete == "N" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Acción no permitido.',
+                ] );
+            }
+
+
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
             //
 
             /* fin de restriccion */
 
-            $result = $obj->remove( $obj, $request );
+            $listprecdet = new ListaPrecioDetalle();
+            $arraylistapreciodetalle = $listprecdet->getListaPrecioDetalle( $listprecdet, $request->idlistaprecio );
+
+            foreach ( $arraylistapreciodetalle as $detalle ) {
+                $listapreciodetalle = $listprecdet->find( $detalle->idlistapreciodetalle );
+                if ( !is_null( $listapreciodetalle ) ) {
+                    $listapreciodetalle->delete();
+                }
+            }
+
+            $listaPrecioDelete = $listaprecio->delete();
+
+            if ( $listaPrecioDelete ) {
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Lista Precio eliminado éxitosamente.',
+                    'listaPrecioDelete' => $listaPrecioDelete,
+                ] );
+            }
+
+            DB::rollBack();
+            return response()->json( [
+                'response' => -1,
+                'message'  => 'Hubo conflictos al eliminar, favor de intentar nuevamente.',
+                'listaPrecioDelete' => $listaPrecioDelete,
+            ] );
 
             return response()->json( [
                 'response' => 1,

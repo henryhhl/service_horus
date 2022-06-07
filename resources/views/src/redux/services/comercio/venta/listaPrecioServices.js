@@ -17,6 +17,20 @@ function resultData( result ) {
     }
 };
 
+const getAllProduct = async ( ) => {
+    return await httpRequest( 'get', webservices.wscomercioinventariounidadmedidaproducto_index, {
+        esPaginado: 0,
+        isventa: 'A',
+    } ) . then ( ( result ) => {
+        resultData( result );
+        if ( result.response == 1 ) {
+            C_Message( "success", "Servicio realizado exitosamente." );
+        }
+        console.log(result)
+        return result;
+    } );
+};
+
 const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
     return httpRequest( 'get', webservices.wscomercioventalistaprecio_index + '?page=' + page, {
         paginate: nroPagination,
@@ -201,6 +215,7 @@ const onImprimir = async () => {
 };
 
 export const ListaPrecioServices = {
+    getAllProduct,
     getData,
 
     onCreate,

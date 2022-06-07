@@ -40,7 +40,11 @@ function IndexOrdenCompra( props ) {
 
     function onGrabarData() {
         if( ordenCompra.update ) {
-            props.onUpdate( ordenCompra );
+            let onUpdate = () => props.onUpdate( ordenCompra );
+            C_Confirm( { 
+                title: "Editar Orden Compra", onOk: onUpdate, 
+                okType: "primary", content: "Estás seguro de actualizar información?", 
+            } );
         } else {
             let ongrabar = () => props.onGrabar( ordenCompra );
             C_Confirm( { 
@@ -199,7 +203,7 @@ function IndexOrdenCompra( props ) {
 
                 onCreate={props.onCreate}
                 onGrabar={onGrabarData}
-                // onUpdate={ () => props.onEditar( ordenCompra ) }
+                onUpdate={ () => props.onEditar( ordenCompra ) }
                 onDelete={ onConfirmarDelete }
                 onSearch={ props.onSearch }
 

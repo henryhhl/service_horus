@@ -29,7 +29,7 @@ class ConceptoVentaSeeder extends Seeder
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'estado'      => 'A',
-                'isdelete'    => 'A',
+                'isdelete'    => 'N',
             ],
         ];
     }

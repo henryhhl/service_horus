@@ -54,6 +54,15 @@ const setImprimir = ( data ) => ( {
     payload: data,
 } );
 
+const allProducto = ( array ) => ( {
+    type: Strings.listaprecio_allProducto,
+    payload: array,
+} );
+
+const quitarProductos = ( ) => ( {
+    type: Strings.listaprecio_quitarProducto,
+} );
+
 const initData = ( ) => {
     return async ( dispatch ) => {
 
@@ -70,6 +79,19 @@ const initData = ( ) => {
                 };
                 dispatch( paginationActions.setPagination( obj ) );
             }
+        } );
+    };
+};
+
+const getAllProduct = () => {
+    return ( dispatch ) => {
+        dispatch( setLoading() );
+        ListaPrecioServices.getAllProduct( ).then ( async ( result ) => {
+            if ( result.response == 1 ) {
+                dispatch( allProducto( result.producto ) );
+            }
+        } ) . finally ( () => {
+            dispatch( removeLoading() );
         } );
     };
 };
@@ -302,4 +324,7 @@ export const listaPrecioActions = {
     onSearchData,
 
     onCancelar,
+
+    getAllProduct,
+    quitarProductos,
 };

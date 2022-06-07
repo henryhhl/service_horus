@@ -18,24 +18,26 @@ class OrdenCompraDetalle extends Model
     ];
 
     protected $attributes = [
-        'estado' => 'A',  'isdelete' => 'A', 'fkidsolicitudcompradetalle' => null,
-        'cantidad' => 0, 'cantidadsolicitada' => 0, 'costounitario' => 0, 'costosubtotal' => 0,
-        'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null,
-        'fechasolicitada' => null, 'fechavencimiento' => null,
-        'issolicitudcompra' => 'N', 'iscompra' => 'N',
+        'stockactual' => 0, 'cantidad' => 0, 'cantidadsolicitada' => 0, 'costobase' => 0, 'costounitario' => 0, 'costosubtotal' => 0,
+        'descuento' => 0, 'montodescuento' => 0, 'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null,
+        'fechasolicitada' => null, 'fechavencimiento' => null, 'issolicitudcompra' => 'N', 'iscompra' => 'N',
+        'estado' => 'A',  'isdelete' => 'A', 'fkidsolicitudcompradetalle' => null, 'fkidsolicitudcompra' => null, 'x_idusuario' => null, 'fkidusers' => null,
     ];
 
     protected $fillable = [
-        'fkidordencompra', 'fkidunidadmedidaproducto', 'fkidsolicitudcompradetalle', 'costounitario', 'costosubtotal',
-        'peso', 'pesosubtotal', 'cantidad', 'cantidadsolicitada', 'volumen', 'volumensubtotal',
-        'nota', 'fechasolicitada', 'fechavencimiento', 'iscompra', 'issolicitudcompra', 'isdelete', 'estado', 'fecha', 'hora',
+        'fkidordencompra', 'fkidproducto', 'fkidsolicitudcompradetalle', 'fkidsolicitudcompra', 'fkidproveedor', 'fkidsucursal', 'fkidalmacen', 'fkidseccioninventario',
+        'costobase', 'costounitario', 'costosubtotal', 'peso', 'pesosubtotal', 'stockactual', 'cantidad', 'cantidadsolicitada', 'descuento', 'montodescuento',
+        'volumen', 'volumensubtotal', 'nota', 'fechasolicitada', 'fechavencimiento', 'iscompra', 'issolicitudcompra', 
+        'isdelete', 'estado', 'fecha', 'hora', 'x_idusuario', 'fkidusers',
     ];
 
     public function getOrdenCompraDetalle( $query, $fkidordencompra ) {
         $ordencompradetalle = $query
             ->select( [
-                'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada',
-                'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal',
+                'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidsolicitudcompradetalle', 'ordencompradetalle.fkidsolicitudcompra',
+                'ordencompradetalle.stockactual', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada',
+                'ordencompradetalle.costobase', 'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal',
+                'ordencompradetalle.descuento', 'ordencompradetalle.montodescuento',
                 'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal',
                 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
                 'ordencompradetalle.nota', 'ordencompradetalle.fechavencimiento',
@@ -52,18 +54,28 @@ class OrdenCompraDetalle extends Model
     public function store( $query, $request, $detalle )
     {
         $fkidordencompra = $detalle->fkidordencompra;
-        $fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
+        $fkidproducto = $detalle->fkidproducto;
         $fkidsolicitudcompradetalle = $detalle->fkidsolicitudcompradetalle;
+        $fkidsolicitudcompra = $detalle->fkidsolicitudcompra;
+        $fkidproveedor = $detalle->fkidproveedor;
+        $fkidsucursal = $detalle->fkidsucursal;
+        $fkidalmacen = $detalle->fkidalmacen;
+        $fkidseccioninventario = $detalle->fkidseccioninventario;
 
         $nota = isset( $detalle->nota ) ? $detalle->nota : null;
         $fechasolicitada = isset( $detalle->fechasolicitada ) ? $detalle->fechasolicitada : null;
         $fechavencimiento = isset( $detalle->fechavencimiento ) ? $detalle->fechavencimiento : null;
 
+        $stockactual = isset( $detalle->stockactual ) ? $detalle->stockactual : 0;
         $cantidad = isset( $detalle->cantidad ) ? $detalle->cantidad : 0;
         $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
 
+        $costobase = is_numeric( $detalle->costobase )  ? $detalle->costobase : 0;
         $costounitario = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
         $costosubtotal = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
+
+        $descuento = is_numeric( $detalle->descuento )  ? $detalle->descuento : 0;
+        $montodescuento = is_numeric( $detalle->montodescuento )  ? $detalle->montodescuento : 0;
 
         $peso = is_numeric( $detalle->peso )  ? $detalle->peso : 0;
         $pesosubtotal = is_numeric( $detalle->pesosubtotal )  ? $detalle->pesosubtotal : 0;
@@ -74,18 +86,28 @@ class OrdenCompraDetalle extends Model
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
 
-        $ordencompra = $query->create( [
+        $ordencompradetalle = $query->create( [
             'fkidordencompra' => $fkidordencompra,
-            'fkidunidadmedidaproducto' => $fkidunidadmedidaproducto,
+            'fkidproducto' => $fkidproducto,
             'fkidsolicitudcompradetalle' => $fkidsolicitudcompradetalle,
+            'fkidsolicitudcompra' => $fkidsolicitudcompra,
+            'fkidproveedor' => $fkidproveedor,
+            'fkidsucursal' => $fkidsucursal,
+            'fkidalmacen' => $fkidalmacen,
+            'fkidseccioninventario' => $fkidseccioninventario,
 
             'nota' => $nota,
             'fechasolicitada' => $fechasolicitada,
             'fechavencimiento' => $fechavencimiento,
 
+            'stockactual' => $stockactual,
             'cantidad' => $cantidad,
             'cantidadsolicitada' => $cantidadsolicitada,
 
+            'descuento' => $descuento,
+            'montodescuento' => $montodescuento,
+
+            'costobase' => $costobase,
             'costounitario' => $costounitario,
             'costosubtotal' => $costosubtotal,
 
@@ -99,7 +121,76 @@ class OrdenCompraDetalle extends Model
             'hora'   => $hora
         ] );
 
-        return $ordencompra;
+        return $ordencompradetalle;
+    }
+
+    public function upgrade( $query, $detalle ) {
+        $idordencompradetalle = $detalle->idordencompradetalle;
+
+        $fkidordencompra = $detalle->fkidordencompra;
+        $fkidproducto = $detalle->fkidproducto;
+        $fkidsolicitudcompradetalle = $detalle->fkidsolicitudcompradetalle;
+        $fkidsolicitudcompra = $detalle->fkidsolicitudcompra;
+        $fkidproveedor = $detalle->fkidproveedor;
+        $fkidsucursal = $detalle->fkidsucursal;
+        $fkidalmacen = $detalle->fkidalmacen;
+        $fkidseccioninventario = $detalle->fkidseccioninventario;
+
+        $nota = isset( $detalle->nota ) ? $detalle->nota : null;
+        $fechasolicitada = isset( $detalle->fechasolicitada ) ? $detalle->fechasolicitada : null;
+        $fechavencimiento = isset( $detalle->fechavencimiento ) ? $detalle->fechavencimiento : null;
+
+        $stockactual = isset( $detalle->stockactual ) ? $detalle->stockactual : 0;
+        $cantidad = isset( $detalle->cantidad ) ? $detalle->cantidad : 0;
+        $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
+
+        $costobase = is_numeric( $detalle->costobase )  ? $detalle->costobase : 0;
+        $costounitario = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
+        $costosubtotal = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
+
+        $descuento = is_numeric( $detalle->descuento )  ? $detalle->descuento : 0;
+        $montodescuento = is_numeric( $detalle->montodescuento )  ? $detalle->montodescuento : 0;
+
+        $peso = is_numeric( $detalle->peso )  ? $detalle->peso : 0;
+        $pesosubtotal = is_numeric( $detalle->pesosubtotal )  ? $detalle->pesosubtotal : 0;
+
+        $volumen = is_numeric( $detalle->volumen )  ? $detalle->volumen : 0;
+        $volumensubtotal = is_numeric( $detalle->volumensubtotal )  ? $detalle->volumensubtotal : 0;
+
+        $ordencompradetalle = $query->where( 'idordencompradetalle', '=', $idordencompradetalle )
+            ->update( [
+                'fkidordencompra' => $fkidordencompra,
+                'fkidproducto' => $fkidproducto,
+                'fkidsolicitudcompradetalle' => $fkidsolicitudcompradetalle,
+                'fkidsolicitudcompra' => $fkidsolicitudcompra,
+                'fkidproveedor' => $fkidproveedor,
+                'fkidsucursal' => $fkidsucursal,
+                'fkidalmacen' => $fkidalmacen,
+                'fkidseccioninventario' => $fkidseccioninventario,
+
+                'nota' => $nota,
+                'fechasolicitada' => $fechasolicitada,
+                'fechavencimiento' => $fechavencimiento,
+
+                'stockactual' => $stockactual,
+                'cantidad' => $cantidad,
+                'cantidadsolicitada' => $cantidadsolicitada,
+
+                'descuento' => $descuento,
+                'montodescuento' => $montodescuento,
+
+                'costobase' => $costobase,
+                'costounitario' => $costounitario,
+                'costosubtotal' => $costosubtotal,
+
+                'peso' => $peso,
+                'pesosubtotal' => $pesosubtotal,
+
+                'volumen' => $volumen,
+                'volumensubtotal' => $volumensubtotal,
+            ] );
+
+        return $ordencompradetalle;
     }
 
 }

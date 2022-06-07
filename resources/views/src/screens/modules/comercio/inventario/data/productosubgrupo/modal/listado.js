@@ -18,7 +18,7 @@ function M_ListadoProductoSubGrupo( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >

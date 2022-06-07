@@ -115,8 +115,8 @@ function C_Form( props ) {
                         value={ direccion }
                         onChange={ onChangeDireccion }
                         disabled={ disabled.data }
-                        error={error.descripcion}
-                        message={message.descripcion}
+                        error={error.direccion}
+                        message={message.direccion}
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>

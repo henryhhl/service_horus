@@ -334,6 +334,13 @@ class ClienteTipoController extends Controller
                 ] );
             }
 
+            if ( $clientetipo->isdelete == "N" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Acción no permitido.',
+                ] );
+            }
+
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
             /* fin de restriccion */

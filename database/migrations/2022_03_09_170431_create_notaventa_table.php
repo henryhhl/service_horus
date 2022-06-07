@@ -35,13 +35,14 @@ class CreateNotaventaTable extends Migration
             $table->decimal('tipocambio', 24, 8)->default(0);
 
             $table->string('codigo', 150)->nullable();
-            $table->string('tipoventa')->nullable();
+            $table->text('tipoventa')->nullable();
             $table->string('estadoproceso')->default('F');
             $table->date('fechaventa');
             $table->integer('diascredito')->nullable();
             $table->date('fechavencimiento')->nullable();
 
             $table->enum('facturar', ['S', 'N'])->default('N');
+            $table->enum('esnotaentrega', ['S', 'N'])->default('N');
             $table->integer('nrofactura')->nullable();
             $table->text('razonsocial')->nullable();
             $table->text('nit')->nullable();

@@ -140,6 +140,33 @@ const onDecrementarNumberDecimal = ( value ) => {
     return parseInt(number);
 };
 
+const getMontoPorcentaje = ( monto, porcentaje ) => {
+    if ( isNaN( monto ) || isNaN( porcentaje ) ) return 0;
+    porcentaje = parseFloat( porcentaje * 1 / 100 );
+    return parseFloat( monto * porcentaje );
+};
+
+const getMontoIncremento = ( monto, porcentaje ) => {
+    if ( isNaN( monto ) || isNaN( porcentaje ) ) return 0;
+    porcentaje = parseFloat( porcentaje * 1 / 100 );
+    let montoIncremento = parseFloat( monto * porcentaje );
+    return parseFloat( monto * 1 + montoIncremento );
+};
+
+const getMontoDescuento = ( monto, porcentaje ) => {
+    if ( isNaN( monto ) || isNaN( porcentaje ) ) return 0;
+    porcentaje = parseFloat( porcentaje * 1 / 100 );
+    let montoDescuento = parseFloat( monto * porcentaje );
+    return parseFloat( monto * 1 - montoDescuento );
+};
+
+const initValueServiceInArray = ( array = [], value ) => {
+    if ( array.length > 0 ) {
+        if ( array.length == 1 ) return array[0][value];
+    }
+    return null;
+};
+
 export const Functions = {
     cleanObejct,
     initDate,
@@ -155,4 +182,8 @@ export const Functions = {
     onChangeNumberDecimal,
     onIncrementarNumberDecimal,
     onDecrementarNumberDecimal,
+    getMontoIncremento,
+    getMontoDescuento,
+    getMontoPorcentaje,
+    initValueServiceInArray,
 };

@@ -15,11 +15,23 @@ class CreateNotacompradetalleTable extends Migration
     {
         Schema::create('notacompradetalle', function (Blueprint $table) {
             $table->increments('idnotacompradetalle');
+            $table->integer('x_idusuario')->unsigned()->nullable();
+            $table->integer('fkidusers')->unsigned()->nullable();
             
             $table->integer('fkidnotacompra')->unsigned();
-            $table->integer('fkidalmacenunidadmedidaproducto')->unsigned()->nullable();
-            $table->integer('fkidunidadmedidaproducto')->unsigned();
+            $table->integer('fkidalmacenproductodetalle')->unsigned()->nullable();
+            $table->integer('fkidproducto')->unsigned();
+
+            $table->integer('fkidordencompra')->unsigned()->nullable();
             $table->integer('fkidordencompradetalle')->unsigned()->nullable();
+
+            $table->integer('fkidsolicitudcompra')->unsigned()->nullable();
+            $table->integer('fkidsolicitudcompradetalle')->unsigned()->nullable();
+
+            $table->integer('fkidsucursal')->unsigned();
+            $table->integer('fkidalmacen')->unsigned();
+            $table->integer('fkidseccioninventario')->unsigned()->nullable();
+            $table->integer('fkidproveedor')->unsigned();
 
             $table->integer('cantidadsolicitada')->default(0);
             $table->integer('cantidadrecibida')->default(0);
@@ -29,8 +41,12 @@ class CreateNotacompradetalleTable extends Migration
 
             $table->integer('nrocajas')->default(0);
 
+            $table->decimal('costobase', 24, 8)->default(0);
             $table->decimal('costounitario', 24, 8)->default(0);
             $table->decimal('costosubtotal', 24, 8)->default(0);
+
+            $table->integer('descuento')->default(0);
+            $table->decimal('montodescuento', 24, 8)->default(0);
 
             $table->decimal('peso', 24, 8)->default(0);
             $table->decimal('pesosubtotal', 24, 8)->default(0);

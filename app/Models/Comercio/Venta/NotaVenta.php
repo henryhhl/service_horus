@@ -27,7 +27,7 @@ class NotaVenta extends Model
         'impuestoiva' => 0, 'montototalcobrado' => 0, 'montototaldeudamora' => 0, 'montototaldeudaactual' => 0,
         'descuentoacumulado' => 0, 'porcentajerangodescuentoinicial' => 0, 'porcentajerangodescuentofinal' => 0,
         'montosubtotal' => 0, 'descuento' => 0, 'montodescuento' => 0, 'montototal' => 0, 'montoanticipo' => 0,
-        'isdevolucionventa' => 'N', 'cantidadtotal' => 0,
+        'isdevolucionventa' => 'N', 'cantidadtotal' => 0, 'esnotaentrega' => 'N',
         'estado' => 'A',  'isdelete' => 'A',
         'codigo' => null, 'x_idusuario' => null,
     ];
@@ -36,7 +36,7 @@ class NotaVenta extends Model
         'codigo', 'fkidsucursal', 'fkidalmacen', 'fkidvendedor', 'fkidcliente', 'fkidlistaprecio', 'fkidconceptoventa',
         'fkidmoneda', 'fkidusers', 'fkidtipotransaccion', 'fkidtipopago',
         'nrodebito', 'nroventa', 'nrocotizacion', 'tipocambio', 'estadoproceso', 'tipoventa',
-        'facturar', 'nrofactura', 'razonsocial', 'nit', 'glosa',
+        'facturar', 'nrofactura', 'razonsocial', 'nit', 'glosa', 'esnotaentrega',
         'impuestoiva', 'montototalcobrado', 'montototaldeudamora', 'montototaldeudaactual',
         'descuentoacumulado', 'porcentajerangodescuentoinicial', 'porcentajerangodescuentofinal',
         'montosubtotal', 'descuento', 'montodescuento', 'montototal', 'montoanticipo', 'cantidadtotal',
@@ -44,7 +44,7 @@ class NotaVenta extends Model
         'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
 
-    public function arraynotacompradetalle() {
+    public function arraynotaventadetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Venta\NotaVentaDetalle',
             'fkidnotaventa',
@@ -73,7 +73,7 @@ class NotaVenta extends Model
                 'notaventa.descuentoacumulado', 'notaventa.porcentajerangodescuentoinicial', 'notaventa.porcentajerangodescuentofinal',
                 'notaventa.montosubtotal', 'notaventa.descuento', 'notaventa.montodescuento', 'notaventa.montototal', 'notaventa.montoanticipo',
                 'notaventa.isdevolucionventa', 'notaventa.fechaventa', 'notaventa.diascredito', 'notaventa.fechavencimiento', 'notaventa.cantidadtotal',
-                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora',
+                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora', 'notaventa.esnotaentrega',
                 'suc.idsucursal', 'suc.descripcion as sucursal',
                 'alm.idalmacen', 'alm.descripcion as almacen',
                 'vend.idvendedor', DB::raw("CONCAT(vend.nombre, ' ', vend.apellido) as vendedor"),
@@ -109,22 +109,37 @@ class NotaVenta extends Model
                 }
                 return;
             } )
-            ->with( [ 'arraynotacompradetalle' => function( $query ) {
+            ->with( [ 'arraynotaventadetalle' => function( $query ) {
                 $query
                     ->select( [
-                        'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidunidadmedidaproducto', 'notaventadetalle.fkidalmacenunidadmedidaproducto',
-                        'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidvendedor',
-                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciounitario', 'notaventadetalle.preciounitariosubtotal',
-                        'notaventadetalle.descuento', 'notaventadetalle.montodescuento', 'notaventadetalle.nota',
-                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre as producto',
+                        'notaventadetalle.idnotaventadetalle', 'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo',
+                        'notaventadetalle.fkidproductomarca', 'notaventadetalle.fkidalmacenproductodetalle', 'notaventadetalle.fkidalmacen', 
+                        'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidvendedor',
+                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciobase', 'notaventadetalle.preciounitario',
+                        'notaventadetalle.preciosubtotal', 'notaventadetalle.descuento', 'notaventadetalle.montodescuento',
+                        'notaventadetalle.nrolote', 'notaventadetalle.nrofabrica', 'notaventadetalle.fechavencimiento', 'notaventadetalle.nota',
+                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa', 'notaventadetalle.estado',
+                        'almproddet.idalmacenproductodetalle', 'almproddet.stockactual', 'almproddet.stockminimo', 'almproddet.stockmaximo', 
+                        'almproddet.ingresos', 'almproddet.salidas', 'almproddet.traspasos', 'almproddet.ventas', 'almproddet.compras',
+                        'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stocktotal', 'prod.peso', 'prod.volumen', 'prod.valorequivalente',
                         'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.fkidsucursal',
+                        'venddor.idvendedor', DB::raw("CONCAT(venddor.nombre, ' ', venddor.apellido) as vendedor"),
+                        'listprec.idlistaprecio', 'listprec.descripcion as listaprecio',
+                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prodtipo.idproductotipo', 'prodtipo.descripcion as productotipo',
+                        'prod.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                     ] )
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'notaventadetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'undmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->orderBy('notaventadetalle', 'ASC');
+                    ->leftJoin('almacenproductodetalle as almproddet', 'notaventadetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                    ->leftJoin('almacen as alm', 'notaventadetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('listaprecio as listprec', 'notaventadetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->leftJoin('vendedor as venddor', 'notaventadetalle.fkidvendedor', '=', 'venddor.idvendedor')
+                    ->leftJoin('producto as prod', 'notaventadetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtipo', 'prod.fkidproductotipo', '=', 'prodtipo.idproductotipo')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
+                    ->leftJoin('ciudad as ciu', 'prod.fkidciudadorigen', '=', 'ciu.idciudad')
+                    ->orderBy('notaventadetalle.idnotaventadetalle', 'ASC');
             } ] )
             ->whereNull( 'notaventa.deleted_at' )
             ->orderBy( $column , $orderBy)
@@ -157,7 +172,7 @@ class NotaVenta extends Model
                 'notaventa.descuentoacumulado', 'notaventa.porcentajerangodescuentoinicial', 'notaventa.porcentajerangodescuentofinal',
                 'notaventa.montosubtotal', 'notaventa.descuento', 'notaventa.montodescuento', 'notaventa.montototal', 'notaventa.montoanticipo',
                 'notaventa.isdevolucionventa', 'notaventa.fechaventa', 'notaventa.diascredito', 'notaventa.fechavencimiento', 'notaventa.cantidadtotal',
-                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora',
+                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora', 'notaventa.esnotaentrega',
                 'suc.idsucursal', 'suc.descripcion as sucursal',
                 'alm.idalmacen', 'alm.descripcion as almacen',
                 'vend.idvendedor', DB::raw("CONCAT(vend.nombre, ' ', vend.apellido) as vendedor"),
@@ -193,22 +208,37 @@ class NotaVenta extends Model
                 }
                 return;
             } )
-            ->with( [ 'arraynotacompradetalle' => function( $query ) {
+            ->with( [ 'arraynotaventadetalle' => function( $query ) {
                 $query
                     ->select( [
-                        'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidunidadmedidaproducto', 'notaventadetalle.fkidalmacenunidadmedidaproducto',
-                        'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidvendedor',
-                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciounitario', 'notaventadetalle.preciounitariosubtotal',
-                        'notaventadetalle.descuento', 'notaventadetalle.montodescuento', 'notaventadetalle.nota',
-                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre as producto',
+                        'notaventadetalle.idnotaventadetalle', 'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo',
+                        'notaventadetalle.fkidproductomarca', 'notaventadetalle.fkidalmacenproductodetalle', 'notaventadetalle.fkidalmacen', 
+                        'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidvendedor',
+                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciobase', 'notaventadetalle.preciounitario',
+                        'notaventadetalle.preciosubtotal', 'notaventadetalle.descuento', 'notaventadetalle.montodescuento',
+                        'notaventadetalle.nrolote', 'notaventadetalle.nrofabrica', 'notaventadetalle.fechavencimiento', 'notaventadetalle.nota',
+                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa', 'notaventadetalle.estado',
+                        'almproddet.idalmacenproductodetalle', 'almproddet.stockactual', 'almproddet.stockminimo', 'almproddet.stockmaximo', 
+                        'almproddet.ingresos', 'almproddet.salidas', 'almproddet.traspasos', 'almproddet.ventas', 'almproddet.compras',
+                        'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stocktotal', 'prod.peso', 'prod.volumen', 'prod.valorequivalente',
                         'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.fkidsucursal',
+                        'venddor.idvendedor', DB::raw("CONCAT(venddor.nombre, ' ', venddor.apellido) as vendedor"),
+                        'listprec.idlistaprecio', 'listprec.descripcion as listaprecio',
+                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prodtipo.idproductotipo', 'prodtipo.descripcion as productotipo',
+                        'prod.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                     ] )
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'notaventadetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'undmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->orderBy('notaventadetalle', 'ASC');
+                    ->leftJoin('almacenproductodetalle as almproddet', 'notaventadetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                    ->leftJoin('almacen as alm', 'notaventadetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('listaprecio as listprec', 'notaventadetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->leftJoin('vendedor as venddor', 'notaventadetalle.fkidvendedor', '=', 'venddor.idvendedor')
+                    ->leftJoin('producto as prod', 'notaventadetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtipo', 'prod.fkidproductotipo', '=', 'prodtipo.idproductotipo')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
+                    ->leftJoin('ciudad as ciu', 'prod.fkidciudadorigen', '=', 'ciu.idciudad')
+                    ->orderBy('notaventadetalle.idnotaventadetalle', 'ASC');
             } ] )
             ->whereNull( 'notaventa.deleted_at' )
             ->orderBy( $column, $orderBy )
@@ -253,6 +283,7 @@ class NotaVenta extends Model
         $razonsocial  = isset( $request->razonsocial ) ? $request->razonsocial : null;
         $nit  = isset( $request->nit ) ? $request->nit : null;
         $glosa  = isset( $request->glosa ) ? $request->glosa : null;
+        $esnotaentrega  = isset( $request->esnotaentrega ) ? $request->esnotaentrega : null;
 
         $impuestoiva  = isset( $request->impuestoiva ) ? $request->impuestoiva : 0;
         $montototalcobrado  = isset( $request->montototalcobrado ) ? $request->montototalcobrado : 0;
@@ -304,6 +335,7 @@ class NotaVenta extends Model
             'razonsocial' => $razonsocial,
             'nit' => $nit,
             'glosa' => $glosa,
+            'esnotaentrega' => $esnotaentrega,
 
             'impuestoiva' => $impuestoiva,
             'montototalcobrado' => $montototalcobrado,
@@ -362,6 +394,7 @@ class NotaVenta extends Model
         $razonsocial  = isset( $request->razonsocial ) ? $request->razonsocial : null;
         $nit  = isset( $request->nit ) ? $request->nit : null;
         $glosa  = isset( $request->glosa ) ? $request->glosa : null;
+        $esnotaentrega  = isset( $request->esnotaentrega ) ? $request->esnotaentrega : null;
 
         $impuestoiva  = isset( $request->impuestoiva ) ? $request->impuestoiva : 0;
         $montototalcobrado  = isset( $request->montototalcobrado ) ? $request->montototalcobrado : 0;
@@ -411,6 +444,7 @@ class NotaVenta extends Model
                 'razonsocial' => $razonsocial,
                 'nit' => $nit,
                 'glosa' => $glosa,
+                'esnotaentrega' => $esnotaentrega,
 
                 'impuestoiva' => $impuestoiva,
                 'montototalcobrado' => $montototalcobrado,
@@ -451,7 +485,7 @@ class NotaVenta extends Model
                 'notaventa.descuentoacumulado', 'notaventa.porcentajerangodescuentoinicial', 'notaventa.porcentajerangodescuentofinal',
                 'notaventa.montosubtotal', 'notaventa.descuento', 'notaventa.montodescuento', 'notaventa.montototal', 'notaventa.montoanticipo',
                 'notaventa.isdevolucionventa', 'notaventa.fechaventa', 'notaventa.diascredito', 'notaventa.fechavencimiento', 'notaventa.cantidadtotal',
-                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora',
+                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora', 'notaventa.esnotaentrega',
                 'suc.idsucursal', 'suc.descripcion as sucursal',
                 'alm.idalmacen', 'alm.descripcion as almacen',
                 'vend.idvendedor', DB::raw("CONCAT(vend.nombre, ' ', vend.apellido) as vendedor"),
@@ -471,22 +505,37 @@ class NotaVenta extends Model
             ->leftJoin('moneda as mond', 'notaventa.fkidmoneda', '=', 'mond.idmoneda')
             ->leftJoin('tipotransaccion as ttrans', 'notaventa.fkidtipotransaccion', '=', 'ttrans.idtipotransaccion')
             ->leftJoin('tipopago as tpago', 'notaventa.fkidtipopago', '=', 'tpago.idtipopago')
-            ->with( [ 'arraynotacompradetalle' => function( $query ) {
+            ->with( [ 'arraynotaventadetalle' => function( $query ) {
                 $query
                     ->select( [
-                        'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidunidadmedidaproducto', 'notaventadetalle.fkidalmacenunidadmedidaproducto',
-                        'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidvendedor',
-                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciounitario', 'notaventadetalle.preciounitariosubtotal',
-                        'notaventadetalle.descuento', 'notaventadetalle.montodescuento', 'notaventadetalle.nota',
-                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre as producto',
+                        'notaventadetalle.idnotaventadetalle', 'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo',
+                        'notaventadetalle.fkidproductomarca', 'notaventadetalle.fkidalmacenproductodetalle', 'notaventadetalle.fkidalmacen', 
+                        'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidvendedor',
+                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciobase', 'notaventadetalle.preciounitario',
+                        'notaventadetalle.preciosubtotal', 'notaventadetalle.descuento', 'notaventadetalle.montodescuento',
+                        'notaventadetalle.nrolote', 'notaventadetalle.nrofabrica', 'notaventadetalle.fechavencimiento', 'notaventadetalle.nota',
+                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa', 'notaventadetalle.estado',
+                        'almproddet.idalmacenproductodetalle', 'almproddet.stockactual', 'almproddet.stockminimo', 'almproddet.stockmaximo', 
+                        'almproddet.ingresos', 'almproddet.salidas', 'almproddet.traspasos', 'almproddet.ventas', 'almproddet.compras',
+                        'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stocktotal', 'prod.peso', 'prod.volumen', 'prod.valorequivalente',
                         'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.fkidsucursal',
+                        'venddor.idvendedor', DB::raw("CONCAT(venddor.nombre, ' ', venddor.apellido) as vendedor"),
+                        'listprec.idlistaprecio', 'listprec.descripcion as listaprecio',
+                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prodtipo.idproductotipo', 'prodtipo.descripcion as productotipo',
+                        'prod.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                     ] )
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'notaventadetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'undmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->orderBy('notaventadetalle', 'ASC');
+                    ->leftJoin('almacenproductodetalle as almproddet', 'notaventadetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                    ->leftJoin('almacen as alm', 'notaventadetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('listaprecio as listprec', 'notaventadetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->leftJoin('vendedor as venddor', 'notaventadetalle.fkidvendedor', '=', 'venddor.idvendedor')
+                    ->leftJoin('producto as prod', 'notaventadetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtipo', 'prod.fkidproductotipo', '=', 'prodtipo.idproductotipo')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
+                    ->leftJoin('ciudad as ciu', 'prod.fkidciudadorigen', '=', 'ciu.idciudad')
+                    ->orderBy('notaventadetalle.idnotaventadetalle', 'ASC');
             } ] )
             ->where( 'notaventa.idnotaventa', '=', $idnotaventa )
             ->whereNull('notaventa.deleted_at')
@@ -526,7 +575,7 @@ class NotaVenta extends Model
                 'notaventa.descuentoacumulado', 'notaventa.porcentajerangodescuentoinicial', 'notaventa.porcentajerangodescuentofinal',
                 'notaventa.montosubtotal', 'notaventa.descuento', 'notaventa.montodescuento', 'notaventa.montototal', 'notaventa.montoanticipo',
                 'notaventa.isdevolucionventa', 'notaventa.fechaventa', 'notaventa.diascredito', 'notaventa.fechavencimiento', 'notaventa.cantidadtotal',
-                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora',
+                'notaventa.estado', 'notaventa.isdelete', 'notaventa.fecha', 'notaventa.hora', 'notaventa.esnotaentrega',
                 'suc.idsucursal', 'suc.descripcion as sucursal',
                 'alm.idalmacen', 'alm.descripcion as almacen',
                 'vend.idvendedor', DB::raw("CONCAT(vend.nombre, ' ', vend.apellido) as vendedor"),
@@ -546,22 +595,37 @@ class NotaVenta extends Model
             ->leftJoin('moneda as mond', 'notaventa.fkidmoneda', '=', 'mond.idmoneda')
             ->leftJoin('tipotransaccion as ttrans', 'notaventa.fkidtipotransaccion', '=', 'ttrans.idtipotransaccion')
             ->leftJoin('tipopago as tpago', 'notaventa.fkidtipopago', '=', 'tpago.idtipopago')
-            ->with( [ 'arraynotacompradetalle' => function( $query ) {
+            ->with( [ 'arraynotaventadetalle' => function( $query ) {
                 $query
                     ->select( [
-                        'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidunidadmedidaproducto', 'notaventadetalle.fkidalmacenunidadmedidaproducto',
-                        'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidvendedor',
-                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciounitario', 'notaventadetalle.preciounitariosubtotal',
-                        'notaventadetalle.descuento', 'notaventadetalle.montodescuento', 'notaventadetalle.nota',
-                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre as producto',
+                        'notaventadetalle.idnotaventadetalle', 'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo',
+                        'notaventadetalle.fkidproductomarca', 'notaventadetalle.fkidalmacenproductodetalle', 'notaventadetalle.fkidalmacen', 
+                        'notaventadetalle.fkidlistapreciodetalle', 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidvendedor',
+                        'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.preciobase', 'notaventadetalle.preciounitario',
+                        'notaventadetalle.preciosubtotal', 'notaventadetalle.descuento', 'notaventadetalle.montodescuento',
+                        'notaventadetalle.nrolote', 'notaventadetalle.nrofabrica', 'notaventadetalle.fechavencimiento', 'notaventadetalle.nota',
+                        'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa', 'notaventadetalle.estado',
+                        'almproddet.idalmacenproductodetalle', 'almproddet.stockactual', 'almproddet.stockminimo', 'almproddet.stockmaximo', 
+                        'almproddet.ingresos', 'almproddet.salidas', 'almproddet.traspasos', 'almproddet.ventas', 'almproddet.compras',
+                        'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stocktotal', 'prod.peso', 'prod.volumen', 'prod.valorequivalente',
                         'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.fkidsucursal',
+                        'venddor.idvendedor', DB::raw("CONCAT(venddor.nombre, ' ', venddor.apellido) as vendedor"),
+                        'listprec.idlistaprecio', 'listprec.descripcion as listaprecio',
+                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prodtipo.idproductotipo', 'prodtipo.descripcion as productotipo',
+                        'prod.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                     ] )
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'notaventadetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'undmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->orderBy('notaventadetalle', 'ASC');
+                    ->leftJoin('almacenproductodetalle as almproddet', 'notaventadetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                    ->leftJoin('almacen as alm', 'notaventadetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('listaprecio as listprec', 'notaventadetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->leftJoin('vendedor as venddor', 'notaventadetalle.fkidvendedor', '=', 'venddor.idvendedor')
+                    ->leftJoin('producto as prod', 'notaventadetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtipo', 'prod.fkidproductotipo', '=', 'prodtipo.idproductotipo')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
+                    ->leftJoin('ciudad as ciu', 'prod.fkidciudadorigen', '=', 'ciu.idciudad')
+                    ->orderBy('notaventadetalle.idnotaventadetalle', 'ASC');
             } ] )
             ->where('notaventa.idnotaventa', '=', $idnotaventa)
             ->whereNull('notaventa.deleted_at')

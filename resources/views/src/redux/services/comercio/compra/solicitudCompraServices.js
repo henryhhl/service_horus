@@ -65,6 +65,8 @@ const onGrabar = async ( solicitudcompra ) => {
         montototal:  solicitudcompra.montototal,
         nota:  solicitudcompra.nota,
         tiposolicitud:  solicitudcompra.tiposolicitud,
+        fkidtipotransaccion: 4,
+        fkidusers: null,
         arraySolicitudCompraDetalle: JSON.stringify(solicitudcompra.arraySolicitudCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
@@ -121,6 +123,10 @@ const onUpdate = async ( solicitudcompra ) => {
         montototal:  solicitudcompra.montototal,
         nota:  solicitudcompra.nota,
         tiposolicitud:  solicitudcompra.tiposolicitud,
+        fkidtipotransaccion: 4,
+        fkidusers: null,
+        arraySolicitudCompraDetalle: JSON.stringify(solicitudcompra.arraySolicitudCompraDetalle),
+        arrayDeleteSolicitudCompraDetalle: JSON.stringify(solicitudcompra.arrayDeleteSolicitudCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {

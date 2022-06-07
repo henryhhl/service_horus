@@ -18,7 +18,7 @@ function M_ListadoCliente( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }
             title={ props.title }
         >
@@ -39,7 +39,7 @@ M_ListadoCliente.propTypes = {
 
     value: PropTypes.any,
 
-    width:  PropTypes.number,
+    width:  PropTypes.any,
     zIndex: PropTypes.number,
 
     title:    PropTypes.string,
@@ -55,7 +55,7 @@ M_ListadoCliente.defaultProps = {
 
     value: null,
 
-    width: 400,
+    width: '80%',
     zIndex: 1200,
 
     title: "CLIENTE",

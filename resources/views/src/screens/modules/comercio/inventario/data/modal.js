@@ -32,7 +32,7 @@ function ModalDatoGeneral( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="ÁLMACEN"
-                        width={650}
+                        width={750}
                     >
                         <IndexAlmacen
                             onClose={ onClose }

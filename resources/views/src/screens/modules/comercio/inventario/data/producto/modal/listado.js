@@ -18,7 +18,7 @@ function M_ListadoProducto( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -55,7 +55,7 @@ M_ListadoProducto.defaultProps = {
 
     value: null,
 
-    width: "80%",
+    width: "85%",
     zIndex: 1200,
 
     title: "PRODUCTO",

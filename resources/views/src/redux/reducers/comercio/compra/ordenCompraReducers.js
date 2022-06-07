@@ -30,6 +30,9 @@ const initialState = {
     montosubtotal: "",
     montototal: "",
 
+    descuento: "",
+    montodescuento: "",
+
     fletes: "",
     internacion: "",
     otrosgastos: "",
@@ -95,14 +98,16 @@ const initialState = {
 };
 
 export const OrdenCompraCompraReducer = ( state = initialState, action = { payload, type} ) => {
+    const { payload, type } = action;
 
-    switch ( action.type ) {
+    switch ( type ) {
 
         case Strings.ordencompra_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.ordencompra_onCreate:
+            const { arrayConceptoCompra, arrayMoneda, arraySeccionInventario, arraySucursal } = payload;
             cleanObejct( state );
             state.idordencompra = action.payload.idordencompra;
 
@@ -116,15 +121,32 @@ export const OrdenCompraCompraReducer = ( state = initialState, action = { paylo
             state.montosubtotal = "0.00";
             state.montototal = "0.00";
 
+            state.descuento = "0";
+            state.montodescuento = "0.00";
+
             state.fletes = "0.00";
             state.internacion = "0.00";
             state.otrosgastos = "0.00";
             state.nrofactura = 0;
-
-            state.arrayOrdenCompraDetalle = loadDetailBuyOrder();
-
-            state.fkidmoneda  = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].idmoneda;
-            state.moneda      = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].descripcion;
+            
+            state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
+            state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;
+            
+            state.fkidconceptocompra = Functions.initValueServiceInArray( arrayConceptoCompra, "idconceptocompra" );
+            state.conceptocompra     = Functions.initValueServiceInArray( arrayConceptoCompra, "descripcion" );
+            
+            state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
+            state.sucursal     = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
+            
+            let arrayAlmacen = ( typeof state.fkidsucursal == "number" ) ? arraySucursal[0].arrayalmacen : [];
+            
+            state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
+            state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
+            
+            state.fkidseccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "idseccioninventario" );
+            state.seccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "descripcion" );
+            
+            state.arrayOrdenCompraDetalle = loadDetailBuyOrder( state );
 
             state.loading = false;
             state = Object.assign( {}, state );
@@ -204,6 +226,9 @@ function onSetData( state, payload ) {
     state.internacion = parseFloat(payload.internacion).toFixed(2);
     state.otrosgastos = parseFloat(payload.otrosgastos).toFixed(2);
 
+    state.descuento = parseInt(payload.descuento);
+    state.montodescuento = parseFloat(payload.montodescuento).toFixed(2);
+
     state.fkidsucursal = payload.fkidsucursal;
     state.sucursal = payload.sucursal;
 
@@ -227,91 +252,95 @@ function onSetData( state, payload ) {
     state.estado = payload.estado;
     state.isdelete = payload.isdelete;
 
-    state.arrayOrdenCompraDetalle = setStateDetailsBuyOrder(payload.ordencompradetalle);
+    state.arrayOrdenCompraDetalle = setStateDetailsBuyOrder( payload.arrayordencompradetalle, state );
 };
 
-function loadDetailBuyOrder() {
+function loadDetailBuyOrder( state ) {
     let array = [];
     for ( let index = 0; index < 10; index++ ) {
-        const element = {
-            key: index,
-
-            codigo: "",
-            producto: "",
-            ciudadorigen: "",
-            productomarca: "",
-
-            fkidunidadmedidaproducto: null,
-            unidadmedidaproducto: "",
-
-            cantidad: "",
-            cantidadsolicitada: "",
-
-            costounitario: "",
-            costosubtotal: "",
-
-            peso: "",
-            pesosubtotal: "",
-
-            volumen: "",
-            volumensubtotal: "",
-
-            fechasolicitada: null,
-            fsolicitada: null,
-            nota: null,
-
-            visible_producto: false,
-            fkidproducto: null,
-            fkidsolicitudcompradetalle: null,
-            idordencompradetalle: null,
-            errorcantidad: false,
-            errorcosto: false,
-        };
+        const element = defaultOrdenCompraDetalle( index, state );
         array = [ ...array, element];
     }
     return array;
 };
 
-function setStateDetailsBuyOrder( ordencompradetalle ) {
+function defaultOrdenCompraDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        producto: detalle ? detalle.producto : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` :  "",
+
+        fkidciudadorigen: detalle ? detalle.fkidciudadorigen : null,
+        ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        fkidproveedor: detalle ? detalle.fkidproveedor : state.fkidproveedor,
+        proveedor: detalle ? detalle.proveedor : state.proveedor,
+
+        fkidseccioninventario: detalle ? detalle.fkidseccioninventario : state.fkidseccioninventario,
+        seccioninventario: detalle ? detalle.seccioninventario : state.seccioninventario,
+
+        stockactual: detalle ? detalle.stockactual : "",
+        cantidad: detalle ? detalle.cantidad : "",
+        cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
+
+        costobase: detalle ? parseFloat( detalle.costobase ).toFixed(2) : "",
+        costounitario: detalle ? parseFloat( detalle.costounitario ).toFixed(2) : "",
+        costosubtotal: detalle ? parseFloat( detalle.costosubtotal ).toFixed(2) : "",
+
+        descuento: detalle ? parseInt( detalle.descuento ) : "",
+        montodescuento: detalle ? parseFloat( detalle.montodescuento ).toFixed(2) : "",
+
+        peso: detalle ? parseFloat( detalle.peso ).toFixed(2) : "",
+        pesosubtotal: detalle ? parseFloat( detalle.pesosubtotal ).toFixed(2) : "",
+
+        volumen: detalle ? parseFloat( detalle.volumen ).toFixed(2) : "",
+        volumensubtotal: detalle ? parseFloat( detalle.volumensubtotal ).toFixed(2) : "",
+
+        fechasolicitada: detalle ? detalle.fechasolicitada : null,
+        fsolicitada: detalle ? Functions.convertYMDToDMY( detalle.fechasolicitada ) : null,
+
+        fechavencimiento: detalle ? detalle.fechavencimiento : null,
+        fvencimiento: detalle ? Functions.convertYMDToDMY( detalle.fechavencimiento ) : null,
+
+        nota: detalle ? detalle.nota : null,
+        iscompra: detalle ? detalle.iscompra : "N",
+        issolicitudcompra: detalle ? detalle.issolicitudcompra : "N",
+
+        fkidordencompra: detalle ? detalle.fkidordencompra : null,
+        fkidsolicitudcompradetalle: detalle ? detalle.fkidsolicitudcompradetalle : null,
+        fkidsolicitudcompra: detalle ? detalle.fkidsolicitudcompra : null,
+        idordencompradetalle: detalle ? detalle.idordencompradetalle : null,
+
+        visible_producto: false,
+        visible_sucursal: false,
+        visible_almacen: false,
+        visible_seccioninventario: false,
+
+        errorcantidad: false,
+        errorcostounitario: false,
+    };
+}
+
+function setStateDetailsBuyOrder( arrayordencompradetalle, state ) {
     let array = [];
-    for (let index = 0; index < ordencompradetalle.length; index++) {
-        let detalle = ordencompradetalle[index];
-
-        const element = {
-            key: index,
-
-            codigo: detalle.codigo,
-            producto: detalle.nombre,
-            ciudadorigen: detalle.ciudadorigen,
-            productomarca: detalle.productomarca,
-
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
-
-            cantidad: parseInt(detalle.cantidad),
-            cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
-
-            costounitario: parseFloat(detalle.costounitario).toFixed(2),
-            costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
-
-            peso: parseFloat(detalle.peso).toFixed(2),
-            pesosubtotal: parseFloat(detalle.pesosubtotal).toFixed(2),
-
-            volumen: parseFloat(detalle.volumen).toFixed(2),
-            volumensubtotal: parseFloat(detalle.volumensubtotal).toFixed(2),
-
-            fechasolicitada: detalle.fechasolicitada,
-            fsolicitada: Functions.convertYMDToDMY(detalle.fechasolicitada),
-            
-            nota: detalle.nota,
-
-            visible_producto: false,
-            fkidproducto: detalle.idproducto,
-            fkidsolicitudcompradetalle: detalle.fkidsolicitudcompradetalle,
-            idordencompradetalle: detalle.idordencompradetalle,
-            errorcantidad: false,
-            errorcosto: false,
-        };
+    for (let index = 0; index < arrayordencompradetalle.length; index++) {
+        let detalle = arrayordencompradetalle[index];
+        const element = defaultOrdenCompraDetalle( index, state, detalle );
         array = [ ...array, element];
     };
     return array;

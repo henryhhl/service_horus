@@ -6,11 +6,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Inventario\ProductoRequest;
 use App\Models\Comercio\Compra\ProveedorProducto;
+use App\Models\Comercio\Inventario\Almacen;
+use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
+use App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto;
 use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Inventario\ProductoTipo;
 use App\Models\Comercio\Inventario\UnidadMedida;
 use App\Models\Comercio\Inventario\UnidadMedidaProducto;
 use App\Models\Comercio\Venta\ListaPrecio;
+use App\Models\Comercio\Venta\ListaPrecioDetalle;
+use App\Models\Comercio\Venta\Sucursal;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -29,6 +34,13 @@ class ProductoController extends Controller
             $esPaginado = isset( $request->esPaginado ) ? $request->esPaginado : 1;
             $obj = new Producto();
 
+            $listprec = new ListaPrecio();
+            $arrayListaPrecio = $listprec->get_data( $listprec, $request );
+
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
+
+
             if ( $esPaginado == 0 ) {
 
                 $producto = $obj->get_data( $obj, $request );
@@ -36,13 +48,17 @@ class ProductoController extends Controller
                 return response( )->json( [
                     'response' => 1,
                     'producto'  => $producto,
+                    'arrayListaPrecio' => $arrayListaPrecio,
+                    'arraySucursal' => $arraySucursal,
                 ] );
             }
 
             $producto = $obj->get_paginate( $obj, $request );
-            
+
             return response( )->json( [
                 'response' => 1,
+                'arrayListaPrecio' => $arrayListaPrecio,
+                'arraySucursal' => $arraySucursal,
                 'producto'  => $producto->getCollection(),
                 'pagination' => [
                     'total'        => $producto->total(),
@@ -89,14 +105,18 @@ class ProductoController extends Controller
             $undmed = new UnidadMedida();
             $unidadmedida = $undmed->get_data( $undmed, $request );
 
+            $suc = new Sucursal();
+            $sucursal = $suc->get_data( $suc, $request );
+
             return response()->json( [
                 'response' => 1,
                 'idproducto'        => $idproducto,
                 'arrayListaPrecio'  => $listaprecio,
                 'arrayProductoTipo' => $productotipo,
                 'arrayUnidadMedida' => $unidadmedida,
+                'arraySucursal'     => $sucursal,
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             return response( )->json( [
@@ -126,20 +146,39 @@ class ProductoController extends Controller
             $obj = new Producto();
             $producto = $obj->store( $obj, $request );
 
-            $array_unidadmedidaproducto = json_decode($request->input('arrayUnidadMedidaProducto', '[]'));
-            $stocktotal = 0;
+            $arrayListaPrecio = json_decode( $request->input('arrayListaPrecio', '[]') );
 
-            foreach ( $array_unidadmedidaproducto as $unidadmedidaproducto ) {
-                if ( !is_null( $unidadmedidaproducto->fkidunidadmedida ) ) {
-                    $unidadmedidaproducto->fkidproducto = $producto->idproducto;
-                    $undmedprod = new UnidadMedidaProducto();
-                    $undmedprod->store($undmedprod, $request, $unidadmedidaproducto);
-                    $stocktotal += intval( $unidadmedidaproducto->stock );
+            foreach ( $arrayListaPrecio as $detalle ) {
+                $listprec = new ListaPrecio();
+                $listaPrecio = $listprec->find( $detalle->fkidlistaprecio );
+                if ( !is_null( $listaPrecio ) ) {
+                    $detalle->fkidproducto = $producto->idproducto;
+                    $listprecdet = new ListaPrecioDetalle();
+                    $listprecdet->store( $listprecdet, $request, $detalle );
+                }
+            }
+
+            $arraySucursalAlmacen = json_decode( $request->input( 'arraySucursalAlmacen', '[]' ) );
+            foreach ( $arraySucursalAlmacen as $sucursal ) {
+                $suc = new Sucursal();
+                if ( !is_null( $suc->find( $sucursal->idsucursal ) ) ) {
+                    foreach ( $sucursal->arrayalmacen as $almacen ) {
+                        if ( !is_null( $almacen->idalmacen ) ) {
+                            if ( $almacen->checked == true ) {
+                                $alm = new Almacen();
+                                $almacenFirst = $alm->find( $almacen->idalmacen );
+                                if ( !is_null( $almacenFirst ) ) {
+                                    $almacen->fkidproducto = $producto->idproducto;
+                                    $almundmedprod = new AlmacenProductoDetalle();
+                                    $almundmedprod->store( $almundmedprod, $request, $almacen );
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             $array_proveedor = json_decode($request->input('arrayProveedor', '[]'));
-
             foreach ( $array_proveedor as $proveedor ) {
                 if ( !is_null( $proveedor->fkidproveedor ) ) {
                     $proveedor->fkidproducto = $producto->idproducto;
@@ -148,16 +187,13 @@ class ProductoController extends Controller
                 }
             }
 
-            $producto->stockactual = $stocktotal;
-            $producto->update();
-
             DB::commit();
             return response( )->json( [
                 'response' => 1,
                 'producto' => $producto,
                 'message'  => 'Producto registrado éxitosamente.',
             ] );
-            
+
         } catch ( \Exception $th ) {
 
             DB::rollBack();
@@ -196,7 +232,7 @@ class ProductoController extends Controller
 
             return response()->json( [
                 'response' => 1,
-                'producto'   => $producto,
+                'producto' => $producto,
             ] );
 
         } catch (\Exception $th) {
@@ -233,10 +269,17 @@ class ProductoController extends Controller
                 ] );
             }
 
+            $listprec = new ListaPrecio();
+            $arrayListaPrecio = $listprec->get_data( $listprec, $request );
+
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
 
             return response()->json( [
                 'response' => 1,
-                'producto'   => $producto,
+                'producto' => $producto,
+                'arrayListaPrecio' => $arrayListaPrecio,
+                'arraySucursal'    => $arraySucursal,
             ] );
 
         } catch (\Exception $th) {
@@ -297,20 +340,65 @@ class ProductoController extends Controller
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
+                
+                $arrayListaPrecio = json_decode( $request->input('arrayListaPrecio', '[]') );
+                $arraySucursalAlmacen = json_decode( $request->input( 'arraySucursalAlmacen', '[]' ) );
 
-                $array_unidadmedidaproducto = json_decode($request->input('arrayUnidadMedidaProducto', '[]'));
-                $stocktotal = 0;
+                $suc = new Sucursal();
+                $alm = new Almacen();
 
-                foreach ( $array_unidadmedidaproducto as $unidadmedidaproducto ) {
-                    if ( !is_null( $unidadmedidaproducto->fkidunidadmedida ) ) {
-                        $unidadmedidaproducto->fkidproducto = $producto->idproducto;
-                        $undmedprod = new UnidadMedidaProducto();
-                        if ( is_null( $unidadmedidaproducto->idunidadmedidaproducto ) ) {
-                            $undmedprod->store($undmedprod, $request, $unidadmedidaproducto);
-                        } else {
-                            $undmedprod->upgrade($undmedprod, $unidadmedidaproducto);
+                foreach ( $arraySucursalAlmacen as $sucursal ) {
+                    if ( !is_null( $suc->find( $sucursal->idsucursal ) ) ) {
+                        foreach ( $sucursal->arrayalmacen as $almacen ) {
+                            if ( !is_null( $almacen->idalmacen ) ) {
+                                $almacenFirst = $alm->find( $almacen->idalmacen );
+                                if ( !is_null( $almacenFirst ) ) {
+                                    if ( $almacen->checked == true ) {
+                                        $almproddet = new AlmacenProductoDetalle();
+                                        if ( is_null( $almacen->idalmacenproductodetalle ) ) {
+                                            $almproddet->fkidproducto = $producto->idproducto;
+                                            $almproddet->fkidalmacen = $almacen->idalmacen;
+                                            $almproddet->stockactual = $almacen->stockactual;
+                                            $almproddet->stockminimo = $almacen->stockminimo;
+                                            $almproddet->stockmaximo = $almacen->stockmaximo;
+                                            $almproddet->fecha = $request->x_fecha;
+                                            $almproddet->hora = $request->x_hora;
+                                            $almproddet->save();
+                                        } else {
+                                            $almacenproductodetalle = $almproddet->find($almacen->idalmacenproductodetalle);
+                                            if ( !is_null($almacenproductodetalle) ) {
+                                                // Condicion
+                                                $almacenproductodetalle->stockactual = $almacen->stockactual;
+                                                $almacenproductodetalle->stockminimo = $almacen->stockminimo;
+                                                $almacenproductodetalle->stockmaximo = $almacen->stockmaximo;
+                                                $almacenproductodetalle->update();
+                                            }
+                                        }
+                                    } else {
+                                        if ( !is_null( $almacen->idalmacenproductodetalle ) ) {
+                                            //Condicion
+                                            $almproddet = new AlmacenProductoDetalle();
+                                            $almacenproductodetalle = $almproddet->find($almacen->idalmacenproductodetalle);
+                                            $almacenproductodetalle->delete();
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        $stocktotal += intval( $unidadmedidaproducto->stock );
+                    }
+                }
+
+                foreach ( $arrayListaPrecio as $detalle ) {
+                    $listprec = new ListaPrecio();
+                    $listaPrecio = $listprec->find( $detalle->fkidlistaprecio );
+                    if ( !is_null( $listaPrecio ) ) {
+                        $detalle->fkidproducto = $producto->idproducto;
+                        $listprecdet = new ListaPrecioDetalle();
+                        if ( is_null( $detalle->idlistapreciodetalle ) ) {
+                            $listprecdet->store( $listprecdet, $request, $detalle );
+                        } else {
+                            $listprecdet->upgrade( $listprecdet, $detalle );
+                        }
                     }
                 }
 
@@ -327,14 +415,6 @@ class ProductoController extends Controller
                     }
                 }
 
-                $producto->stockactual = $stocktotal;
-                $producto->update();
-
-                $arrayDeleteUnidadMedida = json_decode($request->input('arrayDeleteUnidadMedida', '[]'));
-                foreach ( $arrayDeleteUnidadMedida as $idunidadmedidaproducto ) {
-                    $unidadmedidaproducto = new UnidadMedidaProducto();
-                    $unidadmedidaproducto->remove($unidadmedidaproducto, $idunidadmedidaproducto);
-                }
                 $arrayDeleteProveedor = json_decode($request->input('arrayDeleteProveedor', '[]'));
                 foreach ( $arrayDeleteProveedor as $idproveedorproducto ) {
                     $proveedorproducto = new ProveedorProducto();
@@ -352,7 +432,7 @@ class ProductoController extends Controller
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Producto.',
             ] );
-            
+
         } catch ( \Exception $th ) {
             DB::rollBack();
             return response()->json( [
@@ -460,7 +540,7 @@ class ProductoController extends Controller
             }
 
             $idproducto = $request->input('idproducto');
-            
+
             $obj = new Producto();
             $producto = $obj->searchByID( $obj, $idproducto );
 
@@ -471,11 +551,15 @@ class ProductoController extends Controller
                 ] );
             }
 
+            $listprec = new ListaPrecio();
+            $arrayListaPrecio = $listprec->get_data( $listprec, $request );
+
             return response()->json( [
                 'response'  => 1,
                 'producto' => $producto,
+                'arrayListaPrecio' => $arrayListaPrecio,
             ] );
-            
+
         } catch (\Exception $th) {
             return response()->json( [
                 'response' => -4,
@@ -511,16 +595,16 @@ class ProductoController extends Controller
 
             $fecha = explode( '-', $fecha );
             $fecha = $fecha[2] . '/' . $fecha[1] . '/' . $fecha[0];
-            
+
             return response()->json( [
                 'response'      => 1,
                 'fecha'         => $fecha,
                 'hora'          => $hora,
                 'arrayProducto' => $producto,
             ] );
-            
+
         } catch (\Exception $th) {
-            
+
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud',

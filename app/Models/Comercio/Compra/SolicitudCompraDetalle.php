@@ -18,15 +18,15 @@ class SolicitudCompraDetalle extends Model
     ];
 
     protected $attributes = [
-        'estado' => 'A',  'isdelete' => 'A', 'costounitario' => 0, 'costosubtotal' => 0,
+        'estado' => 'A',  'isdelete' => 'A', 'costounitario' => 0, 'costosubtotal' => 0, 'costobase' => 0,
         'stockactual' => 0, 'cantidadpendiente' => 0, 'cantidadsolicitada' => 0, 'nota' => null,
-        'isordencompra' => 'N', 'fechasolicitada' => null, 'fechafinalizada' => null,
+        'isordencompra' => 'N', 'fechasolicitada' => null, 'fechafinalizada' => null, 'x_idusuario' => null, 'fkidusers' => null,
     ];
 
     protected $fillable = [
-        'fkidsolicitudcompra', 'fkidunidadmedidaproducto', 'costounitario', 'costosubtotal',
-        'stockactual', 'cantidadpendiente', 'cantidadsolicitada', 'nota', 'fechasolicitada', 'fechafinalizada',
-        'isordencompra', 'isdelete', 'estado', 'fecha', 'hora',
+        'fkidsolicitudcompra', 'fkidproducto', 'fkidsucursal', 'fkidalmacen', 'fkidseccioninventario', 'fkidproveedor', 'costobase',
+        'costounitario', 'costosubtotal', 'stockactual', 'cantidadpendiente', 'cantidadsolicitada', 'nota', 'fechasolicitada', 'fechafinalizada',
+        'isordencompra', 'isdelete', 'estado', 'fecha', 'hora', 'x_idusuario', 'fkidusers',
     ];
 
     public function getSolicitudCompraDetalle( $query, $fkidsolicitudcompra ) {
@@ -34,7 +34,7 @@ class SolicitudCompraDetalle extends Model
             ->select( [
                 'solicitudcompradetalle.idsolicitudcompradetalle', 'solicitudcompradetalle.stockactual',
                 'solicitudcompradetalle.cantidadpendiente', 'solicitudcompradetalle.cantidadsolicitada',
-                'solicitudcompradetalle.costounitario', 'solicitudcompradetalle.costosubtotal',
+                'solicitudcompradetalle.costobase', 'solicitudcompradetalle.costounitario', 'solicitudcompradetalle.costosubtotal',
                 'solicitudcompradetalle.nota', 'solicitudcompradetalle.fechasolicitada', 'solicitudcompradetalle.fechafinalizada',
                 'solicitudcompradetalle.fecha', 'solicitudcompradetalle.hora', 'solicitudcompradetalle.estado',
             ] )
@@ -49,7 +49,11 @@ class SolicitudCompraDetalle extends Model
     public function store( $query, $request, $detalle )
     {
         $fkidsolicitudcompra = $detalle->fkidsolicitudcompra;
-        $fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
+        $fkidproducto = $detalle->fkidproducto;
+        $fkidsucursal = $detalle->fkidsucursal;
+        $fkidalmacen = $detalle->fkidalmacen;
+        $fkidseccioninventario = $detalle->fkidseccioninventario;
+        $fkidproveedor = $detalle->fkidproveedor;
 
         $nota = isset( $detalle->nota ) ? $detalle->nota : null;
         $fechasolicitada = isset( $detalle->fechasolicitada ) ? $detalle->fechasolicitada : null;
@@ -59,15 +63,20 @@ class SolicitudCompraDetalle extends Model
         $cantidadpendiente = isset( $detalle->cantidadpendiente ) ? $detalle->cantidadpendiente : 0;
         $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
 
+        $costobase = is_numeric( $detalle->costobase )  ? $detalle->costobase : 0;
         $costounitario = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
         $costosubtotal = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
 
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
 
-        $notaingresodetalle = $query->create( [
+        $solicitudcompradetalle = $query->create( [
             'fkidsolicitudcompra' => $fkidsolicitudcompra,
-            'fkidunidadmedidaproducto' => $fkidunidadmedidaproducto,
+            'fkidproducto' => $fkidproducto,
+            'fkidsucursal' => $fkidsucursal,
+            'fkidalmacen' => $fkidalmacen,
+            'fkidseccioninventario' => $fkidseccioninventario,
+            'fkidproveedor' => $fkidproveedor,
 
             'nota' => $nota,
             'fechasolicitada' => $fechasolicitada,
@@ -77,6 +86,7 @@ class SolicitudCompraDetalle extends Model
             'cantidadpendiente' => $cantidadpendiente,
             'cantidadsolicitada' => $cantidadsolicitada,
 
+            'costobase' => $costobase,
             'costounitario' => $costounitario,
             'costosubtotal' => $costosubtotal,
 
@@ -84,7 +94,55 @@ class SolicitudCompraDetalle extends Model
             'hora'   => $hora
         ] );
 
-        return $notaingresodetalle;
+        return $solicitudcompradetalle;
+    }
+
+    public function upgrade( $query, $detalle )
+    {
+        $idsolicitudcompradetalle = $detalle->idsolicitudcompradetalle;
+
+        $fkidsolicitudcompra = $detalle->fkidsolicitudcompra;
+        $fkidproducto = $detalle->fkidproducto;
+        $fkidsucursal = $detalle->fkidsucursal;
+        $fkidalmacen = $detalle->fkidalmacen;
+        $fkidseccioninventario = $detalle->fkidseccioninventario;
+        $fkidproveedor = $detalle->fkidproveedor;
+
+        $nota = isset( $detalle->nota ) ? $detalle->nota : null;
+        $fechasolicitada = isset( $detalle->fechasolicitada ) ? $detalle->fechasolicitada : null;
+        $fechafinalizada = isset( $detalle->fechafinalizada ) ? $detalle->fechafinalizada : null;
+
+        $stockactual = is_numeric( $detalle->stockactual ) ? $detalle->stockactual : 0;
+        $cantidadpendiente = isset( $detalle->cantidadpendiente ) ? $detalle->cantidadpendiente : 0;
+        $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
+
+        $costobase = is_numeric( $detalle->costobase )  ? $detalle->costobase : 0;
+        $costounitario = is_numeric( $detalle->costounitario )  ? $detalle->costounitario : 0;
+        $costosubtotal = is_numeric( $detalle->costosubtotal )  ? $detalle->costosubtotal : 0;
+
+        $solicitudcompradetalle = $query->where( 'idsolicitudcompradetalle', '=', $idsolicitudcompradetalle )
+            ->update( [
+                'fkidsolicitudcompra' => $fkidsolicitudcompra,
+                'fkidproducto' => $fkidproducto,
+                'fkidsucursal' => $fkidsucursal,
+                'fkidalmacen' => $fkidalmacen,
+                'fkidseccioninventario' => $fkidseccioninventario,
+                'fkidproveedor' => $fkidproveedor,
+
+                'nota' => $nota,
+                'fechasolicitada' => $fechasolicitada,
+                'fechafinalizada' => $fechafinalizada,
+
+                'stockactual' => $stockactual,
+                'cantidadpendiente' => $cantidadpendiente,
+                'cantidadsolicitada' => $cantidadsolicitada,
+
+                'costobase' => $costobase,
+                'costounitario' => $costounitario,
+                'costosubtotal' => $costosubtotal,
+            ] );
+
+        return $solicitudcompradetalle;
     }
 
 }

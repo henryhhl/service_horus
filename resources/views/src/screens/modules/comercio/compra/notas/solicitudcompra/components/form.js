@@ -14,6 +14,7 @@ import M_ListadoProveedor from '../../../data/proveedor/modal/listado';
 import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 
 import { columns } from './column';
+import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
 
 function C_Form( props ) {
     const { solicitudCompra, disabled, onChange } = props;
@@ -73,6 +74,13 @@ function C_Form( props ) {
         solicitudCompra.seccioninventario      = data.descripcion;
         solicitudCompra.error.fkidseccioninventario   = false;
         solicitudCompra.message.fkidseccioninventario = "";
+
+        for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
+            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidseccioninventario = data.idseccioninventario;
+            element.seccioninventario = data.descripcion;
+        }
+
         onChange( solicitudCompra );
         setVisibleSeccion(false);
     };
@@ -98,6 +106,13 @@ function C_Form( props ) {
         solicitudCompra.sucursal      = data.descripcion;
         solicitudCompra.error.fkidsucursal   = false;
         solicitudCompra.message.fkidsucursal = "";
+
+        for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
+            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidsucursal = data.idsucursal;
+            element.sucursal = data.descripcion;
+        }
+
         onChange( solicitudCompra );
         setVisibleSucursal(false);
     };
@@ -123,6 +138,13 @@ function C_Form( props ) {
         solicitudCompra.almacen      = data.descripcion;
         solicitudCompra.error.fkidalmacen   = false;
         solicitudCompra.message.fkidalmacen = "";
+
+        for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
+            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidalmacen = data.idalmacen;
+            element.almacen = data.descripcion;
+        }
+
         onChange( solicitudCompra );
         setVisibleAlmacen(false);
     };
@@ -174,6 +196,13 @@ function C_Form( props ) {
         solicitudCompra.proveedor      = data.nombre;
         solicitudCompra.error.fkidproveedor   = false;
         solicitudCompra.message.fkidproveedor = "";
+
+        for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
+            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidproveedor = data.idproveedor;
+            element.proveedor = data.nombre;
+        }
+
         onChange( solicitudCompra );
         setVisibleProveedor(false);
     };
@@ -199,25 +228,39 @@ function C_Form( props ) {
     function existProducto( value ) {
         for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
             const element = solicitudCompra.arraySolicitudCompraDetalle[index];
-            if ( element.fkidunidadmedidaproducto === value ) return true;
+            if ( element.fkidproducto == value ) return true;
         }
         return false;
     };
 
-    function onFKIDUnidadMedidaProducto( data ) {
-        if ( !existProducto( data.idunidadmedidaproducto ) ) {
+    function onFKIDProducto( producto ) {
+        if ( !existProducto( producto.idproducto ) ) {
             let detalle = solicitudCompra.arraySolicitudCompraDetalle[row_detalle.index];
-            detalle.fkidproducto = data.idproducto;
-            detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-            detalle.unidadmedidaproducto = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.unidadmedida}`;
-            detalle.codigo = data.codigo ? data.codigo : "";
-            detalle.producto = data.producto;
-            detalle.stockactual = parseInt(data.stock);
-            detalle.ciudadorigen = data.origen;
+
+            detalle.fkidproducto = producto.idproducto;
+            detalle.codigo = producto.codigo ? producto.codigo : "";
+            detalle.producto = producto.nombre;
+            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
+
+            detalle.fkidciudadorigen = producto.fkidciudadorigen;
+            detalle.ciudadorigen = producto.ciudadorigen;
+
+            detalle.fkidproductomarca = producto.fkidproductomarca;
+            detalle.productomarca = producto.productomarca;
+
+            detalle.fkidproductotipo = producto.fkidproductotipo;
+            detalle.productotipo = producto.productotipo;
+
+            detalle.stockactual = parseInt(producto.stockactual);
             detalle.cantidadsolicitada = 0;
-            detalle.costounitario = parseFloat(data.costo).toFixed(2);
+            detalle.cantidadpendiente = 0;
+
+            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
+            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
             detalle.costosubtotal = "0.00";
-            detalle.productomarca = data.marca;
+            detalle.errorcantidad = false;
+            detalle.errorcostounitario = false;
+
             onChange(solicitudCompra);
             setRowDetalle(null);
         } else {
@@ -229,26 +272,13 @@ function C_Form( props ) {
         if ( row_detalle === null ) return null;
         if ( !row_detalle.visible_producto ) return null;
         return (
-            <M_ListadoUnidadMedidaProducto
+            <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
                 value={row_detalle.fkidproducto}
-                onChange={onFKIDUnidadMedidaProducto}
+                onChange={onFKIDProducto}
             />
         );
-    };
-
-    function updateTotales() {
-        let cantidadsolicitadatotal = 0;
-        let montototal = 0;
-        solicitudCompra.arraySolicitudCompraDetalle.map( (item) => {
-            if ( item.fkidproducto !== null ) {
-                cantidadsolicitadatotal += parseInt(item.cantidadsolicitada);
-                montototal += parseFloat(item.costosubtotal);
-            }
-        } );
-        solicitudCompra.cantidadsolicitadatotal = parseInt(cantidadsolicitadatotal);
-        solicitudCompra.montototal = parseFloat(montototal).toFixed(2);
     };
 
     return (
@@ -275,7 +305,20 @@ function C_Form( props ) {
                         focus={ focusInput }
                     />
                 </Col>
-                <Col sm={{ span: 8, }}></Col>
+                <Col sm={{ span: 4, }}></Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Select
+                        label={ "Tipo"}
+                        placeholder={ "TIPO SOLICITUD" }
+                        value={ solicitudCompra.tiposolicitud }
+                        onChange={ onChangeTipoSolicitud }
+                        disabled={ disabled.data }
+                        data={ [
+                            { title: "Local",   value: "L" },
+                            { title: "Exterior", value: "E" },
+                        ] }
+                    />
+                </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input 
                         label={"Moneda"}
@@ -302,28 +345,16 @@ function C_Form( props ) {
                 </Col>
             </Row>
             <Row gutter={ [12, 8] }>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    {/* <C_Input
-                        label={ "Código"}
-                        placeholder={ "INGRESAR CÓDIGO..." }
-                        value={ codigo }
-                        onChange={ onChangeCodigo }
+                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                    <C_Input
+                        label={"Concepto*"}
+                        placeholder={ "SELECCIONAR CONCEPTO..." }
+                        value={ solicitudCompra.conceptocompra }
+                        onClick={onShowConcepto}
                         disabled={ disabled.data }
-                        error={error.codigo}
-                        message={message.codigo}
-                    /> */}
-                </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <C_Select
-                        label={ "Tipo"}
-                        placeholder={ "TIPO SOLICITUD" }
-                        value={ solicitudCompra.tiposolicitud }
-                        onChange={ onChangeTipoSolicitud }
-                        disabled={ disabled.data }
-                        data={ [
-                            { title: "Local",   value: "L" },
-                            { title: "Exterior", value: "E" },
-                        ] }
+                        error={error.fkidconceptocompra}
+                        message={message.fkidconceptocompra}
+                        select={true}
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
@@ -336,7 +367,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Sección"}
+                        label={"Sección*"}
                         placeholder={ "SELECCIONAR SECCIÓN..." }
                         value={ solicitudCompra.seccioninventario }
                         onClick={onShowSeccion}
@@ -348,9 +379,9 @@ function C_Form( props ) {
                 </Col>
             </Row>
             <Row gutter={ [12, 8] }>
-                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Sucursal"}
+                        label={"Sucursal*"}
                         placeholder={ "SELECCIONAR SUCURSAL..." }
                         value={ solicitudCompra.sucursal }
                         onClick={onShowSucursal}
@@ -360,9 +391,9 @@ function C_Form( props ) {
                         select={true}
                     />
                 </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Álmacen"}
+                        label={"Álmacen*"}
                         placeholder={ "SELECCIONAR ÁLMACEN..." }
                         value={ solicitudCompra.almacen }
                         onClick={onShowAlmacen}
@@ -372,21 +403,9 @@ function C_Form( props ) {
                         select={true}
                     />
                 </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Concepto"}
-                        placeholder={ "SELECCIONAR CONCEPTO..." }
-                        value={ solicitudCompra.conceptocompra }
-                        onClick={onShowConcepto}
-                        disabled={ disabled.data }
-                        error={error.fkidconceptocompra}
-                        message={message.fkidconceptocompra}
-                        select={true}
-                    />
-                </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 6, }}>
-                    <C_Input
-                        label={"Proveedor"}
+                        label={"Proveedor*"}
                         placeholder={ "SELECCIONAR PROVEEDOR..." }
                         value={ solicitudCompra.proveedor }
                         onClick={onShowProveedor}
@@ -403,7 +422,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( solicitudCompra, disabled, onChange, onVisibleProducto ) } 
                     dataSource={solicitudCompra.arraySolicitudCompraDetalle}
-                    scroll={{ x: 2000, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2200, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

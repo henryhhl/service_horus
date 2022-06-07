@@ -23,20 +23,34 @@ class CreateProductoTable extends Migration
             $table->integer('fkidproductogrupo')->unsigned();
             $table->integer('fkidproductosubgrupo')->unsigned();
 
+            $table->integer('fkidunidadmedida')->unsigned();
+
+            $table->decimal('valorequivalente', 24, 8)->default(0);
+            $table->decimal('peso', 24, 8)->default(0);
+            $table->decimal('volumen', 24, 8)->default(0);
+
             $table->string('codigo', 150)->nullable();
             $table->string('nombre', 250);
             $table->text('descripcion')->nullable();
             $table->string('abreviatura', 50)->nullable();
 
-            // $table->decimal('costo', 24, 8)->default(0);
             $table->integer('stockactual')->default(0);
             $table->integer('nivel')->default(0);
+
+            $table->decimal('costobase', 24, 8)->default(0);
+            $table->integer('costodescuento')->default(0);
+            $table->decimal('costomontodescuento', 24, 8)->default(0);
+            $table->decimal('costounitario', 24, 8)->default(0);
+
+            $table->decimal('costocif', 24, 8)->default(0);
+            $table->decimal('costofob', 24, 8)->default(0);
 
             $table->longText('imagen')->nullable();
             $table->string('extension', 200)->nullable();
 
             $table->date('fecha');
             $table->time('hora');
+            $table->enum('isventa', ['A', 'N'])->default('A');
             $table->enum('estado', ['A', 'N'])->default('A');
             $table->enum('isdelete', ['A', 'N'])->default('A');
 

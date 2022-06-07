@@ -17,6 +17,7 @@ import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmed
 import M_ListadoSolicitudCompra from '../../solicitudcompra/modal/listado';
 
 import { columns } from './column';
+import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
 
 function C_Form( props ) {
     const { ordenCompra, disabled, onChange } = props;
@@ -140,6 +141,13 @@ function C_Form( props ) {
         ordenCompra.seccioninventario      = data.descripcion;
         ordenCompra.error.fkidseccioninventario   = false;
         ordenCompra.message.fkidseccioninventario = "";
+
+        for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
+            let element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidseccioninventario = data.idseccioninventario;
+            element.seccioninventario = data.descripcion;
+        }
+
         onChange( ordenCompra );
         setVisibleSeccion(false);
     };
@@ -165,6 +173,13 @@ function C_Form( props ) {
         ordenCompra.sucursal      = data.descripcion;
         ordenCompra.error.fkidsucursal   = false;
         ordenCompra.message.fkidsucursal = "";
+
+        for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
+            let element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidsucursal = data.idsucursal;
+            element.sucursal = data.descripcion;
+        }
+
         onChange( ordenCompra );
         setVisibleSucursal(false);
     };
@@ -190,6 +205,13 @@ function C_Form( props ) {
         ordenCompra.almacen      = data.descripcion;
         ordenCompra.error.fkidalmacen   = false;
         ordenCompra.message.fkidalmacen = "";
+
+        for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
+            let element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidalmacen = data.idalmacen;
+            element.almacen = data.descripcion;
+        }
+
         onChange( ordenCompra );
         setVisibleAlmacen(false);
     };
@@ -241,6 +263,13 @@ function C_Form( props ) {
         ordenCompra.proveedor      = data.nombre;
         ordenCompra.error.fkidproveedor   = false;
         ordenCompra.message.fkidproveedor = "";
+
+        for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
+            let element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidproveedor = data.idproveedor;
+            element.proveedor = data.nombre;
+        }
+
         onChange( ordenCompra );
         setVisibleProveedor(false);
     };
@@ -266,31 +295,51 @@ function C_Form( props ) {
     function existProducto( value ) {
         for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
             const element = ordenCompra.arrayOrdenCompraDetalle[index];
-            if ( element.fkidunidadmedidaproducto === value ) return true;
+            if ( element.fkidproducto === value ) return true;
         }
         return false;
     };
 
-    function onFKIDUnidadMedidaProducto( data ) {
-        if ( !existProducto( data.idunidadmedidaproducto ) ) {
+    function onFKIDProducto( producto ) {
+        if ( !existProducto( producto.idproducto ) ) {
             let detalle = ordenCompra.arrayOrdenCompraDetalle[row_detalle.index];
-            detalle.fkidproducto = data.idproducto;
-            detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-            detalle.unidadmedidaproducto = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.unidadmedida}`;
-            detalle.codigo = data.codigo ? data.codigo : "";
-            detalle.producto = data.producto;
-            detalle.stockactual = parseInt(data.stock);
-            detalle.ciudadorigen = data.origen;
+
+            detalle.fkidproducto = producto.idproducto;
+            detalle.codigo = producto.codigo ? producto.codigo : "";
+            detalle.producto = producto.nombre;
+            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
+
+            detalle.fkidciudadorigen = producto.fkidciudadorigen;
+            detalle.ciudadorigen = producto.ciudadorigen;
+
+            detalle.fkidproductomarca = producto.fkidproductomarca;
+            detalle.productomarca = producto.productomarca;
+
+            detalle.fkidproductotipo = producto.fkidproductotipo;
+            detalle.productotipo = producto.productotipo;
+
+            detalle.stockactual = parseInt(producto.stockactual);
             detalle.cantidad = 0;
-            detalle.costounitario = parseFloat(data.costo).toFixed(2);
+            detalle.cantidadsolicitada = 0;
+
+            detalle.descuento = 0;
+            detalle.montodescuento = 0;
+
+            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
+            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
             detalle.costosubtotal = "0.00";
-            detalle.productomarca = data.marca;
 
-            detalle.peso = parseFloat(data.peso).toFixed(2);
+            detalle.peso = parseFloat(producto.peso).toFixed(2);
             detalle.pesosubtotal = "0.00";
-
-            detalle.volumen = parseFloat(data.volumen).toFixed(2);
+            
+            detalle.volumen = parseFloat(producto.volumen).toFixed(2);
             detalle.volumensubtotal = "0.00";
+            detalle.errorcantidad = false;
+
+            detalle.iscompra = "N",
+            detalle.issolicitudcompra = "N",
+            detalle.fkidsolicitudcompradetalle = null;
+            detalle.fkidsolicitudcompra = null;
 
             onChange(ordenCompra);
             setRowDetalle(null);
@@ -303,11 +352,11 @@ function C_Form( props ) {
         if ( row_detalle === null ) return null;
         if ( !row_detalle.visible_producto ) return null;
         return (
-            <M_ListadoUnidadMedidaProducto
+            <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
                 value={row_detalle.fkidproducto}
-                onChange={onFKIDUnidadMedidaProducto}
+                onChange={onFKIDProducto}
             />
         );
     };
@@ -335,7 +384,6 @@ function C_Form( props ) {
     };
 
     function onChangeFKIDSolicitudCompra( data ) {
-        console.log(data)
         ordenCompra.fkidsolicitudcompra = data.idsolicitudcompra;
         ordenCompra.tiposolicitud = data.tiposolicitud;
 
@@ -348,8 +396,8 @@ function C_Form( props ) {
         ordenCompra.fkidalmacen = data.fkidalmacen;
         ordenCompra.almacen = data.almacen;
 
-        ordenCompra.fkidconceptocompra = data.fkidconceptocompra;
-        ordenCompra.conceptocompra = data.conceptocompra;
+        // ordenCompra.fkidconceptocompra = data.fkidconceptocompra;
+        // ordenCompra.conceptocompra = data.conceptocompra;
 
         ordenCompra.fkidproveedor = data.fkidproveedor;
         ordenCompra.proveedor = data.proveedor;
@@ -360,24 +408,47 @@ function C_Form( props ) {
         ordenCompra.montototal = parseFloat(data.montototal).toFixed(2);
 
         let array = [];
-        for (let index = 0; index < data.solicitudcompradetalle.length; index++) {
-            const detalle = data.solicitudcompradetalle[index];
+        for (let index = 0; index < data.arraysolicitudcompradetalle.length; index++) {
+            const detalle = data.arraysolicitudcompradetalle[index];
             let element = {
                 key: index,
 
+                fkidproducto: detalle.idproducto,
                 codigo: detalle.codigo,
-                producto: detalle.nombre,
+                producto: detalle.producto,
+                unidadmedida: `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}`,
+
+                fkidciudadorigen: detalle.fkidciudadorigen,
                 ciudadorigen: detalle.ciudadorigen,
+
+                fkidproductomarca: detalle.fkidproductomarca,
                 productomarca: detalle.productomarca,
 
-                fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-                unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
+                fkidproductotipo: detalle.fkidproductotipo,
+                productotipo: detalle.productotipo,
 
+                fkidsucursal: detalle.fkidsucursal,
+                sucursal: detalle.sucursal,
+
+                fkidalmacen: detalle.fkidalmacen,
+                almacen: detalle.almacen,
+
+                fkidproveedor: detalle.fkidproveedor,
+                proveedor: detalle.proveedor,
+
+                fkidseccioninventario: detalle.fkidseccioninventario,
+                seccioninventario: detalle.seccioninventario,
+
+                stockactual: parseInt(detalle.stockactual),
                 cantidad: parseInt(detalle.cantidadsolicitada),
                 cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
 
+                costobase: parseFloat(detalle.costobase).toFixed(2),
                 costounitario: parseFloat(detalle.costounitario).toFixed(2),
                 costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
+
+                descuento: 0,
+                montodescuento: "0.00",
 
                 peso: parseFloat(detalle.peso).toFixed(2),
                 pesosubtotal: parseFloat(detalle.peso * detalle.cantidad).toFixed(2),
@@ -387,13 +458,26 @@ function C_Form( props ) {
 
                 fechasolicitada: detalle.fechasolicitada,
                 fsolicitada: Functions.convertYMDToDMY(detalle.fechasolicitada),
+
+                fechavencimiento: null,
+                fvencimiento: null,
                 
                 nota: null,
+                iscompra: "N",
+                issolicitudcompra: "A",
+
+                fkidordencompra: null,
+                fkidsolicitudcompradetalle: detalle.idsolicitudcompradetalle,
+                fkidsolicitudcompra: detalle.fkidsolicitudcompra,
+                idordencompradetalle: null,
 
                 visible_producto: false,
-                fkidproducto: detalle.idproducto,
-                fkidsolicitudcompradetalle: detalle.idsolicitudcompradetalle,
-                idordencompradetalle: null,
+                visible_sucursal: false,
+                visible_almacen: false,
+                visible_seccioninventario: false,
+
+                errorcantidad: false,
+                errorcostounitario: false,
             };
             array = [ ...array, element ]
         }
@@ -581,7 +665,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( ordenCompra, disabled, onChange, onVisibleProducto ) } 
                     dataSource={ordenCompra.arrayOrdenCompraDetalle}
-                    scroll={{ x: 2000, y: ordenCompra.arrayOrdenCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2200, y: ordenCompra.arrayOrdenCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

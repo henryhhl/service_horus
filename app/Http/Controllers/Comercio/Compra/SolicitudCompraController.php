@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\SolicitudCompraRequest;
+use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\SolicitudCompra;
 use App\Models\Comercio\Compra\SolicitudCompraDetalle;
+use App\Models\Comercio\Inventario\SeccionInventario;
+use App\Models\Comercio\Venta\Sucursal;
+use App\Models\Comercio\Venta\TipoTransaccion;
 use App\Models\Configuracion\Moneda;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -80,12 +84,24 @@ class SolicitudCompraController extends Controller
             $idsolicitudcompra = $obj->newID();
 
             $obj = new Moneda();
-            $moneda = $obj->get_data( $obj, $request );
+            $arrayMoneda = $obj->get_data( $obj, $request );
+
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
+
+            $concepcomp = new ConceptoCompra();
+            $arrayConceptoCompra = $concepcomp->get_data( $concepcomp, $request );
+
+            $seccinv = new SeccionInventario();
+            $arraySeccionInventario = $seccinv->get_data( $seccinv, $request );
 
             return response()->json( [
                 'response' => 1,
-                'idsolicitudcompra' => $idsolicitudcompra,
-                'arrayMoneda'       => $moneda,
+                'idsolicitudcompra'  => $idsolicitudcompra,
+                'arrayMoneda'        => $arrayMoneda,
+                'arraySucursal'      => $arraySucursal,
+                'arrayConceptoCompra' => $arrayConceptoCompra,
+                'arraySeccionInventario' => $arraySeccionInventario,
             ] );
 
         } catch ( \Exception $th ) {
@@ -120,12 +136,17 @@ class SolicitudCompraController extends Controller
             $arraySolicitudCompraDetalle = json_decode($request->input('arraySolicitudCompraDetalle', '[]'));
             foreach ( $arraySolicitudCompraDetalle as $detalle ) {
                 if ( !is_null( $detalle->fkidproducto ) ) {
-
                     $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
                     $solicitudcompradetalle = new SolicitudCompraDetalle();
                     $solicitudcompradetalle->store($solicitudcompradetalle, $request, $detalle);
-
                 }
+            }
+
+            $tpotrans = new TipoTransaccion();
+            $tipotransaccion = $tpotrans->find( $solicitudcompra->fkidtipotransaccion );
+            if ( !is_null( $tipotransaccion ) ) {
+                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                $tipotransaccion->update();
             }
 
             DB::commit();
@@ -239,12 +260,14 @@ class SolicitudCompraController extends Controller
     {
         try {
 
+            DB::beginTransaction();
+
             $regla = [
                 'idsolicitudcompra' => 'required',
             ];
 
             $mensajes = [
-                'idsolicitudcompra.required' => 'El ID Solicitud Compra es requerido.'
+                'idsolicitudcompra.required' => 'El ID es requerido.'
             ];
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
@@ -269,22 +292,54 @@ class SolicitudCompraController extends Controller
                 ] );
             }
 
-            // $result = $obj->upgrade( $obj, $request );
+            if ( $solicitudcompra->isordencompra == "A" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Funcionalidad no permitido. Ya que se encuentra en ORDEN DE COMPRA registrado.',
+                ] );
+            }
 
-            // if ( $result ) {
-            //     return response()->json( [
-            //         'response' => 1,
-            //         'message'  => 'Solicitud Compra actualizado éxitosamente.',
-            //     ] );
-            // }
+            $result = $obj->upgrade( $obj, $request );
 
+            if ( $result ) {
+
+                $arraySolicitudCompraDetalle = json_decode( isset( $request->arraySolicitudCompraDetalle ) ? $request->arraySolicitudCompraDetalle : '[]' );
+                foreach ( $arraySolicitudCompraDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $solicompdet = new SolicitudCompraDetalle();
+                        $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
+                        if ( is_null( $detalle->idsolicitudcompradetalle ) ) {
+                            $solicompdet->store( $solicompdet, $request, $detalle );
+                        } else {
+                            $solicitudcompradetalle = $solicompdet->upgrade( $solicompdet, $detalle );
+                        }
+                    }
+                }
+
+                $arrayDeleteSolicitudCompraDetalle = json_decode( isset( $request->arrayDeleteSolicitudCompraDetalle ) ? $request->arrayDeleteSolicitudCompraDetalle : '[]' );
+                foreach ( $arrayDeleteSolicitudCompraDetalle as $idsolicitudcompradetalle ) {
+                    $solicompdet = new SolicitudCompraDetalle();
+                    $solicitudcompradetalle = $solicompdet->find( $idsolicitudcompradetalle );
+                    if ( !is_null( $solicitudcompradetalle ) ) {
+                        $solicitudcompradetalle->delete();
+                    }
+                }
+
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Solicitud Compra actualizado éxitosamente.',
+                ] );
+            }
+
+            DB::rollBack();
             return response()->json( [
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Solicitud Compra.',
             ] );
 
         } catch ( \Exception $th ) {
-
+            DB::rollBack();
             return response()->json( [
                 'response' => -4,
                 'message'  => 'Error al procesar la solicitud.',
@@ -319,7 +374,7 @@ class SolicitudCompraController extends Controller
             ];
 
             $mensajes = [
-                'idsolicitudcompra.required' => 'El ID Solicitud Compra es requerido.'
+                'idsolicitudcompra.required' => 'El ID es requerido.'
             ];
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
@@ -340,6 +395,13 @@ class SolicitudCompraController extends Controller
                 return response()->json( [
                     'response'  => -1,
                     'message'   => 'Solicitud Compra no existe.',
+                ] );
+            }
+
+            if ( $solicitudcompra->isordencompra == "A" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Funcionalidad no permitido. Ya que se encuentra en ORDEN DE COMPRA registrado.',
                 ] );
             }
 
@@ -370,12 +432,28 @@ class SolicitudCompraController extends Controller
                         $solicitudcompradetalle->delete();
                     }
                 }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $solicitudcompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) - 1;
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Solicitud Compra eliminado éxitosamente.',
+                    'solicitudcompradelete' => $solicitudcompradelete,
+                ] );
+
             }
 
-            DB::commit();
+            DB::rollBack();
             return response()->json( [
-                'response' => 1,
-                'message'  => 'Solicitud Compra eliminado éxitosamente.',
+                'response' => -1,
+                'message'  => 'Hubo conflictos al eliminar, favor de intentar nuevamente.',
                 'solicitudcompradelete' => $solicitudcompradelete,
             ] );
 

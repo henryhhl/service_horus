@@ -59,6 +59,7 @@ const initialState = {
     razonsocial: "",
     nit: "",
     glosa: "",
+    esnotaentrega: "",
 
     impuestoiva: "",
     montototalcobrado: "",
@@ -75,6 +76,9 @@ const initialState = {
     cantidadtotal: "",
     montoanticipo: "",
     isdevolucionventa: "",
+
+    notaventadetalle: [],
+    notaventadetalledelete: [],
 
     estado: "",
     fecha: "",
@@ -164,6 +168,8 @@ const initialState = {
 
 export const NotaVentaReducer = ( state = initialState, action = { payload, type} ) => {
 
+    const { payload, type } = action;
+ 
     switch ( action.type ) {
 
         case Strings.notaventa_onChange:
@@ -171,6 +177,7 @@ export const NotaVentaReducer = ( state = initialState, action = { payload, type
             return state;
 
         case Strings.notaventa_onCreate:
+            const { arrayConceptoVenta, arrayListaPrecio, arrayTipoPago, arraySucursal } = payload;
             cleanObejct( state );
             state.idnotaventa = action.payload.idnotaventa;
             state.loading = false;
@@ -185,6 +192,8 @@ export const NotaVentaReducer = ( state = initialState, action = { payload, type
 
             state.fechaventa = Functions.dateToString( new Date() );
             state.facturar = 'N';
+            state.nrofactura = 0;
+            state.esnotaentrega = 'N';
 
             state.impuestoiva = 0;
             state.montototalcobrado = 0;
@@ -201,6 +210,28 @@ export const NotaVentaReducer = ( state = initialState, action = { payload, type
             state.cantidadtotal = 0;
             state.montoanticipo = 0;
             state.isdevolucionventa = 'N';
+
+            state.fkidconceptoventa = arrayConceptoVenta.length > 0 ? arrayConceptoVenta[0].idconceptoventa : null;
+            state.conceptoventa = arrayConceptoVenta.length > 0 ? arrayConceptoVenta[0].descripcion : "";
+
+            state.fkidlistaprecio = arrayListaPrecio.length > 0 ? arrayListaPrecio[0].idlistaprecio : null;
+            state.listaprecio = arrayListaPrecio.length > 0 ? arrayListaPrecio[0].descripcion : "";
+
+            state.fkidsucursal = arraySucursal.length > 0 ? arraySucursal[0].idsucursal : null;
+            state.sucursal = arraySucursal.length > 0 ? arraySucursal[0].descripcion : "";
+
+            let arrayAlmacen = arraySucursal.length > 0 ? arraySucursal[0].arrayalmacen : [];
+
+            state.fkidalmacen = arrayAlmacen.length > 0 ? arrayAlmacen[0].idalmacen : null;
+            state.almacen = arrayAlmacen.length > 0 ? arrayAlmacen[0].descripcion : "";
+
+            state.fkidtipopago = arrayTipoPago.length > 0 ? arrayTipoPago[0].idtipopago : null;
+            state.tipopago = arrayTipoPago.length > 0 ? arrayTipoPago[0].descripcion : "";
+
+            state.fkidtipotransaccion = 1;
+            state.tipotransaccion = "Venta";
+
+            state.notaventadetalle = loadNotaVentaDetalle(state);
 
             state.estado = 'A';
             state = Object.assign( {}, state );
@@ -256,7 +287,7 @@ export const NotaVentaReducer = ( state = initialState, action = { payload, type
     }
 };
 
-function onSetData( state, payload ) {
+function onSetData( state = initialState, payload ) {
     state.idnotaventa   = payload.idnotaventa;
 
     state.codigo = payload.codigo;
@@ -299,29 +330,110 @@ function onSetData( state, payload ) {
     state.nrodebito = payload.nrodebito;
     state.nroventa = payload.nroventa;
     state.nrocotizacion = payload.nrocotizacion;
-    state.tipocambio = payload.tipocambio;
+    state.tipocambio = parseFloat(payload.tipocambio).toFixed(2);
 
     state.facturar = payload.facturar;
     state.nrofactura = payload.nrofactura;
     state.razonsocial = payload.razonsocial;
     state.nit = payload.nit;
     state.glosa = payload.glosa;
+    state.esnotaentrega = payload.esnotaentrega;
 
     state.impuestoiva = payload.impuestoiva;
     state.montototalcobrado = payload.montototalcobrado;
-    state.montototaldeudamora = payload.montototaldeudamora;
-    state.montototaldeudaactual = payload.montototaldeudaactual;
+    state.montototaldeudamora = parseFloat(payload.montototaldeudamora).toFixed(2);
+    state.montototaldeudaactual = parseFloat(payload.montototaldeudaactual).toFixed(2);
     state.descuentoacumulado = payload.descuentoacumulado;
     state.porcentajerangodescuentoinicial = payload.porcentajerangodescuentoinicial;
     state.porcentajerangodescuentofinal = payload.porcentajerangodescuentofinal;
 
-    state.montosubtotal = payload.montosubtotal;
+    state.montosubtotal = parseFloat(payload.montosubtotal).toFixed(2);
     state.descuento = payload.descuento;
-    state.montodescuento = payload.montodescuento;
-    state.montototal = payload.montototal;
+    state.montodescuento = parseFloat(payload.montodescuento).toFixed(2);
+    state.montototal = parseFloat(payload.montototal).toFixed(2);
     state.cantidadtotal = payload.cantidadtotal;
     state.montoanticipo = payload.montoanticipo;
     state.isdevolucionventa = payload.isdevolucionventa;
 
     state.estado = payload.estado;
+
+    let arrayNotaVentaDetalle = [];
+    for (let pos = 0; pos < payload.arraynotaventadetalle.length; pos++) {
+        const element = payload.arraynotaventadetalle[pos];
+        let detalle = defaulNotaVentaDetalle( pos, null, element );
+        arrayNotaVentaDetalle = [ ...arrayNotaVentaDetalle, detalle ];
+    }
+    
+    state.notaventadetalle = arrayNotaVentaDetalle;
 }
+
+function loadNotaVentaDetalle(state) {
+    let array = [];
+    for ( let index = 0; index < 10; index++ ) {
+        const element = defaulNotaVentaDetalle( index, state );
+        array = [ ...array, element];
+    };
+    return array;
+};
+
+function defaulNotaVentaDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        fkidalmacenproductodetalle: detalle ? detalle.fkidalmacenproductodetalle : null,
+        producto: detalle ? detalle.producto : "",
+
+        cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
+        cantidad: detalle ? detalle.cantidad : "",
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` : "",
+
+        fkidlistaprecio: detalle ? detalle.fkidlistaprecio : state.fkidlistaprecio,
+        fkidlistapreciodetalle: detalle ? detalle.fkidlistapreciodetalle : null,
+        listaprecio: detalle ? detalle.listaprecio : state.listaprecio,
+
+        preciobase: detalle ? parseFloat(detalle.preciobase).toFixed(2) : "",
+        preciounitario: detalle ? parseFloat(detalle.preciounitario).toFixed(2) : "",
+        preciosubtotal: detalle ? parseFloat(detalle.preciosubtotal).toFixed(2) : "",
+
+        descuento: detalle ? detalle.descuento : "",
+        montodescuento: detalle ? parseFloat(detalle.montodescuento).toFixed(2) : "",
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
+        nrofabrica: detalle ? parseFloat(detalle.nrofabrica).toFixed(2) : "",
+        fvencimiento: detalle ? Functions.convertYMDToDMY(detalle.fechavencimiento) : null,
+        fechavencimiento: detalle ? detalle.fechavencimiento : null,
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidciudad: detalle ? detalle.fkidciudadorigen : null,
+        productociudad: detalle ? detalle.ciudadorigen : "",
+
+        fkidvendedor: detalle ? detalle.fkidvendedor : null,
+        vendedor: detalle ? detalle.vendedor : "",
+        nota: detalle ? detalle.nota : "",
+
+        isdevolucionventa: detalle ? detalle.isdevolucionventa : "N",
+        estadoproceso: detalle ? detalle.estadoproceso : "F",
+        tipoentrega: detalle ? detalle.tipoentrega : "L",
+
+        fkidalmacenunidadmedidaproducto: null,
+        fkidunidadmedidaproducto: null,
+        idnotaventadetalle: detalle ? detalle.idnotaventadetalle : null,
+        fkidnotaventa: detalle ? detalle.fkidnotaventa : null,
+        visible_producto: false,
+        visible_almacen: false,
+        visible_listaprecio: false,
+        errorcantidad: false,
+        errorpreciounitario: false,
+    };
+};

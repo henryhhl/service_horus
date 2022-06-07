@@ -54,6 +54,16 @@ const setImprimir = ( data ) => ( {
     payload: data,
 } );
 
+const updateListaPrecio = ( arrayListaPrecio ) => ( {
+    type: Strings.producto_updateListaPrecio,
+    payload: arrayListaPrecio,
+} );
+
+const updateSucursalAlmacen = ( arraySucursal ) => ( {
+    type: Strings.producto_updateSucursalAlmacen,
+    payload: arraySucursal,
+} );
+
 const initData = ( ) => {
     return async ( dispatch ) => {
 
@@ -96,6 +106,7 @@ const onChangePage = ( page ) => {
                 await dispatch( disabledActions.onAction() );
                 await dispatch( paginationActions.setPagination( obj ) );
                 await dispatch( setState( result.producto[0] ) );
+                // await dispatch( updateListaPrecio( result.arrayListaPrecio ) );
             }
         } );
 
@@ -138,16 +149,19 @@ const onGrabar = ( producto ) => {
     };
 };
 
-const onEdit = ( idproducto ) => {
+const onEdit = ( producto ) => {
     return ( dispatch ) => {
-        dispatch( onLoad() );
+        dispatch( setLoading() );
 
-        ProductoServices.onEdit( idproducto ).then( ( result ) => {
+        ProductoServices.onEdit( producto.idproducto ).then( async ( result ) => {
             if ( result.response == 1 ) {
-                dispatch( setEditar( result ) );
+                await dispatch( setEditar( result.producto ) );
+                await dispatch( updateListaPrecio( result.arrayListaPrecio ) );
+                await dispatch( updateSucursalAlmacen( result ) );
+                await dispatch( disabledActions.onEditar() );
             }
         } ) . finally ( () => {
-            // dispatch( removeLoading() );
+            dispatch( removeLoading() );
         } );
     };
 };
@@ -226,10 +240,10 @@ const onSearchData = ( producto ) => {
     return ( dispatch ) => {
         dispatch( setLoading() );
 
-        ProductoServices.onSearchData( producto ).then( (result) => {
+        ProductoServices.onSearchData( producto ).then( async (result) => {
             if ( result.response == 1 ) {
-                dispatch( disabledActions.onAction() );
-                dispatch( setState( result.producto ) );
+                await dispatch( disabledActions.onAction() );
+                await dispatch( setState( result.producto ) );
             }
         } ) . finally ( () => {
             dispatch( removeLoading() );
@@ -310,36 +324,9 @@ function onValidate( producto ) {
         producto.message.fkidproductosubgrupo = "Campo requerido";
         bandera = false;
     }
-    if ( producto.arrayUnidadMedidaProducto.length > 0 ) {
-        if ( typeof producto.arrayUnidadMedidaProducto[0].fkidunidadmedida !== "number" ) {
-            producto.error.fkidunidadmedida   = true;
-            producto.message.fkidunidadmedida = "Campo requerido";
-            bandera = false;
-        }
-    }
-
-    let contador = 0;
-    for (let index = 0; index < producto.arrayUnidadMedidaProducto.length; index++) {
-        let detalle = producto.arrayUnidadMedidaProducto[index];
-        if ( detalle.fkidunidadmedida == null ) {
-            contador++;
-        } else {
-            if ( detalle.codigo != null ) {
-                if ( detalle.codigo.toString().length == 0 ) {
-                    detalle.error.codigo   = true;
-                    detalle.message.codigo = "Campo requerido";
-                    bandera = false;
-                }
-            } else {
-                detalle.error.codigo   = true;
-                detalle.message.codigo = "Campo requerido";
-                bandera = false;
-            }
-        }
-    }
-    if ( contador === producto.arrayUnidadMedidaProducto.length ) {
-        producto.arrayUnidadMedidaProducto[0].error.fkidunidadmedida  = true;
-        producto.arrayUnidadMedidaProducto[0].message.fkidunidadmedida = "Campo requerido";
+    if ( typeof producto.fkidunidadmedida !== "number" ) {
+        producto.error.fkidunidadmedida   = true;
+        producto.message.fkidunidadmedida = "Campo requerido";
         bandera = false;
     }
 

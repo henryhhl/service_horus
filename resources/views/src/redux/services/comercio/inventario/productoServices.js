@@ -16,6 +16,19 @@ function resultData( result ) {
     }
 };
 
+const getAllProduct = async ( ) => {
+    return await httpRequest( 'get', webservices.wscomercioinventarioproducto_index, {
+        esPaginado: 0,
+    } ) . then ( ( result ) => {
+        resultData( result );
+        if ( result.response == 1 ) {
+            C_Message( "success", "Servicio realizado exitosamente." );
+        }
+        console.log(result)
+        return result;
+    } );
+};
+
 const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
     return httpRequest( 'get', webservices.wscomercioinventarioproducto_index + '?page=' + page, {
         paginate: nroPagination,
@@ -23,7 +36,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
         search: search,
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 1 ) {
             C_Message( "success", "Servicio realizado exitosamente." );
         }
@@ -33,7 +46,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
 };
 
 const onCreate = async () => {
-    
+
     return httpRequest( 'get', webservices.wscomercioinventarioproducto_create, {
 
     } ) . then ( ( result ) => {
@@ -59,17 +72,27 @@ const onGrabar = async ( producto ) => {
         imagen:  producto.imagen,
         extension:  producto.extension,
         estado:  producto.estado,
+        isventa: producto.isventa,
+        valorequivalente: producto.valorequivalente,
+        peso: producto.peso,
+        volumen: producto.volumen,
+        costobase: producto.costobase,
+        costodescuento: producto.costodescuento,
+        costomontodescuento: producto.costomontodescuento,
+        costounitario: producto.costounitario,
         fkidciudadorigen:  producto.fkidciudadorigen,
         fkidcategoria:  producto.fkidcategoria,
         fkidproductomarca:  producto.fkidproductomarca,
         fkidproductotipo:  producto.fkidproductotipo,
         fkidproductogrupo:  producto.fkidproductogrupo,
         fkidproductosubgrupo:  producto.fkidproductosubgrupo,
-        arrayUnidadMedidaProducto: JSON.stringify(producto.arrayUnidadMedidaProducto),
+        fkidunidadmedida:  producto.fkidunidadmedida,
         arrayProveedor: JSON.stringify(producto.arrayProveedor),
+        arrayListaPrecio: JSON.stringify(producto.arrayListaPrecio),
+        arraySucursalAlmacen: JSON.stringify(producto.arraySucursalAlmacen),
     } ) . then ( ( result ) => {
         resultData( result );
-        
+
         if ( result.response == 0 ) {
             C_Message( "warning", result.message );
             var errors = result.errors;
@@ -116,16 +139,25 @@ const onUpdate = async ( producto ) => {
         imagen:  producto.imagen,
         extension:  producto.extension,
         estado:  producto.estado,
+        isventa: producto.isventa,
+        valorequivalente: producto.valorequivalente,
+        peso: producto.peso,
+        volumen: producto.volumen,
+        costobase: producto.costobase,
+        costodescuento: producto.costodescuento,
+        costomontodescuento: producto.costomontodescuento,
+        costounitario: producto.costounitario,
         fkidciudadorigen:  producto.fkidciudadorigen,
         fkidcategoria:  producto.fkidcategoria,
         fkidproductomarca:  producto.fkidproductomarca,
         fkidproductotipo:  producto.fkidproductotipo,
         fkidproductogrupo:  producto.fkidproductogrupo,
         fkidproductosubgrupo:  producto.fkidproductosubgrupo,
-        arrayUnidadMedidaProducto: JSON.stringify(producto.arrayUnidadMedidaProducto),
-        arrayDeleteUnidadMedida: JSON.stringify(producto.arrayDeleteUnidadMedida),
+        fkidunidadmedida:  producto.fkidunidadmedida,
         arrayProveedor: JSON.stringify(producto.arrayProveedor),
         arrayDeleteProveedor: JSON.stringify(producto.arrayDeleteProveedor),
+        arrayListaPrecio: JSON.stringify(producto.arrayListaPrecio),
+        arraySucursalAlmacen: JSON.stringify(producto.arraySucursalAlmacen),
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {
@@ -197,7 +229,7 @@ const onSearchData = async ( producto ) => {
 
 const onImprimir = async () => {
     return httpRequest( "post", webservices.wscomercioinventarioproducto_reporte, {
-        
+
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 1 ) {
@@ -208,6 +240,7 @@ const onImprimir = async () => {
 };
 
 export const ProductoServices = {
+    getAllProduct,
     getData,
 
     onCreate,

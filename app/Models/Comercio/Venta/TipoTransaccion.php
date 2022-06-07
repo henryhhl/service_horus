@@ -18,13 +18,12 @@ class TipoTransaccion extends Model
     ];
 
     protected $attributes = [
-        'estado' => 'A',  'isdelete' => 'A',
-        'codigo' => null, 'abreviatura' => null,
-        'imagen' => null, 'extension' => null, 'x_idusuario' => null,
+        'codigo' => null, 'abreviatura' => null, 'cantidadrealizada' => 0, 'cantidadcancelada' => 0,
+        'imagen' => null, 'extension' => null, 'estado' => 'A',  'isdelete' => 'A', 'x_idusuario' => null,
     ];
 
     protected $fillable = [
-        'codigo', 'descripcion', 'abreviatura', 'imagen', 'extension',
+        'codigo', 'descripcion', 'abreviatura', 'cantidadrealizada', 'cantidadcancelada', 'imagen', 'extension',
         'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
 }

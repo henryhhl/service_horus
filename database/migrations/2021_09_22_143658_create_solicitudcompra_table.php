@@ -15,6 +15,7 @@ class CreateSolicitudcompraTable extends Migration
     {
         Schema::create('solicitudcompra', function (Blueprint $table) {
             $table->increments('idsolicitudcompra');
+            $table->integer('x_idusuario')->unsigned()->nullable();
             
             $table->integer('fkidsucursal')->unsigned();
             $table->integer('fkidalmacen')->unsigned();
@@ -22,6 +23,8 @@ class CreateSolicitudcompraTable extends Migration
             $table->integer('fkidseccioninventario')->unsigned();
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidmoneda')->unsigned();
+            $table->integer('fkidusers')->unsigned()->nullable();
+            $table->integer("fkidtipotransaccion")->unsigned();
 
             $table->string('codigo', 150)->nullable();
             $table->decimal('tipocambio', 24, 8)->default(0);

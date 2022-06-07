@@ -20,20 +20,21 @@ class OrdenCompra extends Model
     ];
 
     protected $attributes = [
-        'estado' => 'A', 'isdelete' => 'A', 'fkidsolicitudcompra' => null,
+        'fkidsolicitudcompra' => null, 'fkidusers' => null, 'descuento' => 0, 'montodescuento' => 0,
         'codigo' => null, 'nrofactura' => null, 'tipocambio' => 0, 'diasplazo' => 0, 'fechavencimiento' => null,
         'cantidadtotal' => 0, 'montosubtotal' => 0, 'montototal' => 0, 'fletes' => 0, 'internacion' => 0, 'otrosgastos' => 0,
         'nota' => null, 'tiposolicitud' => 'L', 'issolicitudcompra' => 'N',
+        'estado' => 'A', 'isdelete' => 'A', 'x_idusuario' => null,
     ];
 
     protected $fillable = [
-        'fkidsolicitudcompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidseccioninventario', 'fkidproveedor', 'fkidmoneda',
-        'codigo', 'nrofactura', 'tipocambio', 'fechasolicitada', 'fechavencimiento', 'diasplazo',
-        'cantidadtotal', 'montosubtotal', 'montototal', 'fletes', 'internacion', 'otrosgastos', 'nota',
-        'tiposolicitud', 'issolicitudcompra', 'iscompra', 'estado', 'fecha', 'hora', 'isdelete',
+        'fkidsolicitudcompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidseccioninventario', 'fkidproveedor', 'fkidmoneda', 'fkidusers',
+        'fkidtipotransaccion', 'codigo', 'nrofactura', 'tipocambio', 'fechasolicitada', 'fechavencimiento', 'diasplazo',
+        'descuento', 'montodescuento', 'cantidadtotal', 'montosubtotal', 'montototal', 'fletes', 'internacion', 'otrosgastos', 'nota',
+        'tiposolicitud', 'issolicitudcompra', 'iscompra', 'estado', 'fecha', 'hora', 'isdelete', 'x_idusuario',
     ];
 
-    public function ordencompradetalle() {
+    public function arrayordencompradetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\OrdenCompraDetalle',
             'fkidordencompra',
@@ -61,6 +62,7 @@ class OrdenCompra extends Model
             ->leftJoin('solicitudcompra as solicomp', 'ordencompra.fkidsolicitudcompra', '=', 'solicomp.idsolicitudcompra')
             ->select( [
                 'ordencompra.idordencompra', 'ordencompra.codigo', 'ordencompra.nrofactura', 'ordencompra.tipocambio', 'ordencompra.cantidadtotal',
+                'ordencompra.fkidtipotransaccion', 'ordencompra.descuento', 'ordencompra.montodescuento',
                 'ordencompra.fechasolicitada', 'ordencompra.fechavencimiento', 'ordencompra.diasplazo', 'ordencompra.montosubtotal',
                 'ordencompra.montototal', 'ordencompra.fletes', 'ordencompra.internacion', 'ordencompra.otrosgastos', 'solicomp.idsolicitudcompra',
                 'ordencompra.nota', 'ordencompra.tiposolicitud', 'ordencompra.iscompra', 'ordencompra.issolicitudcompra', 'ordencompra.fkidsolicitudcompra',
@@ -83,25 +85,35 @@ class OrdenCompra extends Model
                 }
                 return;
             } )
-            ->with( [ 'ordencompradetalle' => function( $query ) {
+            ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'ordencompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'ordencompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'ordencompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'ordencompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'ordencompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
-                        'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle', 'ordencompradetalle.fkidsolicitudcompra',
+                        'ordencompradetalle.stockactual', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
+                        'ordencompradetalle.descuento', 'ordencompradetalle.montodescuento', 'ordencompradetalle.costobase',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'ordencompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'ordencompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'ordencompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'ordencompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'ordencompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+                    ] )
                     ->orderBy('ordencompradetalle.idordencompradetalle');
             } ] )
             ->whereNull( 'ordencompra.deleted_at' )
@@ -134,6 +146,7 @@ class OrdenCompra extends Model
             ->leftJoin('solicitudcompra as solicomp', 'ordencompra.fkidsolicitudcompra', '=', 'solicomp.idsolicitudcompra')
             ->select( [
                 'ordencompra.idordencompra', 'ordencompra.codigo', 'ordencompra.nrofactura', 'ordencompra.tipocambio', 'ordencompra.cantidadtotal',
+                'ordencompra.fkidtipotransaccion', 'ordencompra.descuento', 'ordencompra.montodescuento',
                 'ordencompra.fechasolicitada', 'ordencompra.fechavencimiento', 'ordencompra.diasplazo', 'ordencompra.montosubtotal',
                 'ordencompra.montototal', 'ordencompra.fletes', 'ordencompra.internacion', 'ordencompra.otrosgastos', 'solicomp.idsolicitudcompra',
                 'ordencompra.nota', 'ordencompra.tiposolicitud', 'ordencompra.iscompra', 'ordencompra.issolicitudcompra', 'ordencompra.fkidsolicitudcompra',
@@ -156,25 +169,35 @@ class OrdenCompra extends Model
                 }
                 return;
             } )
-            ->with( [ 'ordencompradetalle' => function( $query ) {
+            ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'ordencompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'ordencompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'ordencompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'ordencompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'ordencompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
-                        'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle', 'ordencompradetalle.fkidsolicitudcompra',
+                        'ordencompradetalle.stockactual', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
+                        'ordencompradetalle.descuento', 'ordencompradetalle.montodescuento', 'ordencompradetalle.costobase',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'ordencompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'ordencompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'ordencompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'ordencompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'ordencompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+                    ] )
                     ->orderBy('ordencompradetalle.idordencompradetalle');
             } ] )
             ->whereNull( 'ordencompra.deleted_at' )
@@ -203,6 +226,7 @@ class OrdenCompra extends Model
         $fkidproveedor         = isset( $request->fkidproveedor )         ? $request->fkidproveedor : null;
         $fkidmoneda            = isset( $request->fkidmoneda )            ? $request->fkidmoneda : null;
         $fkidsolicitudcompra   = isset( $request->fkidsolicitudcompra )   ? $request->fkidsolicitudcompra : null;
+        $fkidtipotransaccion   = isset( $request->fkidtipotransaccion )   ? $request->fkidtipotransaccion : null;
 
         $nrofactura  = isset( $request->nrofactura )  ? $request->nrofactura : null;
         $codigo      = isset( $request->codigo )      ? $request->codigo : null;
@@ -234,6 +258,7 @@ class OrdenCompra extends Model
             'fkidproveedor' => $fkidproveedor,
             'fkidmoneda'    => $fkidmoneda,
             'fkidsolicitudcompra' => $fkidsolicitudcompra,
+            'fkidtipotransaccion' => $fkidtipotransaccion,
 
             'nrofactura' => $nrofactura,
             'codigo'     => $codigo,
@@ -261,6 +286,70 @@ class OrdenCompra extends Model
         return $ordencompra;
     }
 
+    public function upgrade( $query, $request )
+    {
+        $idordencompra = isset( $request->idordencompra ) ? $request->idordencompra : null;
+
+        $fkidsucursal          = isset( $request->fkidsucursal )          ? $request->fkidsucursal : null;
+        $fkidalmacen           = isset( $request->fkidalmacen )           ? $request->fkidalmacen : null;
+        $fkidconceptocompra    = isset( $request->fkidconceptocompra )    ? $request->fkidconceptocompra : null;
+        $fkidseccioninventario = isset( $request->fkidseccioninventario ) ? $request->fkidseccioninventario : null;
+        $fkidproveedor         = isset( $request->fkidproveedor )         ? $request->fkidproveedor : null;
+        $fkidmoneda            = isset( $request->fkidmoneda )            ? $request->fkidmoneda : null;
+        $fkidsolicitudcompra   = isset( $request->fkidsolicitudcompra )   ? $request->fkidsolicitudcompra : null;
+
+        $nrofactura  = isset( $request->nrofactura )  ? $request->nrofactura : null;
+        $codigo      = isset( $request->codigo )      ? $request->codigo : null;
+        $tipocambio  = isset( $request->tipocambio )  ? $request->tipocambio : null;
+
+        $diasplazo       = isset( $request->diasplazo )       ? $request->diasplazo       : null;
+        $fechasolicitada = isset( $request->fechasolicitada ) ? $request->fechasolicitada : null;
+        $fechavencimiento = isset( $request->fechavencimiento ) ? $request->fechavencimiento : null;
+
+        $cantidadtotal   = isset( $request->cantidadtotal ) ? $request->cantidadtotal : null;
+        $montosubtotal   = isset( $request->montosubtotal ) ? $request->montosubtotal : null;
+        $montototal      = isset( $request->montototal ) ? $request->montototal : null;
+
+        $fletes      = isset( $request->fletes ) ? $request->fletes : null;
+        $internacion = isset( $request->internacion ) ? $request->internacion : null;
+        $otrosgastos = isset( $request->otrosgastos ) ? $request->otrosgastos : null;
+
+        $nota            = isset( $request->nota ) ? $request->nota : null;
+        $tiposolicitud   = isset( $request->tiposolicitud ) ? $request->tiposolicitud : null;
+
+        $ordencompra = $query->where( 'idordencompra', '=', $idordencompra )
+            ->update( [
+                'fkidsucursal' => $fkidsucursal,
+                'fkidalmacen'  => $fkidalmacen,
+                'fkidconceptocompra' => $fkidconceptocompra,
+                'fkidseccioninventario' => $fkidseccioninventario,
+                'fkidproveedor' => $fkidproveedor,
+                'fkidmoneda'    => $fkidmoneda,
+                'fkidsolicitudcompra' => $fkidsolicitudcompra,
+
+                'nrofactura' => $nrofactura,
+                'codigo'     => $codigo,
+                'tipocambio' => $tipocambio,
+
+                'diasplazo'       => $diasplazo,
+                'fechasolicitada' => $fechasolicitada,
+                'fechavencimiento' => $fechavencimiento,
+
+                'cantidadtotal' => $cantidadtotal,
+                'montototal'    => $montototal,
+                'montosubtotal' => $montosubtotal,
+
+                'fletes'      => $fletes,
+                'internacion' => $internacion,
+                'otrosgastos' => $otrosgastos,
+
+                'nota'          => $nota,
+                'tiposolicitud' => $tiposolicitud,
+            ] );
+
+        return $ordencompra;
+    }
+
     public function show( $query, $idordencompra ) {
 
         $ordencompra = $query
@@ -273,6 +362,7 @@ class OrdenCompra extends Model
             ->leftJoin('solicitudcompra as solicomp', 'ordencompra.fkidsolicitudcompra', '=', 'solicomp.idsolicitudcompra')
             ->select( [
                 'ordencompra.idordencompra', 'ordencompra.codigo', 'ordencompra.nrofactura', 'ordencompra.tipocambio', 'ordencompra.cantidadtotal',
+                'ordencompra.fkidtipotransaccion', 'ordencompra.descuento', 'ordencompra.montodescuento',
                 'ordencompra.fechasolicitada', 'ordencompra.fechavencimiento', 'ordencompra.diasplazo', 'ordencompra.montosubtotal',
                 'ordencompra.montototal', 'ordencompra.fletes', 'ordencompra.internacion', 'ordencompra.otrosgastos', 'solicomp.idsolicitudcompra',
                 'ordencompra.nota', 'ordencompra.tiposolicitud', 'ordencompra.iscompra', 'ordencompra.issolicitudcompra', 'ordencompra.fkidsolicitudcompra',
@@ -285,25 +375,35 @@ class OrdenCompra extends Model
                 'ordencompra.estado', 'ordencompra.isdelete', 'ordencompra.fecha', 'ordencompra.hora'
             ] )
             ->where( 'ordencompra.idordencompra', '=', $idordencompra )
-            ->with( [ 'ordencompradetalle' => function( $query ) {
+            ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'ordencompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'ordencompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'ordencompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'ordencompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'ordencompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
-                        'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle', 'ordencompradetalle.fkidsolicitudcompra',
+                        'ordencompradetalle.stockactual', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
+                        'ordencompradetalle.descuento', 'ordencompradetalle.montodescuento', 'ordencompradetalle.costobase',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'ordencompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'ordencompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'ordencompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'ordencompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'ordencompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+                    ] )
                     ->orderBy('ordencompradetalle.idordencompradetalle');
             } ] )
             ->whereNull('ordencompra.deleted_at')
@@ -328,7 +428,7 @@ class OrdenCompra extends Model
     public function remove( $query, $request )
     {
         $idordencompra = $request->idordencompra;
-        $query->where('idordencompra', '=', $idordencompra)->delete();
+        return $query->where('idordencompra', '=', $idordencompra)->delete();
     }
 
     public function searchByID( $query, $idordencompra ) {
@@ -342,6 +442,7 @@ class OrdenCompra extends Model
             ->leftJoin('solicitudcompra as solicomp', 'ordencompra.fkidsolicitudcompra', '=', 'solicomp.idsolicitudcompra')
             ->select( [
                 'ordencompra.idordencompra', 'ordencompra.codigo', 'ordencompra.nrofactura', 'ordencompra.tipocambio', 'ordencompra.cantidadtotal',
+                'ordencompra.fkidtipotransaccion', 'ordencompra.descuento', 'ordencompra.montodescuento',
                 'ordencompra.fechasolicitada', 'ordencompra.fechavencimiento', 'ordencompra.diasplazo', 'ordencompra.montosubtotal',
                 'ordencompra.montototal', 'ordencompra.fletes', 'ordencompra.internacion', 'ordencompra.otrosgastos', 'solicomp.idsolicitudcompra',
                 'ordencompra.nota', 'ordencompra.tiposolicitud', 'ordencompra.iscompra', 'ordencompra.issolicitudcompra', 'ordencompra.fkidsolicitudcompra',
@@ -354,25 +455,35 @@ class OrdenCompra extends Model
                 'ordencompra.estado', 'ordencompra.isdelete', 'ordencompra.fecha', 'ordencompra.hora'
             ] )
             ->where('ordencompra.idordencompra', '=', $idordencompra)
-            ->with( [ 'ordencompradetalle' => function( $query ) {
+            ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'ordencompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'ordencompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'ordencompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'ordencompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'ordencompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle',
-                        'ordencompradetalle.fkidunidadmedidaproducto', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'ordencompradetalle.idordencompradetalle', 'ordencompradetalle.fkidordencompra', 'ordencompradetalle.fkidsolicitudcompradetalle', 'ordencompradetalle.fkidsolicitudcompra',
+                        'ordencompradetalle.stockactual', 'ordencompradetalle.cantidad', 'ordencompradetalle.cantidadsolicitada', 'ordencompradetalle.nota', 
                         'ordencompradetalle.iscompra', 'ordencompradetalle.issolicitudcompra', 'ordencompradetalle.fechasolicitada', 'ordencompradetalle.fechavencimiento',
+                        'ordencompradetalle.descuento', 'ordencompradetalle.montodescuento', 'ordencompradetalle.costobase',
                         'ordencompradetalle.costounitario', 'ordencompradetalle.costosubtotal', 'ordencompradetalle.estado',
                         'ordencompradetalle.peso', 'ordencompradetalle.pesosubtotal', 'ordencompradetalle.volumen', 'ordencompradetalle.volumensubtotal',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'unidmedprod.codigo', 'unidmedprod.valorequivalente', 'unidmedprod.stock',
-                        'prod.idproducto', 'prod.nombre',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'ordencompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'ordencompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'ordencompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'ordencompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'ordencompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+                    ] )
                     ->orderBy('ordencompradetalle.idordencompradetalle');
             } ] )
             ->whereNull('ordencompra.deleted_at')

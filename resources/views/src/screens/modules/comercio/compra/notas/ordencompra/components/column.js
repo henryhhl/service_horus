@@ -2,9 +2,9 @@
 import React from 'react';
 
 import { Popconfirm, Popover, Tooltip } from "antd";
-import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined, PlusOutlined, StopOutlined } from "@ant-design/icons";
 
-import { C_Date, C_Input } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
 export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle = () => {}, onVisibleProducto = () => {} ) => {
@@ -33,17 +33,40 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
 
             codigo: "",
             producto: "",
+            fkidproducto: null,
+            unidadmedida: "",
+
+            fkidciudadorigen: null,
             ciudadorigen: "",
+
+            fkidproductomarca: null,
             productomarca: "",
 
-            fkidunidadmedidaproducto: null,
-            unidadmedidaproducto: "",
+            fkidproductotipo: null,
+            productotipo: "",
 
+            fkidsucursal: detalle.fkidsucursal,
+            sucursal: detalle.sucursal,
+
+            fkidalmacen: detalle.fkidalmacen,
+            almacen: detalle.almacen,
+
+            fkidproveedor: detalle.fkidproveedor,
+            proveedor: detalle.proveedor,
+
+            fkidseccioninventario: detalle.fkidseccioninventario,
+            seccioninventario: detalle.seccioninventario,
+
+            stockactual: "",
             cantidad: "",
             cantidadsolicitada: "",
 
+            costobase: "",
             costounitario: "",
             costosubtotal: "",
+
+            descuento: "",
+            montodescuento: "",
 
             peso: "",
             pesosubtotal: "",
@@ -53,14 +76,26 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
 
             fechasolicitada: null,
             fsolicitada: null,
+
+            fechavencimiento: null,
+            fvencimiento: null,
+
             nota: null,
+            iscompra: "N",
+            issolicitudcompra: "N",
+
+            fkidordencompra: null,
+            fkidsolicitudcompradetalle: null,
+            fkidsolicitudcompra: null,
+            idordencompradetalle: null,
 
             visible_producto: false,
-            fkidproducto: null,
-            fkidsolicitudcompradetalle: null,
-            idordencompradetalle: null,
+            visible_sucursal: false,
+            visible_almacen: false,
+            visible_seccioninventario: false,
+
             errorcantidad: false,
-            errorcosto: false,
+            errorcostounitario: false,
         };
         detalle.arrayOrdenCompraDetalle = [ ...detalle.arrayOrdenCompraDetalle, element ];
         onChangeDetalle( detalle );
@@ -68,6 +103,16 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
 
     function onDeleteRowDetalle( index ) {
         detalle.arrayOrdenCompraDetalle = detalle.arrayOrdenCompraDetalle.filter( (item, key) => key !== index );
+
+        for (let index = 0; index < detalle.arrayOrdenCompraDetalle.length; index++) {
+            let element = detalle.arrayOrdenCompraDetalle[index];
+            element.key = index;
+        }
+
+        if ( data.idordencompradetalle != null ) {
+            detalle.arrayDeleteOrdenCompraDetalle = [ ...detalle.arrayDeleteOrdenCompraDetalle, data.idordencompradetalle ];
+        }
+
         updateTotales();
         onChangeDetalle( detalle );
     };
@@ -94,6 +139,12 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             key: 'codigo',
             fixed: 'left',
             render: ( text, data, index ) => (
+                disabled.data ? 
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.codigo != null && data.codigo }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -112,8 +163,14 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         { 
             title: <span style={{ fontSize: 11, }}> { 'Producto' } </span>, 
             dataIndex: 'producto', 
-            key: 'producto', width: 100,
+            key: 'producto', width: 110,
             render: ( text, data, index ) => (
+                disabled.data ?
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.producto != null && <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </> }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -122,38 +179,23 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                     <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}
                         onClick={ () => ( !disabled.data ) && onVisibleProducto(data, index) }
                     > 
-                        { ( data.producto.toString().length == 0 ) ?
-                            "SELECCIONAR" : data.producto
+                        { ( data.producto == null || data.producto == "" ) ?
+                            "SELECCIONAR" : <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </>
                         }
                     </label>
                 </span>
             ),
         },
         {
-            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>,
-            width: 50,
-            dataIndex: 'ciudadorigen',
-            key: 'ciudadorigen',
+            title: <span style={{ fontSize: 11, }}> { 'Solicitada' } </span>,
+            width: 40,
+            dataIndex: 'cantidadsolicitada',
+            key: 'cantidadsolicitada',
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <label> 
-                        { data.ciudadorigen }
+                        { data.cantidadsolicitada }
                     </label>
-                </span>
-            ),
-        },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Und.' } </span>,
-            width: 55,
-            dataIndex: 'unidadmedidaproducto',
-            key: 'unidadmedidaproducto',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.unidadmedidaproducto.toString().length == 0 ) ? "" :
-                        <label> 
-                            { data.unidadmedidaproducto }
-                        </label>
-                    }
                 </span>
             ),
         },
@@ -164,6 +206,12 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.cantidad.toString().length == 0 ) ?
                         "" : 
+                        disabled.data ?
+                        <span style={{ fontSize: 10, display: 'flex', }}>
+                            <label style={{ cursor: 'pointer', }}> 
+                                { data.cantidad }
+                            </label>
+                        </span> : 
                         <Popover title={"Cantidad"} trigger="click"
                             content={
                                 <div>
@@ -223,13 +271,30 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 </span>
             ),
         },
+        {
+            title: <span style={{ fontSize: 11, }}> { 'Costo Base' } </span>,
+            width: 50,
+            dataIndex: 'costobase',
+            key: 'costobase',
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label> 
+                        { data.costobase }
+                    </label>
+                </span>
+            ),
+        },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
-            dataIndex: 'costounitario', key: 'costounitario', width: 70,
+            dataIndex: 'costounitario', key: 'costounitario', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costounitario.toString().length == 0 ) ?
                         "" : 
+                        disabled.data ? 
+                        <label style={{ cursor: 'pointer', }}> 
+                            {data.costounitario}
+                        </label> : 
                         <Popover title={"Costo Unitario"} trigger="click"
                             content={
                                 <div>
@@ -291,13 +356,83 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 80,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costosubtotal.toString().length == 0 ) ?
                         "" : 
                         <label> 
                             {data.costosubtotal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
+            dataIndex: 'almacen', key: 'almacen', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.almacen == null ) ?
+                        "" : 
+                        <label> 
+                            {data.almacen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Sección Inv.' } </span>, 
+            dataIndex: 'seccioninventario', key: 'seccioninventario', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.seccioninventario == null ) ?
+                        "" : 
+                        <label> 
+                            {data.seccioninventario}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
+            dataIndex: 'productomarca', key: 'productomarca', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productomarca == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productomarca}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>, 
+            dataIndex: 'ciudadorigen', key: 'ciudadorigen', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.ciudadorigen == null ) ?
+                        "" : 
+                        <label> 
+                            {data.ciudadorigen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Tipo' } </span>, 
+            dataIndex: 'productotipo', key: 'productotipo', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productotipo == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productotipo}
                         </label>
                     }
                 </span>
@@ -359,20 +494,6 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 </span>
             ),
         },
-        { 
-            title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
-            dataIndex: 'productomarca', key: 'productomarca', width: 80,
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.productomarca.toString().length == 0 ) ?
-                        "" : 
-                        <label> 
-                            {data.productomarca}
-                        </label>
-                    }
-                </span>
-            ),
-        },
         // { 
         //     title: <span style={{ fontSize: 11, }}> { 'Fecha Sol.' } </span>, 
         //     dataIndex: 'fsolicitada', key: 'fsolicitada', width: 60,
@@ -405,6 +526,12 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             title: <span style={{ fontSize: 11, }}> { 'Nota' } </span>,
             dataIndex: 'nota', key: 'nota', width: 200,
             render: ( text, data, index ) => (
+                disabled.data ?
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.nota == null ? "" : data.nota }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <Popover title={"Nota"} trigger="click"
                         content={
@@ -446,22 +573,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             key: 'accion',
             fixed: 'right',
             width: 50,
-            render: ( text, data, index ) => (
-                <Popconfirm title={"Estas seguro de quitar la fila?"}
-                    onConfirm={ () => {
-                        if ( disabled.data ) return;
-                        onDeleteRowDetalle(index);
-                    } }
-                >
-                    <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
-                        <DeleteOutlined className="icon-table-horus" 
-                            // onClick={ () => {
-                            //     if ( disabled.data ) return;
-                            //     onDeleteRowDetalle(index);
-                            // } }
-                        />
-                    </Tooltip>
-                </Popconfirm>
+            render: ( text, data, index ) => !disabled.data ? (
+                <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
+                    <DeleteOutlined className="icon-table-horus"
+                        onClick={ () => {
+                            let onDeleteRowDetalles = () => onDeleteRowDetalle( data, index );
+                            C_Confirm( {
+                                title: "Quitar Producto", onOk: onDeleteRowDetalles,
+                                okType: "primary", content: "Estás seguro de realizar acción.?",
+                            } );
+                        } }
+                    />
+                </Tooltip>
+            ) : (
+                <StopOutlined className="icon-table-horus" style={{ color: 'red', }} /> 
             ),
         },
     ] ); 

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 
 import { Col, Row, Table } from 'antd';
-import { C_Date, C_Input, C_Message, C_Select, C_Table } from '../../../../../../../components';
+import { C_Button, C_Confirm, C_Date, C_Input, C_Message, C_Select, C_Table } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 import { columns } from './column';
 
@@ -127,69 +127,54 @@ function C_Form( props ) {
     function existProducto( value ) {
         for (let index = 0; index < listaPrecio.listapreciodetalle.length; index++) {
             const element = listaPrecio.listapreciodetalle[index];
-            if ( element.fkidunidadmedidaproducto === value ) return true;
+            if ( element.fkidproducto === value ) return true;
         }
         return false;
     };
 
+    function onChangeFKIDProducto( producto ) {
+        console.log(producto)
+        if ( !existProducto( producto.idproducto ) ) {
+            let descuento = listaPrecio.valor;
+            let montoPorcentaje = Functions.getMontoPorcentaje( producto.costounitario, descuento );
+            let precioventa = parseFloat( producto.costounitario );
+            if ( listaPrecio.accion == 'I' ) {
+                precioventa = precioventa + montoPorcentaje;
+            }
+            if ( listaPrecio.accion == 'D' ) {
+                precioventa = precioventa - montoPorcentaje;
+            }
+            let detalle = listaPrecio.listapreciodetalle[rowdetalle.index];
+            detalle.codigo       = producto.codigo;
+            detalle.producto     = producto.nombre;
+            detalle.fkidproducto = producto.idproducto;
+            detalle.fkidlistaprecio = null,
+            detalle.fkidmoneda = null,
+            detalle.preciobase = parseFloat(producto.costounitario).toFixed(2),
+            detalle.preciopivote = parseFloat(producto.costounitario).toFixed(2),
+            detalle.descuento = descuento,
+            detalle.montodescuento = montoPorcentaje.toFixed(2),
+            detalle.precioventa = precioventa.toFixed(2),
+            detalle.nota = "",
+            onChange( listaPrecio );
+            setVisibleProducto(false);
+            setRowDetalle(null);
+        } else {
+            C_Message( "warning", "Producto ya seleccionado" );
+        }
+    }
+
     function componentProducto() {
         if ( !visible_producto ) return null;
         return (
-            <M_ListadoUnidadMedidaProducto
+            <M_ListadoProducto
                 visible={visible_producto}
                 onClose={ () => {
                     setVisibleProducto(false);
                     setRowDetalle(null);
                 } }
                 value={rowdetalle.fkidproducto}
-                onChange={ ( data ) => {
-                    if ( !existProducto( data.idunidadmedidaproducto ) ) {
-                        listaPrecio.listapreciodetalle[rowdetalle.index].codigo       = data.codigo;
-                        listaPrecio.listapreciodetalle[rowdetalle.index].producto     = data.producto;
-                        listaPrecio.listapreciodetalle[rowdetalle.index].fkidproducto = data.idproducto;
-                        listaPrecio.listapreciodetalle[rowdetalle.index].fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-                        listaPrecio.listapreciodetalle[rowdetalle.index].fkidlistaprecio = null,
-                        listaPrecio.listapreciodetalle[rowdetalle.index].fkidmoneda = null,
-                        listaPrecio.listapreciodetalle[rowdetalle.index].preciobase = parseFloat(data.costo).toFixed(2),
-                        listaPrecio.listapreciodetalle[rowdetalle.index].preciopivote = "0.00",
-                        listaPrecio.listapreciodetalle[rowdetalle.index].descuento = "0",
-                        listaPrecio.listapreciodetalle[rowdetalle.index].montodescuento = "0.00",
-                        listaPrecio.listapreciodetalle[rowdetalle.index].precioventa = "0.00",
-                        listaPrecio.listapreciodetalle[rowdetalle.index].nota = "",
-                        onChange( listaPrecio );
-                        setVisibleProducto(false);
-                        setRowDetalle(null);
-                    } else {
-                        C_Message( "warning", "Producto ya seleccionado" );
-                    }
-                } }
-            />
-        );
-    };
-
-    function componentProductos() {
-        if ( !visible_producto ) return null;
-        return (
-            <M_ListadoProducto
-                visible={visible_producto}
-                onClose={onHiddenProducto}
-                // value={sucursal.fkidunionsucursal}
-                onChange={ ( data ) => {
-                    console.log(data)
-                    listaPrecio.listapreciodetalle[indexdetalle].codigo       = data.codigo;
-                    listaPrecio.listapreciodetalle[indexdetalle].producto     = data.descripcion;
-                    listaPrecio.listapreciodetalle[indexdetalle].fkidproducto = data.idproducto;
-                    listaPrecio.listapreciodetalle[indexdetalle].fkidlistaprecio = null,
-                    listaPrecio.listapreciodetalle[indexdetalle].fkidmoneda = null,
-                    listaPrecio.listapreciodetalle[indexdetalle].preciobase = "0.00",
-                    listaPrecio.listapreciodetalle[indexdetalle].preciopivote = "0.00",
-                    listaPrecio.listapreciodetalle[indexdetalle].descuento = "0",
-                    listaPrecio.listapreciodetalle[indexdetalle].montodescuento = "0.00",
-                    listaPrecio.listapreciodetalle[indexdetalle].precioventa = "0.00",
-                    listaPrecio.listapreciodetalle[indexdetalle].nota = "",
-                    onChange( listaPrecio );
-                    onHiddenProducto();
-                } }
+                onChange={ onChangeFKIDProducto }
             />
         );
     };
@@ -270,17 +255,6 @@ function C_Form( props ) {
             <Row gutter={ [12, 8] }>
                 <Col sm={{ span: 4, }}></Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <C_Input
-                        label={ "Valor"}
-                        placeholder={ "INGRESAR VALOR..." }
-                        value={ listaPrecio.valor }
-                        onChange={ onChangeValor }
-                        disabled={ ( disabled.data || listaPrecio.accion === "N" ) }
-                        error={error.valor}
-                        message={message.valor}
-                    />
-                </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Select
                         label={ "Acción"}
                         placeholder={ "SELECCIONAR ACCIÓN" }
@@ -292,6 +266,17 @@ function C_Form( props ) {
                             { title: "Incremento", value: "I" },
                             { title: "Descuento", value: "D" },
                         ] }
+                    />
+                </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Input
+                        label={ "Valor"}
+                        placeholder={ "INGRESAR VALOR..." }
+                        value={ listaPrecio.valor }
+                        onChange={ onChangeValor }
+                        disabled={ ( disabled.data || listaPrecio.accion === "N" ) }
+                        error={error.valor}
+                        message={message.valor}
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
@@ -310,13 +295,43 @@ function C_Form( props ) {
                         disabled={ ( disabled.data || listaPrecio.fechainicio === "" ) }
                     />
                 </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }} style={{ paddingTop: 4, }}>
+                    <C_Button
+                        onClick={ () => {
+                            let getAllProduct = () => props.getAllProduct( );
+                            C_Confirm( {
+                                title: "Agregar Todos los Productos", onOk: getAllProduct,
+                                okType: "primary",
+                                content: "Estás seguro de agregar todos los productos a la Lista de Precio, se reiniciara los datos agregados?",
+                            } );
+                        }
+                    }
+                        disabled={ disabled.data }
+                    >
+                        Agregar Productos
+                    </C_Button>
+                    <C_Button color='danger' style={{ marginTop: 2, }}
+                        onClick={ () => {
+                            let quitarProductos = () => props.quitarProductos( );
+                            C_Confirm( {
+                                title: "Quitar Todos los Productos", onOk: quitarProductos,
+                                okType: "danger",
+                                content: "Estás seguro de quitar todos los productos de la Lista de Precio?",
+                            } );
+                        }
+                    }
+                        disabled={ disabled.data }
+                    >
+                        Quitar Productos
+                    </C_Button>
+                </Col>
             </Row>
-            <div className="main-card card mb-3 mt-3 pl-1 pr-1 pb-1">
+            <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
                 <Table
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( listaPrecio, disabled, onChange, onShowVisibleProducto ) } dataSource={listaPrecio.listapreciodetalle}
-                    scroll={{ x: 1500, y: 200 }}
+                    scroll={{ x: 1500, y: listaPrecio.listapreciodetalle.length == 0 ? 40 : 200 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

@@ -5,6 +5,7 @@ namespace App\Models\Comercio\Inventario;
 use App\Models\Functions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class UnidadMedidaProducto extends Model
 {
@@ -18,13 +19,13 @@ class UnidadMedidaProducto extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
+    protected $attributes = [
+        'estado' => 'A',  'isdelete' => 'A',
         'codigo' => null, 'peso' => 0, 'costo' => 0, 'stock' => 0, 'costounitario' => 0,
         'volumen' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0, 'valorequivalente' => 0,
     ];
 
-    protected $fillable = [ 
+    protected $fillable = [
         'fkidunidadmedida', 'fkidproducto', 'codigo', 'valorequivalente', 'peso', 'costo', 'stock',
         'volumen', 'costodescuento', 'costomontodescuento', 'costounitario',
         'isdelete', 'estado', 'fecha', 'hora',
@@ -46,27 +47,40 @@ class UnidadMedidaProducto extends Model
         return $this->belongsTo("App\Models\Comercio\Inventario\Producto", "fkidproducto", "idproducto");
     }
 
+    public function arrayalmacenunidadmedidaproducto() {
+        return $this->hasMany(
+            'App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto',
+            'fkidunidadmedidaproducto',
+            'idunidadmedidaproducto'
+        );
+    }
+
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;
         $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
+        $isventa = isset($request->isventa) ? $request->isventa : 'T';
         $column  = 'unidadmedidaproducto.idunidadmedidaproducto';
+        $fkidalmacen = isset($request->fkidalmacen) ? $request->fkidalmacen : null;
 
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
+        if ( !is_numeric( $fkidalmacen ) ) $fkidalmacen = null;
+        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) $isventa = 'T';
+        else $isventa = strtoupper( $isventa );
 
         $islike =  Functions::isLikeAndIlike();
 
         $unidadmedidaproducto = $query
             ->select( [
-                'unidadmedidaproducto.idunidadmedidaproducto', 'unidadmedidaproducto.fkidunidadmedida', 'unidadmedidaproducto.fkidproducto', 
+                'unidadmedidaproducto.idunidadmedidaproducto', 'unidadmedidaproducto.fkidunidadmedida', 'unidadmedidaproducto.fkidproducto',
                 'unidadmedidaproducto.codigo', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.volumen',
-                'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento', 
+                'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento',
                 'unidadmedidaproducto.costomontodescuento', 'unidadmedidaproducto.costounitario',
                 'unidadmedidaproducto.valorequivalente',
                 'unidadmedidaproducto.fecha', 'unidadmedidaproducto.hora', 'unidadmedidaproducto.estado', 'unidadmedidaproducto.isdelete',
 
                 'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                'prod.idproducto', 'prod.nombre as producto', 'prod.stockactual', 'prod.nivel',
+                'prod.idproducto', 'prod.nombre as producto', 'prod.stockactual', 'prod.nivel', 'prod.isventa',
                 'prodmarc.idproductomarca', 'prodmarc.descripcion as marca',
                 'prodtipo.idproductotipo', 'prodtipo.descripcion as tipo',
                 'ciu.idciudad', 'ciu.descripcion as origen',
@@ -89,6 +103,15 @@ class UnidadMedidaProducto extends Model
                 }
                 return;
             } )
+            ->where( ( $isventa == 'T' ) ? [] : [[ 'prod.isventa', '=', $isventa ]] )
+            ->where( ( is_null( $fkidalmacen ) ) ? [] : [ [
+                DB::raw("(
+                    SELECT COUNT(*) AS cantidad
+                    FROM almacenunidadmedidaproducto almundmedprod
+                    WHERE almundmedprod.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto
+                        AND almundmedprod.deleted_at IS NULL AND almundmedprod.fkidalmacen = '$fkidalmacen'
+                )"), '>', '0'
+            ] ] )
             // ->with( [ 'unidadmedida' => function ( $query ) {
             //     $query->select( 'idunidadmedida', 'abreviatura', 'descripcion' );
             // } ] )
@@ -117,9 +140,9 @@ class UnidadMedidaProducto extends Model
 
         $unidadmedidaproducto = $query
             ->select( [
-                'unidadmedidaproducto.idunidadmedidaproducto', 'unidadmedidaproducto.fkidunidadmedida', 'unidadmedidaproducto.fkidproducto', 
+                'unidadmedidaproducto.idunidadmedidaproducto', 'unidadmedidaproducto.fkidunidadmedida', 'unidadmedidaproducto.fkidproducto',
                 'unidadmedidaproducto.codigo', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.volumen',
-                'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento', 
+                'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.costodescuento',
                 'unidadmedidaproducto.costomontodescuento', 'unidadmedidaproducto.costounitario',
                 'unidadmedidaproducto.valorequivalente',
                 'unidadmedidaproducto.fecha', 'unidadmedidaproducto.hora', 'unidadmedidaproducto.estado', 'unidadmedidaproducto.isdelete',
@@ -251,7 +274,7 @@ class UnidadMedidaProducto extends Model
             ->where( 'unidadmedidaproducto.fkidunidadmedida', '=', $idunidadmedida )
             ->whereNull('unidadmedidaproducto.deleted_at')
             ->get();
-        
+
         return ( sizeof( $unidadmedidaproducto ) > 0 );
     }
 

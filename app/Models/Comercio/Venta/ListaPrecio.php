@@ -32,7 +32,7 @@ class ListaPrecio extends Model
         'imagen', 'extension', 'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
-    public function listapreciodetalle() {
+    public function arraylistapreciodetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Venta\ListaPrecioDetalle',
             'fkidlistaprecio',
@@ -69,16 +69,15 @@ class ListaPrecio extends Model
                 }
                 return;
             } )
-            ->with( [ 'listapreciodetalle' => function( $query ) {
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('producto as prod', 'listapreciodetalle.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'prod.idproducto', 'prod.nombre as producto', 'prod.codigo',
                         'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
                         'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
                         'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
-                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
                     ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
@@ -121,16 +120,15 @@ class ListaPrecio extends Model
                 }
                 return;
             } )
-            ->with( [ 'listapreciodetalle' => function( $query ) {
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('producto as prod', 'listapreciodetalle.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'prod.idproducto', 'prod.nombre as producto', 'prod.codigo',
                         'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
                         'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
                         'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
-                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
                     ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
@@ -239,16 +237,15 @@ class ListaPrecio extends Model
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where('listaprecio.idlistaprecio', '=', $idlistaprecio)
-            ->with( [ 'listapreciodetalle' => function( $query ) {
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('producto as prod', 'listapreciodetalle.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'prod.idproducto', 'prod.nombre as producto', 'prod.codigo',
                         'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
                         'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
                         'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
-                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
                     ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )
@@ -288,16 +285,15 @@ class ListaPrecio extends Model
                 'listaprecio.isdelete', 'listaprecio.estado', 'listaprecio.fecha', 'listaprecio.hora'
             ] )
             ->where('listaprecio.idlistaprecio', '=', $idlistaprecio)
-            ->with( [ 'listapreciodetalle' => function( $query ) {
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as undmedprod', 'listapreciodetalle.fkidunidadmedidaproducto', '=', 'undmedprod.idunidadmedidaproducto')
-                    ->leftJoin('producto as prod', 'undmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('producto as prod', 'listapreciodetalle.fkidproducto', '=', 'prod.idproducto')
                     ->select( [
-                        'prod.idproducto', 'prod.nombre as producto', 'undmedprod.codigo',
+                        'prod.idproducto', 'prod.nombre as producto', 'prod.codigo',
                         'listapreciodetalle.idlistapreciodetalle', 'listapreciodetalle.fkidlistaprecio',
                         'listapreciodetalle.preciobase', 'listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
                         'listapreciodetalle.descuento', 'listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
-                        'listapreciodetalle.fkidunidadmedidaproducto', 'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidmoneda',
                     ] )
                     ->orderBy('listapreciodetalle.idlistapreciodetalle');
             } ] )

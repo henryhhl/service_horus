@@ -39,10 +39,10 @@ class ConceptoCompra extends Model
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;
-        $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
+        $orderBy = isset($request->orderBy) ? $request->orderBy : 'ASC';
         $column  = 'conceptocompra.idconceptocompra';
 
-        if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
+        if ( strtoupper( $orderBy ) != 'DESC' ) $orderBy = 'ASC';
 
         $islike =  Functions::isLikeAndIlike();
 

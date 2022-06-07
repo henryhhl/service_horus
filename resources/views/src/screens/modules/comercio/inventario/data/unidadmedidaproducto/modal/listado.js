@@ -18,7 +18,7 @@ function M_ListadoUnidadMedidaProducto( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title } keyboard maskClosable
         >
@@ -26,6 +26,7 @@ function M_ListadoUnidadMedidaProducto( props ) {
                 onChecked={ onChecked }
                 value={ value }
                 data={props.data}
+                isventa={props.isventa}
                 // onCreate={ props.onCreate }
             />
         </C_ModalDraggable>
@@ -44,6 +45,7 @@ M_ListadoUnidadMedidaProducto.propTypes = {
     data: PropTypes.array,
 
     title:    PropTypes.string,
+    isventa:  PropTypes.string,
     onClose:  PropTypes.func,
     onChange: PropTypes.func,
 }
@@ -58,7 +60,8 @@ M_ListadoUnidadMedidaProducto.defaultProps = {
 
     data: [],
 
-    title: "UNIDAD MEDIDA PRODUCTO",
+    title: "LISTADO DE PRODUCTO",
+    isventa: "T",
 }
 
 export default M_ListadoUnidadMedidaProducto;

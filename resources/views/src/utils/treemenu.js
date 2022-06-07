@@ -166,6 +166,10 @@ export const treeMenu = [
                                 key: "notaventa", title: "NOTA VENTA",
                                 children: [],
                             },
+                            {
+                                key: "devolucionnotaventa", title: "DEVOLUCIÓN NOTA VENTA",
+                                children: [],
+                            },
                         ],
                     },
                     {

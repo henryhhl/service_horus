@@ -5,8 +5,14 @@ namespace App\Http\Controllers\Comercio\Venta;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Venta\NotaVentaRequest;
+use App\Models\Comercio\Venta\ConceptoVenta;
+use App\Models\Comercio\Venta\ListaPrecio;
 use App\Models\Comercio\Venta\NotaVenta;
+use App\Models\Comercio\Venta\NotaVentaDetalle;
+use App\Models\Comercio\Venta\Sucursal;
+use App\Models\Comercio\Venta\TipoPago;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class NotaVentaController extends Controller
@@ -74,9 +80,25 @@ class NotaVentaController extends Controller
             $ntavta = new NotaVenta();
             $idnotaventa = $ntavta->newID();
 
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
+
+            $conctovta = new ConceptoVenta();
+            $arrayConceptoVenta = $conctovta->get_data( $conctovta, $request );
+
+            $ltaprec = new ListaPrecio();
+            $arrayListaPrecio = $ltaprec->get_data( $ltaprec, $request );
+
+            $tpopago = new TipoPago();
+            $arrayTipoPago = $tpopago->get_data( $tpopago, $request );
+
             return response()->json( [
                 'response' => 1,
                 'idnotaventa'  => $idnotaventa,
+                'arraySucursal'  => $arraySucursal,
+                'arrayConceptoVenta'  => $arrayConceptoVenta,
+                'arrayListaPrecio'  => $arrayListaPrecio,
+                'arrayTipoPago'  => $arrayTipoPago,
             ] );
 
         } catch ( \Exception $th ) {
@@ -103,10 +125,25 @@ class NotaVentaController extends Controller
     {
         try {
 
+            DB::beginTransaction();
+
             $ntavta = new NotaVenta();
             $notaventa = $ntavta->store( $ntavta, $request );
 
             if ( $notaventa ) {
+
+                $arraynotaventadetalle = json_decode( $request->input( 'arraynotaventadetalle', '[]' ) );
+
+                foreach ( $arraynotaventadetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidalmacenproductodetalle ) ) {
+                        $ntavtadet = new NotaVentaDetalle();
+                        $detalle->fkidnotaventa = $notaventa->idnotaventa;
+                        $detalle->fkidvendedor = $notaventa->fkidvendedor;
+                        $ntavtadet->store( $ntavtadet, $request, $detalle );
+                    }
+                }
+
+                DB::commit();
                 return response( )->json( [
                     'response' => 1,
                     'notaventa' => $notaventa,
@@ -114,6 +151,7 @@ class NotaVentaController extends Controller
                 ] );
             }
 
+            DB::rollBack();
             return response( )->json( [
                 'response' => -1,
                 'notaventa' => $notaventa,
@@ -122,7 +160,7 @@ class NotaVentaController extends Controller
 
 
         } catch ( \Exception $th ) {
-
+            DB::rollBack();
             return response( )->json( [
                 'response' => -4,
                 'message'  => 'Error al procesar la solicitud.',
@@ -224,6 +262,8 @@ class NotaVentaController extends Controller
     {
         try {
 
+            DB::beginTransaction();
+
             $regla = [
                 'idnotaventa' => 'required',
             ];
@@ -255,19 +295,44 @@ class NotaVentaController extends Controller
             $result = $ntavta->upgrade( $ntavta, $request );
 
             if ( $result ) {
+
+                $arraynotaventadetalle = json_decode( isset( $request->arraynotaventadetalle ) ? $request->arraynotaventadetalle : '[]' );
+                foreach ( $arraynotaventadetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidalmacenproductodetalle ) ) {
+                        $ntavtadet = new NotaVentaDetalle();
+                        if ( is_null( $detalle->idnotaventadetalle ) ) {
+                            $detalle->fkidnotaventa = $notaventa->idnotaventa;
+                            $detalle->fkidvendedor = $notaventa->fkidvendedor;
+                            $ntavtadet->store( $ntavtadet, $request, $detalle );
+                        } else {
+                            $notaventadetalle = $ntavtadet->upgrade( $ntavtadet, $detalle );
+                        }
+                    }
+                }
+
+                $arraynotaventadetalledelete = json_decode( isset( $request->arraynotaventadetalledelete ) ? $request->arraynotaventadetalledelete : '[]' );
+                foreach ( $arraynotaventadetalledelete as $idnotaventadetalle ) {
+                    $ntavtadet = new NotaVentaDetalle();
+                    $notaventadetalle = $ntavtadet->find( $idnotaventadetalle );
+                    if ( !is_null( $notaventadetalle ) ) {
+                        $notaventadetalle->delete();
+                    }
+                }
+
+                DB::commit();
                 return response()->json( [
                     'response' => 1,
                     'message'  => 'Nota Venta actualizado éxitosamente.',
                 ] );
             }
-
+            DB::rollBack();
             return response()->json( [
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Nota Venta.',
             ] );
 
         } catch ( \Exception $th ) {
-
+            DB::rollBack();
             return response()->json( [
                 'response' => -4,
                 'message'  => 'Error al procesar la solicitud.',
@@ -294,6 +359,8 @@ class NotaVentaController extends Controller
     public function delete( Request $request )
     {
         try {
+
+            DB::beginTransaction();
 
             $regla = [
                 'idnotaventa' => 'required',
@@ -328,9 +395,20 @@ class NotaVentaController extends Controller
 
             /* fin de restriccion */
 
-            $notaVentaDelete = $ntavta->delete();
+            $ntavtadet = new NotaVentaDetalle();
+            $arraynotaventadetalle = $ntavtadet->getNotaVentaDetalle( $ntavtadet, $request->idnotaventa );
+
+            foreach ( $arraynotaventadetalle as $detalle ) {
+                $notaventadetalle = $ntavtadet->find( $detalle->idnotaventadetalle );
+                if ( !is_null( $notaventadetalle ) ) {
+                    $notaventadetalle->delete();
+                }
+            }
+
+            $notaVentaDelete = $notaventa->delete();
 
             if ( $notaVentaDelete ) {
+                DB::commit();
                 return response()->json( [
                     'response' => 1,
                     'message'  => 'Nota Venta eliminado éxitosamente.',
@@ -338,6 +416,7 @@ class NotaVentaController extends Controller
                 ] );
             }
 
+            DB::rollBack();
             return response()->json( [
                 'response' => -1,
                 'message'  => 'Hubo conflictos al eliminar, favor de intentar nuevamente.',
@@ -345,6 +424,7 @@ class NotaVentaController extends Controller
             ] );
 
         } catch (\Exception $th) {
+            DB::rollBack();
             return response()->json( [
                 'response' => -4,
                 'message' => 'Error al procesar la solicitud.',

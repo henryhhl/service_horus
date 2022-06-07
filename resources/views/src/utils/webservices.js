@@ -131,7 +131,9 @@ const webservices = {
     wscomercioinventarioproducto_searchByID: module.comercio.inventario + '/producto/searchByID',
 
 
-    wscomercioinventariounidadmedidaproducto_index:      module.comercio.inventario + '/unidadmedidaproducto/index',
+    wscomercioinventariounidadmedidaproducto_index:        module.comercio.inventario + '/unidadmedidaproducto/index',
+    wscomercioinventarioalmacenunidadmedidaproducto_index: module.comercio.inventario + '/almacenunidadmedidaproducto/index',
+    wscomercioinventarioalmacenproductodetalle_index:      module.comercio.inventario + '/almacenproductodetalle/index',
 
 
     wscomercioinventarionotaingreso_index:      module.comercio.inventario + '/notaingreso/index',
@@ -256,6 +258,16 @@ const webservices = {
     wscomercioventanotaventa_delete:     module.comercio.venta + '/notaventa/delete',
     wscomercioventanotaventa_reporte:    module.comercio.venta + '/notaventa/reporte',
     wscomercioventanotaventa_searchByID: module.comercio.venta + '/notaventa/searchByID',
+
+    wscomercioventadevolucionnotaventa_index:      module.comercio.venta + '/devolucionnotaventa/index',
+    wscomercioventadevolucionnotaventa_create:     module.comercio.venta + '/devolucionnotaventa/create',
+    wscomercioventadevolucionnotaventa_store:      module.comercio.venta + '/devolucionnotaventa/store',
+    wscomercioventadevolucionnotaventa_editar:     module.comercio.venta + '/devolucionnotaventa/editar',
+    wscomercioventadevolucionnotaventa_update:     module.comercio.venta + '/devolucionnotaventa/update',
+    wscomercioventadevolucionnotaventa_show:       module.comercio.venta + '/devolucionnotaventa/show',
+    wscomercioventadevolucionnotaventa_delete:     module.comercio.venta + '/devolucionnotaventa/delete',
+    wscomercioventadevolucionnotaventa_reporte:    module.comercio.venta + '/devolucionnotaventa/reporte',
+    wscomercioventadevolucionnotaventa_searchByID: module.comercio.venta + '/devolucionnotaventa/searchByID',
 
 
 

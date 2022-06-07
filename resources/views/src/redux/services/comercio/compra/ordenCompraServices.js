@@ -71,6 +71,10 @@ const onGrabar = async ( ordencompra ) => {
         otrosgastos:  ordencompra.otrosgastos,
         nota:  ordencompra.nota,
         tiposolicitud:  ordencompra.tiposolicitud,
+        descuento:  ordencompra.descuento,
+        montodescuento:  ordencompra.montodescuento,
+        fkidtipotransaccion: 5,
+        fkidusers: null,
         arrayOrdenCompraDetalle: JSON.stringify(ordencompra.arrayOrdenCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
@@ -133,8 +137,14 @@ const onUpdate = async ( ordencompra ) => {
         otrosgastos:  ordencompra.otrosgastos,
         nota:  ordencompra.nota,
         tiposolicitud:  ordencompra.tiposolicitud,
+        descuento:  ordencompra.descuento,
+        montodescuento:  ordencompra.montodescuento,
+        fkidtipotransaccion: 5,
+        fkidusers: null,
         arrayOrdenCompraDetalle: JSON.stringify(ordencompra.arrayOrdenCompraDetalle),
+        arrayDeleteOrdenCompraDetalle: JSON.stringify(ordencompra.arrayDeleteOrdenCompraDetalle),
     } ) . then ( ( result ) => {
+        console.log(ordencompra)
         resultData( result );
         if ( result.response == 0 ) {
             C_Message( "warning", result.message );

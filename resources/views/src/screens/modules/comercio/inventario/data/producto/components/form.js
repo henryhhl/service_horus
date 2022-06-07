@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { Col, Row, Table, Tooltip } from 'antd';
 import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
-import { C_Button, C_Checkbox, C_Image, C_Input, C_Message } from '../../../../../../../components';
+import { C_Button, C_Checkbox, C_Image, C_Input, C_Message, C_Select } from '../../../../../../../components';
 
 import { Functions } from '../../../../../../../utils/functions';
 import { listaPrecioColumns } from './listaPrecioColumn';
@@ -19,6 +19,7 @@ import M_ListadoProductoSubGrupo from '../../productosubgrupo/modal/listado';
 
 import M_ListadoUnidadMedida from '../../unidadmedida/modal/listado';
 import M_ListadoProveedor from '../../../../compra/data/proveedor/modal/listado';
+import { almacenColumns } from './almacenColumn';
 
 function C_Form( props ) {
     const { producto, disabled, onChange } = props;
@@ -54,6 +55,11 @@ function C_Form( props ) {
             producto.nivel = parseInt(value);
             onChange( producto );
         };
+    };
+
+    function onChangeIsVenta( value ) {
+        producto.isventa = value;
+        onChange( producto );
     };
 
     function onChangeCodigo( value ) {
@@ -239,9 +245,8 @@ function C_Form( props ) {
         );
     };
 
-    function onShowUnidadMedida( unidadmedida ) {
+    function onShowUnidadMedida( ) {
         if ( !disabled.data ) {
-            setUnidadMedidaDetalle( unidadmedida );
             setVisibleUnidadMedida(true);
         };
     };
@@ -253,51 +258,48 @@ function C_Form( props ) {
                 visible={visible_unidadmedida}
                 onClose={ () => {
                     setUnidadMedidaDetalle(null);
-                    setVisibleUnidadMedida(false);
                 } }
-                value={unidadmedidadetalle.fkidunidadmedida}
+                value={producto.fkidunidadmedida}
                 onChange={ (data) => {
-                    let detalle = producto.arrayUnidadMedidaProducto[unidadmedidadetalle.index];
-                    detalle.fkidunidadmedida = data.idunidadmedida;
-                    detalle.unidadmedida = data.descripcion;
-                    detalle.message.fkidunidadmedida = "";
-                    detalle.error.fkidunidadmedida = false;
+                    producto.fkidunidadmedida = data.idunidadmedida;
+                    producto.unidadmedida     = data.descripcion;
+                    producto.message.fkidunidadmedida = "";
+                    producto.error.fkidunidadmedida = false;
                     onChange( producto );
-                    setUnidadMedidaDetalle(null);
                     setVisibleUnidadMedida(false);
                 } }
             />
         );
     };
 
-    function onChangeValorEquivalente( data, value ) {
+    function onChangeValorEquivalente( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
                 let valorequivalente = Functions.onChangeNumberDecimal(value);
-                producto.arrayUnidadMedidaProducto[data.index].valorequivalente = valorequivalente;
+                producto.valorequivalente = valorequivalente;
                 onChange( producto );
             }
         };
     };
 
-    function onChangePeso( data, value ) {
+    function onChangePeso( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
                 let peso = Functions.onChangeNumberDecimal(value);
-                producto.arrayUnidadMedidaProducto[data.index].peso = peso;
+                producto.peso = peso;
                 onChange( producto );
             }
         };
     };
 
-    function onChangeVolumen( data, value ) {
+    function onChangeVolumen( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
                 let volumen = Functions.onChangeNumberDecimal(value);
-                producto.arrayUnidadMedidaProducto[data.index].volumen = volumen;
+                producto.volumen = volumen;
                 onChange( producto );
             }
         };
@@ -306,28 +308,40 @@ function C_Form( props ) {
     function onChangeStock( data, value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
-            producto.arrayUnidadMedidaProducto[data.index].stock = parseInt(value);
+            producto.stock = parseInt(value);
             onChange( producto );
         };
     };
 
-    function onChangeCosto( data, value ) {
+    function onChangeCostoBase( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( Functions.esDecimal( value, 2 ) ) {
-                let costounitario = Functions.onChangeNumberDecimal(value);
-                producto.arrayUnidadMedidaProducto[data.index].costounitario = costounitario;
+                let costobase = Functions.onChangeNumberDecimal(value);
+                producto.costobase = costobase;
 
-                let detalle = producto.arrayUnidadMedidaProducto[data.index];
-                let montodescuento = parseFloat( ( detalle.costodescuento * 1 / 100 ) * detalle.costounitario );
+                let montodescuento = parseFloat( ( producto.costodescuento * 1 / 100 ) * producto.costobase );
 
-                let costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
-                producto.arrayUnidadMedidaProducto[data.index].costo = costo;
+                let costounitario = parseFloat( producto.costobase * 1 - montodescuento ).toFixed(2);
+                producto.costounitario = costounitario;
 
                 for (let index = 0; index < producto.arrayProveedor.length; index++) {
                     const element = producto.arrayProveedor[index];
                     if ( element.fkidproveedor !== null ) {
-                        element.costounitario = costo;
+                        element.costounitario = costounitario;
+                    }
+                }
+
+                for (let index = 0; index < producto.arrayListaPrecio.length; index++) {
+                    const element = producto.arrayListaPrecio[index];
+                    element.preciobase = costounitario;
+                    element.preciopivote = costounitario;
+                    element.descuento = element.valor;
+                    element.montodescuento = parseFloat( ( element.descuento*1/100 ) * element.preciopivote ).toFixed(2);
+                    if ( element.accion == 'I' ) {
+                        element.precioventa = parseFloat( element.preciopivote*1 + element.montodescuento*1 ).toFixed(2);
+                    } else {
+                        element.precioventa = parseFloat( element.preciopivote*1 - element.montodescuento*1 ).toFixed(2);
                     }
                 }
 
@@ -336,22 +350,33 @@ function C_Form( props ) {
         };
     };
 
-    function onChangeCostoDescuento( data, value ) {
+    function onChangeCostoDescuento( value ) {
         if ( value === "" ) value = 0;
         if ( !isNaN( value ) ) {
             if ( parseInt( value ) >= 0 && parseInt( value ) <= 100 ) {
-                let detalle = producto.arrayUnidadMedidaProducto[data.index];
-                producto.arrayUnidadMedidaProducto[data.index].costodescuento = parseInt(value);
 
-                let montodescuento = parseFloat( ( value * 1 / 100 ) * detalle.costounitario );
-                let costo = parseFloat( detalle.costounitario - montodescuento ).toFixed(2);
-
-                producto.arrayUnidadMedidaProducto[data.index].costo = costo;
+                producto.costodescuento = parseInt(value);
+                let montodescuento = parseFloat( ( value * 1 / 100 ) * producto.costobase );
+                let costounitario  = parseFloat( producto.costobase - montodescuento ).toFixed(2);
+                producto.costounitario = costounitario;
 
                 for (let index = 0; index < producto.arrayProveedor.length; index++) {
                     const element = producto.arrayProveedor[index];
                     if ( element.fkidproveedor !== null ) {
-                        element.costounitario = costo;
+                        element.costounitario = costounitario;
+                    }
+                }
+
+                for (let index = 0; index < producto.arrayListaPrecio.length; index++) {
+                    const element = producto.arrayListaPrecio[index];
+                    element.preciobase = costounitario;
+                    element.preciopivote = costounitario;
+                    element.descuento = element.valor;
+                    element.montodescuento = parseFloat( ( element.descuento*1/100 ) * element.preciopivote ).toFixed(2);
+                    if ( element.accion == 'I' ) {
+                        element.precioventa = parseFloat( element.preciopivote*1 + element.montodescuento*1 ).toFixed(2);
+                    } else {
+                        element.precioventa = parseFloat( element.preciopivote*1 - element.montodescuento*1 ).toFixed(2);
                     }
                 }
 
@@ -420,7 +445,7 @@ function C_Form( props ) {
         if ( !existProveedor( data.idproveedor ) ) {
             producto.arrayProveedor[proveedordetalle.index].fkidproveedor = data.idproveedor;
             producto.arrayProveedor[proveedordetalle.index].proveedor = data.nombre;
-            producto.arrayProveedor[proveedordetalle.index].costounitario = producto.arrayUnidadMedidaProducto[0].costo;
+            producto.arrayProveedor[proveedordetalle.index].costounitario = producto.costounitario;
             onChange( producto );
             setProveedorDetalle(null);
             setVisibleProveedor(false);
@@ -449,7 +474,7 @@ function C_Form( props ) {
             idproveedorproducto: null,
             fkidproveedor: null,
             proveedor: "",
-            costounitario: producto.arrayUnidadMedidaProducto[0].costo,
+            costounitario: 0,
             stock: 0,
         };
         producto.arrayProveedor = [ ...producto.arrayProveedor, element];
@@ -495,7 +520,7 @@ function C_Form( props ) {
                         focus={ focusInput }
                     />
                 </Col>
-                <Col sm={{ span: 6, }}></Col>
+                <Col sm={{ span: 2, }}></Col>
                 {/* <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input
                         label={ "Código"}
@@ -540,6 +565,19 @@ function C_Form( props ) {
                         disabled={ disabled.data }
                     />
                 </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Select
+                        label={ "Es Venta"}
+                        placeholder={ "SELECCIONAR ACCIÓN" }
+                        value={ producto.isventa }
+                        onChange={ onChangeIsVenta }
+                        disabled={ disabled.data }
+                        data={ [
+                            { title: "Si", value: "A" },
+                            { title: "No", value: "N" },
+                        ] }
+                    />
+                </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }} className="d-flex justify-content-start align-items-center mt-1">
                     <C_Checkbox disabled={disabled.data}
                         titleText={ (producto.estado === "A") ? "Activo" : "Inactivo" }
@@ -549,7 +587,7 @@ function C_Form( props ) {
                 </Col>
             </Row>
 
-            <div className="main-card mb-3 mt-3 card pl-1 pr-1 pb-2 pt-1">
+            <div className="main-card mb-1 mt-2 card pl-1 pr-1 pb-2 pt-1">
                 <Row gutter={ [12, 8] }>
                     <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                         <Row gutter={ [12, 8] }>
@@ -711,173 +749,136 @@ function C_Form( props ) {
                                 <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1"
                                     style={{ maxHeight: 270, overflowX: 'hidden', overflowY: 'auto', }}
                                 >
-                                    { producto.arrayUnidadMedidaProducto.map( (item, key) => {
-                                        return (
-                                            <div key={key} className="main-card card pl-1 pr-1 pb-1 pt-0 mb-2">
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Und. Med."}
-                                                            placeholder={ "SELECCIONAR UND MEDIDA..." }
-                                                            value={ item.unidadmedida }
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Und. Med."}
+                                                placeholder={ "SELECCIONAR UND MEDIDA..." }
+                                                value={ producto.unidadmedida }
+                                                onClick={ () => {
+                                                    onShowUnidadMedida();
+                                                } }
+                                                disabled={ disabled.data }
+                                                select={true}
+                                                message={ producto.message.fkidunidadmedida }
+                                                error={ producto.error.fkidunidadmedida }
+                                                suffix={ ( !disabled.data ) && ( typeof producto.fkidunidadmedida == "number" ) &&
+                                                    <Tooltip title="QUITAR" placement="top" color={'#2db7f5'}>
+                                                        <CloseOutlined
+                                                            className="icon-table-horus"
+                                                            style={{ marginLeft: -20, }}
                                                             onClick={ () => {
-                                                                item.index = key;
-                                                                onShowUnidadMedida(item);
-                                                            } }
-                                                            disabled={ disabled.data }
-                                                            select={true}
-                                                            message={ item.message.fkidunidadmedida }
-                                                            error={ item.error.fkidunidadmedida }
-                                                            suffix={ ( !disabled.data ) && ( item.fkidunidadmedida !== null ) &&
-                                                                <Tooltip title="QUITAR" placement="top" color={'#2db7f5'}>
-                                                                    <CloseOutlined
-                                                                        className="icon-table-horus"
-                                                                        style={{ marginLeft: -20, }}
-                                                                        onClick={ () => {
-                                                                            item.fkidunidadmedida = null;
-                                                                            item.unidadmedida = "";
-                                                                            item.codigo= null;
-                                                                            item.valorequivalente = "0.00";
-                                                                            item.peso = "0.00";
-                                                                            item.volumen = "0.00";
-                                                                            item.costounitario = "0.00";
-                                                                            item.costodescuento = "0";
-                                                                            item.stock = "0";
-                                                                            item.costo = "0.00";
-                                                                            onChange(producto);
-                                                                        } }
-                                                                    />
-                                                                </Tooltip>
-                                                            }
-                                                        />
-                                                    </Col>
-                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"V. Equiv."}
-                                                            placeholder={ "INGRESAR VALOR EQUIVALENTE..." }
-                                                            value={ item.valorequivalente }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangeValorEquivalente(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                                                        <C_Input
-                                                            label={"Código"}
-                                                            placeholder={ "INGRESAR CÓDIGO..." }
-                                                            value={ item.codigo }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                item.codigo = value;
-                                                                item.message.codigo = "";
-                                                                item.error.codigo = false;
+                                                                producto.fkidunidadmedida = "";
+                                                                producto.unidadmedida = "";
                                                                 onChange(producto);
                                                             } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                            message={ item.message.codigo }
-                                                            error={ item.error.codigo }
                                                         />
-                                                    </Col>
-                                                </Row>
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Peso"}
-                                                            placeholder={ "INGRESAR PESO..." }
-                                                            value={ item.peso }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangePeso(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Costo FOB"}
-                                                            placeholder={ "INGRESAR COSTO..." }
-                                                            value={ item.costounitario }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangeCosto(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} md={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Volumen"}
-                                                            placeholder={ "INGRESAR VOLUMEN..." }
-                                                            value={ item.volumen }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangeVolumen(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"%CIF"}
-                                                            placeholder={ "INGRESAR DESC..." }
-                                                            value={ item.costodescuento }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangeCostoDescuento(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                                <Row gutter={ [12, 8] }>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Stock"}
-                                                            placeholder={ "INGRESAR STOCK..." }
-                                                            value={ item.stock }
-                                                            onChange={ (value) => {
-                                                                item.index = key;
-                                                                onChangeStock(item, value);
-                                                            } }
-                                                            disabled={ (disabled.data || ( typeof item.fkidunidadmedida !== "number" ) ) ? true : false }
-                                                        />
-                                                    </Col>
-                                                    <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                                                        <C_Input
-                                                            label={"Costo CIF"}
-                                                            placeholder={ "INGRESAR COSTO..." }
-                                                            value={ item.costo }
-                                                            readOnly
-                                                            disabled={ disabled.data }
-                                                        />
-                                                    </Col>
-                                                </Row>
-                                                { ( !disabled.data ) && ( key !== 0 ) &&
-                                                    <Row gutter={ [12, 8] } justify={"end"} className="mt-1">
-                                                        <C_Button color={"danger"}
-                                                            onClick={ () => DeleteRowUnidadMedida(key) }
-                                                        >
-                                                            Eliminar
-                                                        </C_Button>
-                                                    </Row>
+                                                    </Tooltip>
                                                 }
-                                            </div>
-                                        );
-                                    } ) }
-                                </div>
-                                {/* { ( !disabled.data ) &&
-                                    <Row gutter={ [12, 8] } justify={"end"} className={"mt-2"}>
-                                        <C_Button color={"link"} onClick={AddRowUnidadMedida}>
-                                            Agregar Unidad Medida
-                                        </C_Button>
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} md={{ span: 12, }}>
+                                            <C_Input
+                                                label={"V. Equiv."}
+                                                placeholder={ "INGRESAR VALOR EQUIVALENTE..." }
+                                                value={ producto.valorequivalente }
+                                                onChange={ (value) => {
+                                                    onChangeValorEquivalente( value);
+                                                } }
+                                                disabled={ (disabled.data || ( typeof producto.fkidunidadmedida != "number" ) ) ? true : false }
+                                            />
+                                        </Col>
                                     </Row>
-                                } */}
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                            <C_Input
+                                                label={"Código"}
+                                                placeholder={ "INGRESAR CÓDIGO..." }
+                                                value={ producto.codigo }
+                                                onChange={ (value) => {
+                                                    producto.codigo = value;
+                                                    producto.message.codigo = "";
+                                                    producto.error.codigo = false;
+                                                    onChange(producto);
+                                                } }
+                                                disabled={ ( disabled.data ) ? true : false }
+                                                message={ producto.message.codigo }
+                                                error={ producto.error.codigo }
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} md={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Peso"}
+                                                placeholder={ "INGRESAR PESO..." }
+                                                value={ producto.peso }
+                                                onChange={ (value) => {
+                                                    onChangePeso( value);
+                                                } }
+                                                disabled={ (disabled.data ) ? true : false }
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Costo FOB"}
+                                                placeholder={ "INGRESAR COSTO..." }
+                                                value={ producto.costobase }
+                                                onChange={ (value) => {
+                                                    onChangeCostoBase(value);
+                                                } }
+                                                disabled={ (disabled.data) ? true : false }
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} md={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Volumen"}
+                                                placeholder={ "INGRESAR VOLUMEN..." }
+                                                value={ producto.volumen }
+                                                onChange={ (value) => {
+                                                    onChangeVolumen( value);
+                                                } }
+                                                disabled={ ( disabled.data ) ? true : false }
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                                            <C_Input
+                                                label={"%CIF"}
+                                                placeholder={ "INGRESAR DESC..." }
+                                                value={ producto.costodescuento }
+                                                onChange={ (value) => {
+                                                    onChangeCostoDescuento( value );
+                                                } }
+                                                disabled={ ( disabled.data ) ? true : false }
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row gutter={ [12, 8] }>
+                                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Stock"}
+                                                placeholder={ "INGRESAR STOCK..." }
+                                                value={ producto.stockactual }
+                                                onChange={ (value) => {
+                                                    onChangeStock( value );
+                                                } }
+                                                readOnly
+                                                disabled={ ( disabled.data ) ? true : false }
+                                            />
+                                        </Col>
+                                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                                            <C_Input
+                                                label={"Costo CIF"}
+                                                placeholder={ "INGRESAR COSTO..." }
+                                                value={ producto.costounitario }
+                                                readOnly
+                                                disabled={ disabled.data }
+                                            />
+                                        </Col>
+                                    </Row>
+                                </div>
                             </Col>
                         </Row>
                     </Col>
@@ -888,17 +889,41 @@ function C_Form( props ) {
                                     pagination={false} bordered size={"small"}
                                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                                     scroll={{ x: 1000, y: producto.arrayListaPrecio.length == 0 ? 40 : 200 }}
-                                    columns={ listaPrecioColumns() } dataSource={producto.arrayListaPrecio}
+                                    columns={ listaPrecioColumns( producto, onChange ) } dataSource={producto.arrayListaPrecio}
+                                    title={ () => 'Lista de Precio' }
+                                    rowKey={'fkidlistaprecio'}
                                 />
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1">
+                                    <div className="card-header card-header-title font-size-lg text-capitalize">
+                                        Listado Sucursal de Álmacenes
+                                    </div>
+                                    <div className='card-body p-0' style={{ maxHeight: 200, overflowX: 'hidden', overflowY: 'auto', }}>
+                                        { producto.arraySucursalAlmacen.map( ( detalle, key ) => {
+                                            return (
+                                                <Table 
+                                                    pagination={false} bordered size={"small"}
+                                                    style={{ width: "100%", minWidth: "100%", maxWidth: "100%", marginBottom: 8, }}
+                                                    scroll={{ x: 550, y: detalle.arrayalmacen.length == 0 ? 40 : 200 }}
+                                                    columns={ almacenColumns( detalle, producto, onChange ) } 
+                                                    dataSource={detalle.arrayalmacen}
+                                                    title={ () => detalle.sucursal }
+                                                    rowKey={'idalmacen'} key={key}
+                                                />
+                                            );
+                                        } ) }
+                                    </div>
+                                </div>
+                            </Col>
+                            {/* <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                                 <C_Image
                                     data={ producto.imagen }
                                     onChange={onChangeImage}
                                     id="img-producto"
                                     disabled={disabled.data}
                                 />
-                            </Col>
+                            </Col> */}
                         </Row>
                     </Col>
                 </Row>

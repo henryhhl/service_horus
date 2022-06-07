@@ -34,6 +34,7 @@ function C_ListadoUnidadMedidaProducto( props ) {
     function get_data( search = "" ) {
         httpRequest( 'get', webservices.wscomercioinventariounidadmedidaproducto_index, {
             search: search, orderBy: 'asc', esPaginado: 0,
+            isventa: props.isventa,
         } ) . then( (result) => {
             resultData( result );
             console.log(result)
@@ -180,10 +181,12 @@ function C_ListadoUnidadMedidaProducto( props ) {
 C_ListadoUnidadMedidaProducto.propTypes = {
     value:  PropTypes.any,
     onChecked: PropTypes.func,
+    isventa: PropTypes.string,
 }
 
 C_ListadoUnidadMedidaProducto.defaultProps = {
     value: null,
+    isventa: 'T',
 }
 
 export default C_ListadoUnidadMedidaProducto;

@@ -149,6 +149,8 @@ const moduleVenta = {
     listaprecio_onShow:       '[Lista Precio] on Show',
     listaprecio_onFocus:      '[Lista Precio] On Focus',
     listaprecio_offFocus:     '[Lista Precio] Off Focus',
+    listaprecio_allProducto:  '[Lista Precio] All Productos',
+    listaprecio_quitarProducto: '[Lista Precio] Quitar Productos',
 
     clientetipo_setLimpiar:   '[Cliente Tipo] Set Limpiar',
     clientetipo_setLoad:      '[Cliente Tipo] Set Load',
@@ -238,6 +240,17 @@ const moduleVenta = {
     notaventa_onFocus:      '[Nota Venta] On Focus',
     notaventa_offFocus:     '[Nota Venta] Off Focus',
 
+    devolucionnotaventa_setLimpiar:   '[Devolucion Nota Venta] Set Limpiar',
+    devolucionnotaventa_setLoad:      '[Devolucion Nota Venta] Set Load',
+    devolucionnotaventa_onChange:     '[Devolucion Nota Venta] On Change',
+    devolucionnotaventa_setImprimir:  '[Devolucion Nota Venta] Set Imprimir',
+    devolucionnotaventa_setState:     '[Devolucion Nota Venta] Set Devolucion Nota Venta',
+    devolucionnotaventa_onCreate:     '[Devolucion Nota Venta] on Create',
+    devolucionnotaventa_onEditar:     '[Devolucion Nota Venta] on Editar',
+    devolucionnotaventa_onShow:       '[Devolucion Nota Venta] on Show',
+    devolucionnotaventa_onFocus:      '[Devolucion Nota Venta] On Focus',
+    devolucionnotaventa_offFocus:     '[Devolucion Nota Venta] Off Focus',
+
     producto_setLimpiar:   '[Producto] Set Limpiar',
     producto_setLoad:      '[Producto] Set Load',
     producto_onChange:     '[Producto] On Change',
@@ -248,6 +261,8 @@ const moduleVenta = {
     producto_onShow:       '[Producto] on Show',
     producto_onFocus:      '[Producto] On Focus',
     producto_offFocus:     '[Producto] Off Focus',
+    producto_updateListaPrecio: '[Producto] Update Lista Precio',
+    producto_updateSucursalAlmacen: '[Producto] Update Sucursal Almacen',
 
 };
 

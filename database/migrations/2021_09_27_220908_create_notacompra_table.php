@@ -22,6 +22,7 @@ class CreateNotacompraTable extends Migration
             $table->integer('fkidconceptocompra')->unsigned();
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidmoneda')->unsigned();
+            $table->integer('fkidtipotransaccion')->unsigned();
 
             $table->string('nrorefprov', 150)->nullable();
             $table->string('codigo', 150)->nullable();

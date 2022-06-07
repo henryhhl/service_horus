@@ -24,7 +24,7 @@ class CreateDevolucioncompraTable extends Migration
             $table->integer('fkidmoneda')->unsigned();
 
             $table->string('codigo', 150)->nullable();
-            $table->string('nrofactura', 150)->nullable();
+            $table->text('nrofactura')->nullable();
 
             $table->decimal('tipocambio', 24, 8)->default(0);
             $table->enum('tipocompra', ['L', 'E'])->default('L');

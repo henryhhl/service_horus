@@ -30,20 +30,28 @@ class Sucursal extends Model
         'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
+    public function arrayalmacen() {
+        return $this->hasMany(
+            'App\Models\Comercio\Inventario\Almacen',
+            'fkidsucursal',
+            'idsucursal'
+        );
+    }
+
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;
-        $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
+        $orderBy = isset($request->orderBy) ? $request->orderBy : 'ASC';
         $column  = 'sucursal.idsucursal';
 
-        if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
+        if ( strtoupper( $orderBy ) != 'DESC' ) $orderBy = 'ASC';
 
         $islike =  Functions::isLikeAndIlike();
 
         $sucursal = $query
             ->select( [
                 'sucursal.idsucursal', 'sucursal.codigo', 'sucursal.descripcion', 'sucursal.direccion',
-                'sucursal.fkidciudad', 'ciu.descripcion as ciudad',
+                'sucursal.fkidciudad', 'ciu.descripcion as ciudad', 'sucursal.descripcion as sucursal',
                 'sucursal.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
                 'sucursal.fkidunionsucursal', 'unionsuc.descripcion as unionsucursal',
                 'sucursal.abreviatura', 'sucursal.imagen', 'sucursal.extension',
@@ -65,6 +73,15 @@ class Sucursal extends Model
                 }
                 return;
             } )
+            ->with( [ 'arrayalmacen' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacen.idalmacen', 'almacen.codigo', 'almacen.descripcion', 'almacen.descripcion as almacen', 'almacen.abreviatura', 'almacen.direccion', 'almacen.imagen',
+                        'almacen.extension', 'almacen.isdelete', 'almacen.estado', 'almacen.fecha', 'almacen.hora', 'almacen.fkidsucursal', 
+                    ] )
+                    ->whereNull( 'almacen.deleted_at' )
+                    ->orderBy('almacen.idalmacen', 'ASC');
+            } ] )
             ->whereNull( 'sucursal.deleted_at' )
             ->orderBy( $column , $orderBy)
             ->get();
@@ -110,6 +127,15 @@ class Sucursal extends Model
                 }
                 return;
             } )
+            ->with( [ 'arrayalmacen' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacen.idalmacen', 'almacen.codigo', 'almacen.descripcion', 'almacen.abreviatura', 'almacen.direccion', 'almacen.imagen',
+                        'almacen.extension', 'almacen.isdelete', 'almacen.estado', 'almacen.fecha', 'almacen.hora', 'almacen.fkidsucursal', 
+                    ] )
+                    ->whereNull(  'almacen.deleted_at' )
+                    ->orderBy('almacen.idalmacen', 'ASC');
+            } ] )
             ->whereNull( 'sucursal.deleted_at' )
             ->orderBy( $column, $orderBy )
             ->paginate($paginate);

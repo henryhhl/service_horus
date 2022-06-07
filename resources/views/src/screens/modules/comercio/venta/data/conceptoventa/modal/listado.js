@@ -18,7 +18,7 @@ function M_ListadoConceptoVenta( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -39,7 +39,7 @@ M_ListadoConceptoVenta.propTypes = {
 
     value: PropTypes.any,
 
-    width:  PropTypes.number,
+    width:  PropTypes.any,
     zIndex: PropTypes.number,
 
     title:    PropTypes.string,
@@ -55,7 +55,7 @@ M_ListadoConceptoVenta.defaultProps = {
 
     value: null,
 
-    width: 400,
+    width: 500,
     zIndex: 1200,
 
     title: "CONCEPTO VENTA",

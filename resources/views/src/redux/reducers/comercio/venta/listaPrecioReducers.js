@@ -121,6 +121,16 @@ export const ListaPrecioReducer = ( state = initialState, action = { payload, ty
                 reporte: action.payload,
             };
 
+        case Strings.listaprecio_allProducto:
+            state.listapreciodetalle = loadAllProducts( action.payload, state );
+            state = Object.assign( {}, state );
+            return state;
+
+        case Strings.listaprecio_quitarProducto:
+            state.listapreciodetalle = loadDetalle();
+            state = Object.assign( {}, state );
+            return state;
+
         case Strings.listaprecio_onFocus:
             state.focusInput = true;
             state = Object.assign( {}, state );
@@ -157,15 +167,14 @@ function onSetData( state, payload ) {
     state.estado = payload.estado;
 
     let array = [];
-    for ( let index = 0; index < payload.listapreciodetalle.length; index++ ) {
-        const detalle = payload.listapreciodetalle[index];
+    for ( let index = 0; index < payload.arraylistapreciodetalle.length; index++ ) {
+        const detalle = payload.arraylistapreciodetalle[index];
         const element = {
             key: index,
             idlistapreciodetalle: detalle.idlistapreciodetalle,
             codigo: detalle.codigo,
             producto: detalle.producto,
             fkidproducto: detalle.fkidproducto,
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
             fkidlistaprecio: detalle.fkidlistaprecio,
             fkidmoneda: detalle.fkidmoneda,
             preciobase: parseFloat(detalle.preciobase).toFixed(2),
@@ -197,7 +206,6 @@ function loadDetalle( ) {
             codigo: "",
             producto: "",
             fkidproducto: null,
-            fkidunidadmedidaproducto: null,
             fkidlistaprecio: null,
             fkidmoneda: null,
             preciobase: "",
@@ -211,3 +219,39 @@ function loadDetalle( ) {
     }
     return array;
 };
+
+function loadAllProducts( array_producto = [], state ) {
+    let array = [];
+    for ( let index = 0; index < array_producto.length; index++ ) {
+        const detalle = array_producto[index];
+        let descuento = state.valor;
+        let montoPorcentaje = Functions.getMontoPorcentaje( detalle.costo, descuento );
+        let precioventa = parseFloat( detalle.costo );
+        if ( state.accion == 'I' ) {
+            precioventa = precioventa + montoPorcentaje;
+        }
+        if ( state.accion == 'D' ) {
+            precioventa = precioventa - montoPorcentaje;
+        }
+        const element = {
+            key: index,
+            idlistapreciodetalle: null,
+            codigo: detalle.codigo,
+            producto: detalle.producto,
+            fkidproducto: detalle.idproducto,
+            fkidlistaprecio: null,
+            fkidmoneda: null,
+            preciobase: parseFloat(detalle.costo).toFixed(2),
+            preciopivote: parseFloat(detalle.costo).toFixed(2),
+            descuento: descuento,
+            montodescuento: montoPorcentaje.toFixed(2),
+            precioventa: precioventa.toFixed(2),
+            nota: "",
+        };
+        array = [ ...array, element];
+    }
+    if ( array.length === 0 ) {
+        return loadDetalle();
+    }
+    return array;
+}

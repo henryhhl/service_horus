@@ -40,7 +40,7 @@ class ClienteRequest extends FormRequest
 
             'nombre'      => 'required|max:150',
             'apellido'    => 'required|max:250',
-            'razonsocial' => 'required|max:300',
+            'razonsocial' => 'nullable|max:300',
 
             'diascredito' => 'required|numeric',
             'limitecredito' => 'required|numeric',
@@ -80,7 +80,6 @@ class ClienteRequest extends FormRequest
             'apellido.required' => 'Campo :attribute es obligatorio.',
             'apellido.max'      => 'Campo :attribute permite máximo de 250 caracteres.',
 
-            'razonsocial.required' => 'Campo :attribute es obligatorio.',
             'razonsocial.max'      => 'Campo :attribute permite máximo de 300 caracteres.',
 
             'diascredito.required' => 'Campo :attribute es obligatorio.',

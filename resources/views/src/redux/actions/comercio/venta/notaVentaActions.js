@@ -262,48 +262,48 @@ function onValidate( notaventa ) {
     if ( notaventa.codigo?.toString().length > 150 ) {
         notaventa.error.codigo   = true;
         notaventa.message.codigo = "Se permite máximo 150 caracteres";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidsucursal != "number" ) {
         notaventa.error.fkidsucursal   = true;
         notaventa.message.fkidsucursal = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidalmacen != "number" ) {
         notaventa.error.fkidalmacen   = true;
         notaventa.message.fkidalmacen = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidvendedor != "number" ) {
         notaventa.error.fkidvendedor   = true;
         notaventa.message.fkidvendedor = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidcliente != "number" ) {
         notaventa.error.fkidcliente   = true;
         notaventa.message.fkidcliente = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidlistaprecio != "number" ) {
         notaventa.error.fkidlistaprecio   = true;
         notaventa.message.fkidlistaprecio = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidconceptoventa != "number" ) {
         notaventa.error.fkidconceptoventa   = true;
         notaventa.message.fkidconceptoventa = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.fkidmoneda != "number" ) {
         notaventa.error.fkidmoneda   = true;
         notaventa.message.fkidmoneda = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
 
     if ( typeof notaventa.nrodebito != "number" ) {
         notaventa.error.nrodebito   = true;
         notaventa.message.nrodebito = "Campo requerido";
-        bandera = false;
+        bandera = false
     }
     if ( typeof notaventa.nroventa != "number" ) {
         notaventa.error.nroventa   = true;
@@ -315,76 +315,99 @@ function onValidate( notaventa ) {
         notaventa.message.nrocotizacion = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.tipocambio != "number" ) {
+    if ( typeof parseFloat(notaventa.tipocambio) != "number" ) {
         notaventa.error.tipocambio   = true;
         notaventa.message.tipocambio = "Campo requerido";
         bandera = false;
     }
 
-    if ( typeof notaventa.impuestoiva != "number" ) {
+    if ( typeof parseFloat(notaventa.impuestoiva) != "number" ) {
         notaventa.error.impuestoiva   = true;
         notaventa.message.impuestoiva = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montototalcobrado != "number" ) {
+    if ( typeof parseFloat(notaventa.montototalcobrado) != "number" ) {
         notaventa.error.montototalcobrado   = true;
         notaventa.message.montototalcobrado = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montototaldeudamora != "number" ) {
+    if ( typeof parseFloat(notaventa.montototaldeudamora) != "number" ) {
         notaventa.error.montototaldeudamora   = true;
         notaventa.message.montototaldeudamora = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montototaldeudaactual != "number" ) {
+    if ( typeof parseFloat(notaventa.montototaldeudaactual) != "number" ) {
         notaventa.error.montototaldeudaactual   = true;
         notaventa.message.montototaldeudaactual = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.descuentoacumulado != "number" ) {
+    if ( typeof parseFloat(notaventa.descuentoacumulado) != "number" ) {
         notaventa.error.descuentoacumulado   = true;
         notaventa.message.descuentoacumulado = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.porcentajerangodescuentoinicial != "number" ) {
+    if ( typeof parseFloat(notaventa.porcentajerangodescuentoinicial) != "number" ) {
         notaventa.error.porcentajerangodescuentoinicial   = true;
         notaventa.message.porcentajerangodescuentoinicial = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.porcentajerangodescuentofinal != "number" ) {
+    if ( typeof parseFloat(notaventa.porcentajerangodescuentofinal) != "number" ) {
         notaventa.error.porcentajerangodescuentofinal   = true;
         notaventa.message.porcentajerangodescuentofinal = "Campo requerido";
         bandera = false;
     }
 
-    if ( typeof notaventa.montosubtotal != "number" ) {
+    if ( typeof parseFloat(notaventa.montosubtotal) != "number" ) {
         notaventa.error.montosubtotal   = true;
         notaventa.message.montosubtotal = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.descuento != "number" ) {
+    if ( typeof parseFloat(notaventa.descuento) != "number" ) {
         notaventa.error.descuento   = true;
         notaventa.message.descuento = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montodescuento != "number" ) {
+    if ( typeof parseFloat(notaventa.montodescuento) != "number" ) {
         notaventa.error.montodescuento   = true;
         notaventa.message.montodescuento = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montototal != "number" ) {
+    if ( typeof parseFloat(notaventa.montototal) != "number" ) {
         notaventa.error.montototal   = true;
         notaventa.message.montototal = "Campo requerido";
         bandera = false;
     }
-    if ( typeof notaventa.montoanticipo != "number" ) {
+    if ( typeof parseFloat(notaventa.montoanticipo) != "number" ) {
         notaventa.error.montoanticipo   = true;
         notaventa.message.montoanticipo = "Campo requerido";
         bandera = false;
     }
 
+    let contador = 0;
+    for (let index = 0; index < notaventa.notaventadetalle.length; index++) {
+        const element = notaventa.notaventadetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+            if ( parseInt(element.preciounitario) <= 0 ) {
+                element.errorpreciounitario = true;
+                C_Message( "warning", `El precio de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === notaventa.notaventadetalle.length ) {
+        C_Message( "warning", `Requerido ingresar al menos un producto.` );
+        bandera = false;
+    }
+
     if ( !bandera ) {
-        C_Message( "error", "Problemas al registrar" );
+        C_Message( "error", "Conflictos. Favor de llenar datos requeridos." );
     }
     return bandera;
 };

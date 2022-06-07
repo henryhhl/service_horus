@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 
 import { C_ModalDraggable } from '../../../../../components';
 
-import IndexNotaVenta from './notaventa'
+import IndexNotaVenta from './notaventa';
+import IndexDevolucionNotaVenta from './devolucionnotaventa';
 
 function ModalVentaNota( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -20,9 +21,23 @@ function ModalVentaNota( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="NOTA VENTA"
-                        width={"95%"} style={{ top: 10, }}
+                        width={"98%"} style={{ top: 10, }}
                     >
                         <IndexNotaVenta
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "devolucionnotaventa":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="DEVOLUCIÓN NOTA VENTA"
+                        width={"98%"} style={{ top: 10, }}
+                    >
+                        <IndexDevolucionNotaVenta
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>

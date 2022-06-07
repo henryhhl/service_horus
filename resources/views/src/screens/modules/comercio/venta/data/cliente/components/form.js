@@ -401,7 +401,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={ "Razon social*"}
+                        label={ "Razon social"}
                         placeholder={ "INGRESAR RAZON SOCIAL..." }
                         value={ cliente.razonsocial }
                         onChange={ onChangeRazonSocial }

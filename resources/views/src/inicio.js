@@ -146,7 +146,7 @@ const Inicio = ( props ) => {
 
     return (
         <>
-            <div className="main-card mb-3 card">
+            <div className="main-card mb-3 card p-0">
                 <div className="card-header pr-3 pl-3">
                     <div className="row no-gutters align-items-center w-100">
                         HORUS S.R.L

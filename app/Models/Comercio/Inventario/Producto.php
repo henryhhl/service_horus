@@ -21,17 +21,20 @@ class Producto extends Model
 
     protected $attributes = [
         'estado' => 'A', 'isdelete' => 'A', 'codigo' => null, 'descripcion' => null,
-        'stockactual' => 0, 'nivel' => 0,
+        'stockactual' => 0, 'nivel' => 0, 'isventa' => 'A',
+        'valorequivalente' => 0, 'peso' => 0, 'volumen' => 0, 'costocif' => 0, 'costofob' => 0,
+        'costobase' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0, 'costounitario' => 0,
         'imagen' => null, 'extension' => null, 'abreviatura' => null,
     ];
 
     protected $fillable = [
-        'fkidciudadorigen', 'fkidcategoria', 'fkidproductomarca', 'fkidproductotipo', 'fkidproductogrupo', 'fkidproductosubgrupo',
-        'codigo', 'nombre', 'descripcion', 'stockactual', 'nivel', 'abreviatura',
-        'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
+        'fkidciudadorigen', 'fkidcategoria', 'fkidproductomarca', 'fkidproductotipo', 'fkidproductogrupo', 'fkidproductosubgrupo', 'fkidunidadmedida',
+        'codigo', 'nombre', 'descripcion', 'stockactual', 'nivel', 'abreviatura', 'costocif', 'costofob',
+        'valorequivalente', 'peso', 'volumen', 'costobase', 'costodescuento', 'costomontodescuento', 'costounitario',
+        'imagen', 'extension', 'isventa', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
-    public function unidadmedidaproducto() {
+    public function arrayunidadmedidaproducto() {
         return $this->hasMany(
             'App\Models\Comercio\Inventario\UnidadMedidaProducto',
             'fkidproducto',
@@ -39,9 +42,25 @@ class Producto extends Model
         );
     }
 
-    public function proveedorproducto() {
+    public function arrayproveedorproducto() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\ProveedorProducto',
+            'fkidproducto',
+            'idproducto'
+        );
+    }
+
+    public function arraylistapreciodetalle() {
+        return $this->hasMany(
+            'App\Models\Comercio\Venta\ListaPrecioDetalle',
+            'fkidproducto',
+            'idproducto'
+        );
+    }
+
+    public function arrayalmacenproductodetalle() {
+        return $this->hasMany(
+            'App\Models\Comercio\Inventario\AlmacenProductoDetalle',
             'fkidproducto',
             'idproducto'
         );
@@ -51,9 +70,12 @@ class Producto extends Model
     {
         $search  = isset($request->search)  ? $request->search  : null;
         $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
+        $isventa = isset($request->isventa) ? $request->isventa : 'T';
         $column  = 'producto.idproducto';
 
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
+        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) $isventa = 'T';
+        else $isventa = strtoupper( $isventa );
 
         $islike =  Functions::isLikeAndIlike();
 
@@ -64,16 +86,20 @@ class Producto extends Model
             ->leftJoin('productotipo as prodtipo', 'producto.fkidproductotipo', '=', 'prodtipo.idproductotipo')
             ->leftJoin('productogrupo as prodgrupo', 'producto.fkidproductogrupo', '=', 'prodgrupo.idproductogrupo')
             ->leftJoin('productosubgrupo as prodsubgrupo', 'producto.fkidproductosubgrupo', '=', 'prodsubgrupo.idproductosubgrupo')
+            ->leftJoin('unidadmedida as undmed', 'producto.fkidunidadmedida', '=', 'undmed.idunidadmedida')
             ->select( [
                 'producto.idproducto', 'producto.codigo', 'producto.nombre', 'producto.descripcion', 'producto.abreviatura',
                 'producto.stockactual', 'producto.nivel', 'producto.imagen',  'producto.extension',
+                'producto.valorequivalente', 'producto.peso', 'producto.volumen', 'producto.costobase',
+                'producto.costodescuento', 'producto.costomontodescuento', 'producto.costounitario',
                 'producto.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                 'producto.fkidcategoria', 'cat.descripcion as categoria',
                 'producto.fkidproductomarca', 'prodmarc.descripcion as productomarca',
                 'producto.fkidproductotipo', 'prodtipo.descripcion as productotipo',
                 'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
                 'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
-                'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
+                'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
@@ -90,19 +116,8 @@ class Producto extends Model
                 }
                 return;
             } )
-            ->with( [ 'unidadmedidaproducto' => function( $query ) {
-                $query
-                    ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->select( [
-                        'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
-                        'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
-                        'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
-                    ] )
-                    ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
-            } ] )
-            ->with( [ 'proveedorproducto' => function( $query ) {
+            ->where( ( $isventa == 'T' ) ? [] : [[ 'producto.isventa', '=', $isventa ]] )
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
                 $query
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
@@ -111,6 +126,33 @@ class Producto extends Model
                         'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
+                $query
+                    ->leftJoin('listaprecio as listprec', 'listapreciodetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->select( [
+                        'listprec.descripcion as listaprecio', 'listprec.abreviatura', 'listprec.codigo', 'listprec.accion', 'listprec.valor',
+                        'listapreciodetalle.idlistapreciodetalle','listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase','listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento','listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                    ] )
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
+            } ] )
+            ->with( [ 'arrayalmacenproductodetalle' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacenproductodetalle.idalmacenproductodetalle', 'almacenproductodetalle.fkidproducto', 'almacenproductodetalle.fkidalmacen',
+                        'almacenproductodetalle.stockactual', 'almacenproductodetalle.stockminimo', 'almacenproductodetalle.stockmaximo',
+                        'almacenproductodetalle.ingresos', 'almacenproductodetalle.salidas', 'almacenproductodetalle.traspasos',
+                        'almacenproductodetalle.ventas', 'almacenproductodetalle.compras', 'almacenproductodetalle.fecha', 'almacenproductodetalle.hora',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.direccion',
+                        'suc.idsucursal', 'suc.descripcion as sucursal',
+                    ] )
+                    ->leftJoin('almacen as alm', 'almacenproductodetalle.fkidalmacen', 'alm.idalmacen')
+                    ->leftJoin('sucursal as suc', 'alm.fkidsucursal', 'suc.idsucursal')
+                    ->orderBy('suc.idsucursal', 'ASC')
+                    ->orderBy('alm.idalmacen', 'ASC');
             } ] )
             ->whereNull( 'producto.deleted_at' )
             ->orderBy( $column , $orderBy)
@@ -139,16 +181,20 @@ class Producto extends Model
             ->leftJoin('productotipo as prodtipo', 'producto.fkidproductotipo', '=', 'prodtipo.idproductotipo')
             ->leftJoin('productogrupo as prodgrupo', 'producto.fkidproductogrupo', '=', 'prodgrupo.idproductogrupo')
             ->leftJoin('productosubgrupo as prodsubgrupo', 'producto.fkidproductosubgrupo', '=', 'prodsubgrupo.idproductosubgrupo')
+            ->leftJoin('unidadmedida as undmed', 'producto.fkidunidadmedida', '=', 'undmed.idunidadmedida')
             ->select( [
                 'producto.idproducto', 'producto.codigo', 'producto.nombre', 'producto.descripcion', 'producto.abreviatura',
                 'producto.stockactual', 'producto.nivel', 'producto.imagen',  'producto.extension',
+                'producto.valorequivalente', 'producto.peso', 'producto.volumen', 'producto.costobase',
+                'producto.costodescuento', 'producto.costomontodescuento', 'producto.costounitario',
                 'producto.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                 'producto.fkidcategoria', 'cat.descripcion as categoria',
                 'producto.fkidproductomarca', 'prodmarc.descripcion as productomarca',
                 'producto.fkidproductotipo', 'prodtipo.descripcion as productotipo',
                 'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
                 'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
-                'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
+                'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
@@ -165,19 +211,7 @@ class Producto extends Model
                 }
                 return;
             } )
-            ->with( [ 'unidadmedidaproducto' => function( $query ) {
-                $query
-                    ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->select( [
-                        'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
-                        'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
-                        'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
-                    ] )
-                    ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
-            } ] )
-            ->with( [ 'proveedorproducto' => function( $query ) {
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
                 $query
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
@@ -186,6 +220,33 @@ class Producto extends Model
                         'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
+                $query
+                    ->leftJoin('listaprecio as listprec', 'listapreciodetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->select( [
+                        'listprec.descripcion as listaprecio', 'listprec.abreviatura', 'listprec.codigo', 'listprec.accion', 'listprec.valor',
+                        'listapreciodetalle.idlistapreciodetalle','listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase','listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento','listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                    ] )
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
+            } ] )
+            ->with( [ 'arrayalmacenproductodetalle' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacenproductodetalle.idalmacenproductodetalle', 'almacenproductodetalle.fkidproducto', 'almacenproductodetalle.fkidalmacen',
+                        'almacenproductodetalle.stockactual', 'almacenproductodetalle.stockminimo', 'almacenproductodetalle.stockmaximo',
+                        'almacenproductodetalle.ingresos', 'almacenproductodetalle.salidas', 'almacenproductodetalle.traspasos',
+                        'almacenproductodetalle.ventas', 'almacenproductodetalle.compras', 'almacenproductodetalle.fecha', 'almacenproductodetalle.hora',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.direccion',
+                        'suc.idsucursal', 'suc.descripcion as sucursal',
+                    ] )
+                    ->leftJoin('almacen as alm', 'almacenproductodetalle.fkidalmacen', 'alm.idalmacen')
+                    ->leftJoin('sucursal as suc', 'alm.fkidsucursal', 'suc.idsucursal')
+                    ->orderBy('suc.idsucursal', 'ASC')
+                    ->orderBy('alm.idalmacen', 'ASC');
             } ] )
             ->whereNull( 'producto.deleted_at' )
             ->orderBy( $column, $orderBy )
@@ -214,7 +275,17 @@ class Producto extends Model
         $imagen      = isset( $request->imagen ) ? $request->imagen : null;
         $extension   = isset( $request->extension ) ? $request->extension : null;
         $abreviatura = isset( $request->abreviatura ) ? $request->abreviatura : null;
-        $estado      = isset( $request->estado ) ? $request->estado : null;
+        $estado      = isset( $request->estado ) ? $request->estado : 'A';
+        $isventa     = isset( $request->isventa ) ? $request->isventa : 'A';
+
+        $valorequivalente = isset( $request->valorequivalente ) ? $request->valorequivalente : 0;
+
+        $peso    = isset( $request->peso ) ? $request->peso : 0;
+        $volumen = isset( $request->volumen ) ? $request->volumen : 0;
+        $costobase = isset( $request->costobase ) ? $request->costobase : 0;
+        $costodescuento = isset( $request->costodescuento ) ? $request->costodescuento : 0;
+        $costomontodescuento = isset( $request->costomontodescuento ) ? $request->costomontodescuento : 0;
+        $costounitario = isset( $request->costounitario ) ? $request->costounitario : 0;
 
         $fkidciudadorigen     = isset( $request->fkidciudadorigen ) ? $request->fkidciudadorigen : null;
         $fkidcategoria        = isset( $request->fkidcategoria ) ? $request->fkidcategoria : null;
@@ -222,6 +293,7 @@ class Producto extends Model
         $fkidproductotipo     = isset( $request->fkidproductotipo ) ? $request->fkidproductotipo : null;
         $fkidproductogrupo    = isset( $request->fkidproductogrupo ) ? $request->fkidproductogrupo : null;
         $fkidproductosubgrupo = isset( $request->fkidproductosubgrupo ) ? $request->fkidproductosubgrupo : null;
+        $fkidunidadmedida     = isset( $request->fkidunidadmedida ) ? $request->fkidunidadmedida : null;
 
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
@@ -236,11 +308,20 @@ class Producto extends Model
             'extension'   => $extension,
             'abreviatura' => $abreviatura,
             'estado'      => $estado,
+            'isventa'     => $isventa,
+            'valorequivalente' => $valorequivalente,
+            'peso'    => $peso,
+            'volumen' => $volumen,
+            'costobase' => $costobase,
+            'costodescuento' => $costodescuento,
+            'costomontodescuento' => $costomontodescuento,
+            'costounitario' => $costounitario,
             'fkidciudadorigen'  => $fkidciudadorigen,
             'fkidcategoria'     => $fkidcategoria,
             'fkidproductomarca' => $fkidproductomarca,
             'fkidproductotipo'  => $fkidproductotipo,
             'fkidproductogrupo' => $fkidproductogrupo,
+            'fkidunidadmedida'  => $fkidunidadmedida,
             'fkidproductosubgrupo' => $fkidproductosubgrupo,
             'fecha' => $fecha,
             'hora'  => $hora,
@@ -260,7 +341,17 @@ class Producto extends Model
         $imagen      = isset( $request->imagen ) ? $request->imagen : null;
         $extension   = isset( $request->extension ) ? $request->extension : null;
         $abreviatura = isset( $request->abreviatura ) ? $request->abreviatura : null;
-        $estado      = isset( $request->estado ) ? $request->estado : null;
+        $estado      = isset( $request->estado ) ? $request->estado : 'A';
+        $isventa     = isset( $request->isventa ) ? $request->isventa : 'A';
+
+        $valorequivalente = isset( $request->valorequivalente ) ? $request->valorequivalente : 0;
+
+        $peso    = isset( $request->peso ) ? $request->peso : 0;
+        $volumen = isset( $request->volumen ) ? $request->volumen : 0;
+        $costobase = isset( $request->costobase ) ? $request->costobase : 0;
+        $costodescuento = isset( $request->costodescuento ) ? $request->costodescuento : 0;
+        $costomontodescuento = isset( $request->costomontodescuento ) ? $request->costomontodescuento : 0;
+        $costounitario = isset( $request->costounitario ) ? $request->costounitario : 0;
 
         $fkidciudadorigen     = isset( $request->fkidciudadorigen ) ? $request->fkidciudadorigen : null;
         $fkidcategoria        = isset( $request->fkidcategoria ) ? $request->fkidcategoria : null;
@@ -268,6 +359,7 @@ class Producto extends Model
         $fkidproductotipo     = isset( $request->fkidproductotipo ) ? $request->fkidproductotipo : null;
         $fkidproductogrupo    = isset( $request->fkidproductogrupo ) ? $request->fkidproductogrupo : null;
         $fkidproductosubgrupo = isset( $request->fkidproductosubgrupo ) ? $request->fkidproductosubgrupo : null;
+        $fkidunidadmedida     = isset( $request->fkidunidadmedida ) ? $request->fkidunidadmedida : null;
 
         $producto = $query->where( 'idproducto', '=', $idproducto )
             ->update( [
@@ -280,11 +372,20 @@ class Producto extends Model
                 'extension'   => $extension,
                 'abreviatura' => $abreviatura,
                 'estado'      => $estado,
+                'isventa'     => $isventa,
+                'valorequivalente' => $valorequivalente,
+                'peso'    => $peso,
+                'volumen' => $volumen,
+                'costobase' => $costobase,
+                'costodescuento' => $costodescuento,
+                'costomontodescuento' => $costomontodescuento,
+                'costounitario' => $costounitario,
                 'fkidciudadorigen'  => $fkidciudadorigen,
                 'fkidcategoria'     => $fkidcategoria,
                 'fkidproductomarca' => $fkidproductomarca,
                 'fkidproductotipo'  => $fkidproductotipo,
                 'fkidproductogrupo' => $fkidproductogrupo,
+                'fkidunidadmedida'  => $fkidunidadmedida,
                 'fkidproductosubgrupo' => $fkidproductosubgrupo,
             ] );
 
@@ -300,31 +401,23 @@ class Producto extends Model
             ->leftJoin('productotipo as prodtipo', 'producto.fkidproductotipo', '=', 'prodtipo.idproductotipo')
             ->leftJoin('productogrupo as prodgrupo', 'producto.fkidproductogrupo', '=', 'prodgrupo.idproductogrupo')
             ->leftJoin('productosubgrupo as prodsubgrupo', 'producto.fkidproductosubgrupo', '=', 'prodsubgrupo.idproductosubgrupo')
+            ->leftJoin('unidadmedida as undmed', 'producto.fkidunidadmedida', '=', 'undmed.idunidadmedida')
             ->select( [
                 'producto.idproducto', 'producto.codigo', 'producto.nombre', 'producto.descripcion', 'producto.abreviatura',
                 'producto.stockactual', 'producto.nivel', 'producto.imagen',  'producto.extension',
+                'producto.valorequivalente', 'producto.peso', 'producto.volumen', 'producto.costobase',
+                'producto.costodescuento', 'producto.costomontodescuento', 'producto.costounitario',
                 'producto.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                 'producto.fkidcategoria', 'cat.descripcion as categoria',
                 'producto.fkidproductomarca', 'prodmarc.descripcion as productomarca',
                 'producto.fkidproductotipo', 'prodtipo.descripcion as productotipo',
                 'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
                 'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
-                'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
+                'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
             ] )
             ->where( 'producto.idproducto', '=', $idproducto )
-            ->with( [ 'unidadmedidaproducto' => function( $query ) {
-                $query
-                    ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->select( [
-                        'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
-                        'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
-                        'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
-                    ] )
-                    ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
-            } ] )
-            ->with( [ 'proveedorproducto' => function( $query ) {
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
                 $query
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
@@ -333,6 +426,33 @@ class Producto extends Model
                         'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
+                $query
+                    ->leftJoin('listaprecio as listprec', 'listapreciodetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->select( [
+                        'listprec.descripcion as listaprecio', 'listprec.abreviatura', 'listprec.codigo', 'listprec.accion', 'listprec.valor',
+                        'listapreciodetalle.idlistapreciodetalle','listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase','listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento','listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                    ] )
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
+            } ] )
+            ->with( [ 'arrayalmacenproductodetalle' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacenproductodetalle.idalmacenproductodetalle', 'almacenproductodetalle.fkidproducto', 'almacenproductodetalle.fkidalmacen',
+                        'almacenproductodetalle.stockactual', 'almacenproductodetalle.stockminimo', 'almacenproductodetalle.stockmaximo',
+                        'almacenproductodetalle.ingresos', 'almacenproductodetalle.salidas', 'almacenproductodetalle.traspasos',
+                        'almacenproductodetalle.ventas', 'almacenproductodetalle.compras', 'almacenproductodetalle.fecha', 'almacenproductodetalle.hora',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.direccion',
+                        'suc.idsucursal', 'suc.descripcion as sucursal',
+                    ] )
+                    ->leftJoin('almacen as alm', 'almacenproductodetalle.fkidalmacen', 'alm.idalmacen')
+                    ->leftJoin('sucursal as suc', 'alm.fkidsucursal', 'suc.idsucursal')
+                    ->orderBy('suc.idsucursal', 'ASC')
+                    ->orderBy('alm.idalmacen', 'ASC');
             } ] )
             ->whereNull('producto.deleted_at')
             ->orderBy('producto.idproducto', 'DESC')
@@ -367,31 +487,23 @@ class Producto extends Model
             ->leftJoin('productotipo as prodtipo', 'producto.fkidproductotipo', '=', 'prodtipo.idproductotipo')
             ->leftJoin('productogrupo as prodgrupo', 'producto.fkidproductogrupo', '=', 'prodgrupo.idproductogrupo')
             ->leftJoin('productosubgrupo as prodsubgrupo', 'producto.fkidproductosubgrupo', '=', 'prodsubgrupo.idproductosubgrupo')
+            ->leftJoin('unidadmedida as undmed', 'producto.fkidunidadmedida', '=', 'undmed.idunidadmedida')
             ->select( [
                 'producto.idproducto', 'producto.codigo', 'producto.nombre', 'producto.descripcion', 'producto.abreviatura',
                 'producto.stockactual', 'producto.nivel', 'producto.imagen',  'producto.extension',
+                'producto.valorequivalente', 'producto.peso', 'producto.volumen', 'producto.costobase',
+                'producto.costodescuento', 'producto.costomontodescuento', 'producto.costounitario',
                 'producto.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
                 'producto.fkidcategoria', 'cat.descripcion as categoria',
                 'producto.fkidproductomarca', 'prodmarc.descripcion as productomarca',
                 'producto.fkidproductotipo', 'prodtipo.descripcion as productotipo',
                 'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
                 'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
-                'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
+                'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
             ] )
             ->where('producto.idproducto', '=', $idproducto)
-            ->with( [ 'unidadmedidaproducto' => function( $query ) {
-                $query
-                    ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->select( [
-                        'unidmed.descripcion as unidadmedida', 'unidmed.abreviatura', 'unidadmedidaproducto.fkidunidadmedida',
-                        'unidadmedidaproducto.fkidproducto', 'unidadmedidaproducto.peso', 'unidadmedidaproducto.idunidadmedidaproducto',
-                        'unidadmedidaproducto.stock', 'unidadmedidaproducto.costo', 'unidadmedidaproducto.codigo',
-                        'unidadmedidaproducto.volumen', 'unidadmedidaproducto.costounitario', 'unidadmedidaproducto.valorequivalente',
-                        'unidadmedidaproducto.costodescuento', 'unidadmedidaproducto.costomontodescuento',
-                    ] )
-                    ->orderBy('unidadmedidaproducto.idunidadmedidaproducto');
-            } ] )
-            ->with( [ 'proveedorproducto' => function( $query ) {
+            ->with( [ 'arrayproveedorproducto' => function( $query ) {
                 $query
                     ->leftJoin('proveedor as prov', 'proveedorproducto.fkidproveedor', '=', 'prov.idproveedor')
                     ->select( [
@@ -400,6 +512,33 @@ class Producto extends Model
                         'proveedorproducto.costounitario', 'proveedorproducto.stock'
                     ] )
                     ->orderBy('proveedorproducto.idproveedorproducto');
+            } ] )
+            ->with( [ 'arraylistapreciodetalle' => function( $query ) {
+                $query
+                    ->leftJoin('listaprecio as listprec', 'listapreciodetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->select( [
+                        'listprec.descripcion as listaprecio', 'listprec.abreviatura', 'listprec.codigo', 'listprec.accion', 'listprec.valor',
+                        'listapreciodetalle.idlistapreciodetalle','listapreciodetalle.fkidmoneda',
+                        'listapreciodetalle.fkidproducto', 'listapreciodetalle.fkidlistaprecio',
+                        'listapreciodetalle.preciobase','listapreciodetalle.preciopivote', 'listapreciodetalle.precioventa',
+                        'listapreciodetalle.descuento','listapreciodetalle.montodescuento', 'listapreciodetalle.nota',
+                    ] )
+                    ->orderBy('listapreciodetalle.idlistapreciodetalle');
+            } ] )
+            ->with( [ 'arrayalmacenproductodetalle' => function( $query ) {
+                $query
+                    ->select( [
+                        'almacenproductodetalle.idalmacenproductodetalle', 'almacenproductodetalle.fkidproducto', 'almacenproductodetalle.fkidalmacen',
+                        'almacenproductodetalle.stockactual', 'almacenproductodetalle.stockminimo', 'almacenproductodetalle.stockmaximo',
+                        'almacenproductodetalle.ingresos', 'almacenproductodetalle.salidas', 'almacenproductodetalle.traspasos',
+                        'almacenproductodetalle.ventas', 'almacenproductodetalle.compras', 'almacenproductodetalle.fecha', 'almacenproductodetalle.hora',
+                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.direccion',
+                        'suc.idsucursal', 'suc.descripcion as sucursal',
+                    ] )
+                    ->leftJoin('almacen as alm', 'almacenproductodetalle.fkidalmacen', 'alm.idalmacen')
+                    ->leftJoin('sucursal as suc', 'alm.fkidsucursal', 'suc.idsucursal')
+                    ->orderBy('suc.idsucursal', 'ASC')
+                    ->orderBy('alm.idalmacen', 'ASC');
             } ] )
             ->whereNull('producto.deleted_at')
             ->orderBy('producto.idproducto', 'DESC')

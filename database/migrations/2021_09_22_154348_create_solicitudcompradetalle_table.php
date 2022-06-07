@@ -15,14 +15,22 @@ class CreateSolicitudcompradetalleTable extends Migration
     {
         Schema::create('solicitudcompradetalle', function (Blueprint $table) {
             $table->increments('idsolicitudcompradetalle');
+            $table->integer('x_idusuario')->unsigned()->nullable();
+            $table->integer('fkidusers')->unsigned()->nullable();
             
             $table->integer('fkidsolicitudcompra')->unsigned();
-            $table->integer('fkidunidadmedidaproducto')->unsigned();
+            $table->integer('fkidproducto')->unsigned();
+            $table->integer('fkidproveedor')->unsigned();
+
+            $table->integer('fkidsucursal')->unsigned();
+            $table->integer('fkidalmacen')->unsigned();
+            $table->integer('fkidseccioninventario')->unsigned();
 
             $table->integer('stockactual')->default(0);
             $table->integer('cantidadpendiente')->default(0);
             $table->integer('cantidadsolicitada')->default(0);
 
+            $table->decimal('costobase', 24, 8)->default(0);
             $table->decimal('costounitario', 24, 8)->default(0);
             $table->decimal('costosubtotal', 24, 8)->default(0);
 

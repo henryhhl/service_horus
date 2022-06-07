@@ -29,7 +29,7 @@ class CreateClienteTable extends Migration
             $table->string('codigo', 150)->nullable();
             $table->string('nombre', 150);
             $table->string('apellido', 250);
-            $table->string('razonsocial', 300);
+            $table->string('razonsocial', 300)->nullable();
 
             $table->string('nit', 100)->nullable();
             $table->text('email')->nullable();

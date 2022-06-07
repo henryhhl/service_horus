@@ -18,7 +18,7 @@ function M_ListadoListaPrecio( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -55,7 +55,7 @@ M_ListadoListaPrecio.defaultProps = {
 
     value: null,
 
-    width: '70%',
+    width: '80%',
     zIndex: 1200,
 
     title: "LISTA PRECIO",

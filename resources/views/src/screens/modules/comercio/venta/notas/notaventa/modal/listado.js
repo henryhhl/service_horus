@@ -39,7 +39,7 @@ M_ListadoNotaVenta.propTypes = {
 
     value: PropTypes.any,
 
-    width:  PropTypes.number,
+    width:  PropTypes.any,
     zIndex: PropTypes.number,
 
     title:    PropTypes.string,
@@ -55,7 +55,7 @@ M_ListadoNotaVenta.defaultProps = {
 
     value: null,
 
-    width: 450,
+    width: "90%",
     zIndex: 1200,
 
     title: "NOTA VENTA",

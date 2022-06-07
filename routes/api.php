@@ -158,6 +158,8 @@ Route::get($submodulocomercioinventario  . '/producto/searchByID', 'Comercio\Inv
 Route::post($submodulocomercioinventario . '/producto/reporte', 'Comercio\Inventario\ProductoController@reporte');
 
 Route::get($submodulocomercioinventario  . '/unidadmedidaproducto/index', 'Comercio\Inventario\UnidadMedidaProductoController@index');
+Route::get($submodulocomercioinventario  . '/almacenunidadmedidaproducto/index', 'Comercio\Inventario\AlmacenUnidadMedidaProductoController@index');
+Route::get($submodulocomercioinventario  . '/almacenproductodetalle/index', 'Comercio\Inventario\AlmacenProductoDetalleController@index');
 
 Route::get($submodulocomercioinventario  . '/notaingreso/index', 'Comercio\Inventario\NotaIngresoController@index');
 Route::get($submodulocomercioinventario  . '/notaingreso/create', 'Comercio\Inventario\NotaIngresoController@create');
@@ -281,6 +283,16 @@ Route::get($submodulocomercioventa  . '/notaventa/show/{idnotaventa}', 'Comercio
 Route::post($submodulocomercioventa . '/notaventa/delete', 'Comercio\Venta\NotaVentaController@delete');
 Route::get($submodulocomercioventa  . '/notaventa/searchByID', 'Comercio\Venta\NotaVentaController@searchByID');
 Route::post($submodulocomercioventa . '/notaventa/reporte', 'Comercio\Venta\NotaVentaController@reporte');
+
+Route::get($submodulocomercioventa  . '/devolucionnotaventa/index', 'Comercio\Venta\DevolucionNotaVentaController@index');
+Route::get($submodulocomercioventa  . '/devolucionnotaventa/create', 'Comercio\Venta\DevolucionNotaVentaController@create');
+Route::get($submodulocomercioventa  . '/devolucionnotaventa/editar/{iddevolucionnotaventa}', 'Comercio\Venta\DevolucionNotaVentaController@edit');
+Route::post($submodulocomercioventa . '/devolucionnotaventa/store', 'Comercio\Venta\DevolucionNotaVentaController@store');
+Route::post($submodulocomercioventa . '/devolucionnotaventa/update', 'Comercio\Venta\DevolucionNotaVentaController@update');
+Route::get($submodulocomercioventa  . '/devolucionnotaventa/show/{iddevolucionnotaventa}', 'Comercio\Venta\DevolucionNotaVentaController@show');
+Route::post($submodulocomercioventa . '/devolucionnotaventa/delete', 'Comercio\Venta\DevolucionNotaVentaController@delete');
+Route::get($submodulocomercioventa  . '/devolucionnotaventa/searchByID', 'Comercio\Venta\DevolucionNotaVentaController@searchByID');
+Route::post($submodulocomercioventa . '/devolucionnotaventa/reporte', 'Comercio\Venta\DevolucionNotaVentaController@reporte');
 
 
 

@@ -281,11 +281,6 @@ function onValidate( cliente ) {
         bandera = false;
     }
 
-    if ( cliente.razonsocial.toString().trim().length === 0 ) {
-        cliente.error.razonsocial   = true;
-        cliente.message.razonsocial = "Campo requerido";
-        bandera = false;
-    }
     if ( cliente.razonsocial.toString().length > 300 ) {
         cliente.error.razonsocial   = true;
         cliente.message.razonsocial = "Se permite máximo 300 caracteres";

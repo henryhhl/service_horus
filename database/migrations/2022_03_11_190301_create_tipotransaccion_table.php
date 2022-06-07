@@ -22,6 +22,9 @@ class CreateTipotransaccionTable extends Migration
             $table->text('descripcion');
             $table->string('abreviatura', 50)->nullable();
 
+            $table->integer("cantidadrealizada")->default(0);
+            $table->integer("cantidadcancelada")->default(0);
+
             $table->date('fecha');
             $table->time('hora');
             $table->enum('estado', ['A', 'N'])->default('A');

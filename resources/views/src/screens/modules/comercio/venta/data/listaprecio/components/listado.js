@@ -125,10 +125,16 @@ function C_ListadoListaPrecio( props ) {
                                         Breve
                                     </th>
                                     <th className="text-left">
+                                        Descripción
+                                    </th>
+                                    <th className="text-left">
                                         Fecha
                                     </th>
                                     <th className="text-left">
-                                        Nombre
+                                        Fecha Inicio
+                                    </th>
+                                    <th className="text-left">
+                                        Fecha Fin
                                     </th>
                                 </tr>
                             </thead>
@@ -157,10 +163,16 @@ function C_ListadoListaPrecio( props ) {
                                                 { item.abreviatura && item.abreviatura }
                                             </td>
                                             <td className="text-left">
+                                                { item.descripcion && item.descripcion }
+                                            </td>
+                                            <td className="text-left">
+                                                { Functions.convertYMDToDMY(item.fechalistaprecio) }
+                                            </td>
+                                            <td className="text-left">
                                                 { Functions.convertYMDToDMY(item.fechainicio) }
                                             </td>
                                             <td className="text-left">
-                                                { item.nombre }
+                                                { Functions.convertYMDToDMY(item.fechafinal) }
                                             </td>
                                         </tr>
                                     );

@@ -54,7 +54,7 @@ function App( props ) {
                 <div className="app-main">
                     <div className="app-main__outer">
                         <div className="app-main__inner">
-                            <Route exact path={"/"} render={ ( props ) => <Inicio { ...props } /> } />
+                            <Route exact path={"/home"} render={ ( props ) => <Inicio { ...props } /> } />
                         </div>
                         <Footer />
                     </div>

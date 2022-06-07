@@ -15,7 +15,6 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             codigo: "",
             producto: "",
             fkidproducto: null,
-            fkidunidadmedidaproducto: null,
             fkidlistaprecio: null,
             fkidmoneda: null,
             preciobase: "",
@@ -101,7 +100,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.preciobase.toString().length == 0 ) ?
                         "" :
-                        <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}>
+                        <label style={{ cursor: 'pointer', }}>
                             {data.preciobase}
                         </label>
                     }
@@ -127,6 +126,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             if ( !isNaN( value ) ) {
                                                 if ( Functions.esDecimal( value, 2 ) ) {
                                                     data.preciopivote = Functions.onChangeNumberDecimal(value);
+                                                    data.montodescuento = parseFloat( ( data.descuento*1/100 ) * data.preciopivote ).toFixed(2);
                                                     data.precioventa = parseFloat( data.preciopivote*1 - data.montodescuento*1 ).toFixed(2);
                                                     onChangeDetalle( detalle );
                                                 }
@@ -137,6 +137,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     data.preciopivote = Functions.onIncrementarNumberDecimal(data.preciopivote);
+                                                    data.montodescuento = parseFloat( ( data.descuento*1/100 ) * data.preciopivote ).toFixed(2);
                                                     data.precioventa = parseFloat( data.preciopivote*1 - data.montodescuento*1 ).toFixed(2);
                                                     onChangeDetalle(detalle);
                                                 } }
@@ -147,6 +148,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
                                                     data.preciopivote = Functions.onDecrementarNumberDecimal(data.preciopivote);
+                                                    data.montodescuento = parseFloat( ( data.descuento*1/100 ) * data.preciopivote ).toFixed(2);
                                                     data.precioventa = parseFloat( data.preciopivote*1 - data.montodescuento*1 ).toFixed(2);;
                                                     onChangeDetalle(detalle);
                                                 } }
@@ -169,8 +171,8 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         {
-            title: <span style={{ fontSize: 11, }}> { 'Desc(%)' } </span>,
-            dataIndex: 'descuento', key: 'descuento', width: 100,
+            title: <span style={{ fontSize: 11, }}> { 'Desc/Inc(%)' } </span>,
+            dataIndex: 'descuento', key: 'descuento', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.descuento.toString().length == 0 ) ?
@@ -232,8 +234,8 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         {
-            title: <span style={{ fontSize: 11, }}> { 'Mto. Desc.' } </span>,
-            dataIndex: 'montodescuento', key: 'montodescuento', width: 100,
+            title: <span style={{ fontSize: 11, }}> { 'Mto. Desc/Inc' } </span>,
+            dataIndex: 'montodescuento', key: 'montodescuento', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.descuento.toString().length == 0 ) ?

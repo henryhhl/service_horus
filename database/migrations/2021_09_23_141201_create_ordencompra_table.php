@@ -15,6 +15,8 @@ class CreateOrdencompraTable extends Migration
     {
         Schema::create('ordencompra', function (Blueprint $table) {
             $table->increments('idordencompra');
+            $table->integer('x_idusuario')->unsigned()->nullable();
+            $table->integer('fkidusers')->unsigned()->nullable();
             
             $table->integer('fkidsolicitudcompra')->unsigned()->nullable();
             $table->integer('fkidsucursal')->unsigned();
@@ -23,6 +25,7 @@ class CreateOrdencompraTable extends Migration
             $table->integer('fkidseccioninventario')->unsigned();
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidmoneda')->unsigned();
+            $table->integer("fkidtipotransaccion")->unsigned();
 
             $table->string('nrofactura', 150)->nullable();
 
@@ -36,6 +39,9 @@ class CreateOrdencompraTable extends Migration
             $table->integer('cantidadtotal')->default(0);
             $table->decimal('montosubtotal', 24, 8)->default(0);
             $table->decimal('montototal', 24, 8)->default(0);
+
+            $table->decimal('descuento', 24, 8)->default(0);
+            $table->decimal('montodescuento', 24, 8)->default(0);
 
             $table->decimal('fletes', 24, 8)->default(0);
             $table->decimal('internacion', 24, 8)->default(0);

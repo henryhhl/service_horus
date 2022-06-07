@@ -18,7 +18,7 @@ function M_ListadoAlmacen( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }
             title={ props.title }
         >
@@ -58,7 +58,7 @@ M_ListadoAlmacen.defaultProps = {
     value: null,
     fkidsucursal: null,
 
-    width: 600,
+    width: 750,
     zIndex: 1200,
 
     title: "ÁLMACEN",

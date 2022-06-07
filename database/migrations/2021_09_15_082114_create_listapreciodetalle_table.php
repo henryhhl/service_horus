@@ -20,7 +20,6 @@ class CreateListapreciodetalleTable extends Migration
 
             $table->integer('fkidlistaprecio')->unsigned();
             $table->integer('fkidproducto')->unsigned();
-            $table->integer('fkidunidadmedidaproducto')->unsigned();
             $table->integer('fkidmoneda')->unsigned()->nullable();
 
             $table->decimal('preciobase', 24, 8)->default(0);

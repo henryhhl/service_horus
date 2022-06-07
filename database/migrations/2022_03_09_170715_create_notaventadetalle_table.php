@@ -15,23 +15,34 @@ class CreateNotaventadetalleTable extends Migration
     {
         Schema::create('notaventadetalle', function (Blueprint $table) {
             $table->increments('idnotaventadetalle');
-
             $table->integer('x_idusuario')->unsigned()->nullable();
 
             $table->integer('fkidnotaventa')->unsigned();
-            $table->integer('fkidunidadmedidaproducto')->unsigned();
-            $table->integer('fkidalmacenunidadmedidaproducto')->unsigned();
+            $table->integer('fkidproducto')->unsigned();
+            $table->integer('fkidproductotipo')->unsigned();
+            $table->integer('fkidproductomarca')->unsigned();
+
+            $table->integer('fkidalmacenproductodetalle')->unsigned();
             $table->integer('fkidalmacen')->unsigned();
+
             $table->integer('fkidlistapreciodetalle')->unsigned();
+            $table->integer('fkidlistaprecio')->unsigned();
+
             $table->integer('fkidvendedor')->unsigned();
 
             $table->integer('cantidad')->default(0);
             $table->integer('cantidadsolicitada')->default(0);
+
+            $table->decimal('preciobase', 24, 8)->default(0);
             $table->decimal('preciounitario', 24, 8)->default(0);
-            $table->decimal('preciounitariosubtotal', 24, 8)->default(0);
+            $table->decimal('preciosubtotal', 24, 8)->default(0);
 
             $table->integer('descuento')->default(0);
             $table->decimal('montodescuento', 24, 8)->default(0);
+
+            $table->decimal('nrolote', 24, 8)->default(0);
+            $table->decimal('nrofabrica', 24, 8)->default(0);
+            $table->date('fechavencimiento')->nullable();
 
             $table->text('nota')->nullable();
             $table->string('estadoproceso')->default('F');

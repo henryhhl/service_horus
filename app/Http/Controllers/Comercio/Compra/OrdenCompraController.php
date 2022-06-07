@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\OrdenCompraRequest;
+use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\OrdenCompraDetalle;
 use App\Models\Comercio\Compra\SolicitudCompra;
+use App\Models\Comercio\Inventario\SeccionInventario;
+use App\Models\Comercio\Venta\Sucursal;
+use App\Models\Comercio\Venta\TipoTransaccion;
 use App\Models\Configuracion\Moneda;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -82,10 +86,22 @@ class OrdenCompraController extends Controller
             $obj = new Moneda();
             $moneda = $obj->get_data( $obj, $request );
 
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
+
+            $concepcomp = new ConceptoCompra();
+            $arrayConceptoCompra = $concepcomp->get_data( $concepcomp, $request );
+
+            $seccinv = new SeccionInventario();
+            $arraySeccionInventario = $seccinv->get_data( $seccinv, $request );
+
             return response()->json( [
                 'response' => 1,
                 'idordencompra' => $idordencompra,
                 'arrayMoneda'   => $moneda,
+                'arraySucursal'   => $arraySucursal,
+                'arrayConceptoCompra'   => $arrayConceptoCompra,
+                'arraySeccionInventario'   => $arraySeccionInventario,
             ] );
 
         } catch ( \Exception $th ) {
@@ -127,12 +143,17 @@ class OrdenCompraController extends Controller
             $arrayOrdenCompraDetalle = json_decode($request->input('arrayOrdenCompraDetalle', '[]'));
             foreach ( $arrayOrdenCompraDetalle as $detalle ) {
                 if ( !is_null( $detalle->fkidproducto ) ) {
-
                     $detalle->fkidordencompra = $ordencompra->idordencompra;
                     $ordencompradetalle = new OrdenCompraDetalle();
                     $ordencompradetalle->store($ordencompradetalle, $request, $detalle);
-
                 }
+            }
+
+            $tpotrans = new TipoTransaccion();
+            $tipotransaccion = $tpotrans->find( $ordencompra->fkidtipotransaccion );
+            if ( !is_null( $tipotransaccion ) ) {
+                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                $tipotransaccion->update();
             }
 
             DB::commit();
@@ -244,7 +265,113 @@ class OrdenCompraController extends Controller
      */
     public function update( OrdenCompraRequest $request )
     {
-        //
+        try {
+
+            DB::beginTransaction();
+
+            $regla = [
+                'idordencompra' => 'required',
+            ];
+
+            $mensajes = [
+                'idordencompra.required' => 'El ID es requerido.'
+            ];
+
+            $validator = Validator::make( $request->all(), $regla, $mensajes );
+            if ( $validator->fails() ) {
+
+                return response()->json( [
+                    'response'  => 0,
+                    'errors'    => $validator->errors(),
+                    'message'   => "Conflictos al solicitar el servicio.",
+                ] );
+            }
+
+            $obj = new OrdenCompra();
+
+            $ordencompra = $obj->find( $request->idordencompra );
+
+            if ( is_null( $ordencompra ) ) {
+
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Orden Compra no existe.',
+                ] );
+            }
+
+            if ( $ordencompra->iscompra == "A" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Funcionalidad no permitido. Ya que se encuentra en NOTA DE COMPRA registrado.',
+                ] );
+            }
+
+            if ( !is_null( $ordencompra->fkidsolicitudcompra ) ) {
+                $solicomp = new SolicitudCompra();
+                $solicitudcompra = $solicomp->find( $ordencompra->fkidsolicitudcompra );
+                $solicitudcompra->isordencompra = "N";
+                $solicitudcompra->update();
+            }
+
+            $result = $obj->upgrade( $obj, $request );
+
+            if ( $result ) {
+                $fkidsolicitudcompra = $request->input("fkidsolicitudcompra", null);
+
+                if ( !is_null( $fkidsolicitudcompra ) ) {
+                    $solicomp = new SolicitudCompra();
+                    $solicitudcompra = $solicomp->find( $fkidsolicitudcompra );
+                    $solicitudcompra->isordencompra = "A";
+                    $solicitudcompra->update();
+                }
+
+                $arrayOrdenCompraDetalle = json_decode( isset( $request->arrayOrdenCompraDetalle ) ? $request->arrayOrdenCompraDetalle : '[]' );
+                foreach ( $arrayOrdenCompraDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $ordcompdet = new OrdenCompraDetalle();
+                        $detalle->fkidordencompra = $ordencompra->idordencompra;
+                        if ( is_null( $detalle->idordencompradetalle ) ) {
+                            $ordcompdet->store( $ordcompdet, $request, $detalle );
+                        } else {
+                            $ordencompradetalle = $ordcompdet->upgrade( $ordcompdet, $detalle );
+                        }
+                    }
+                }
+
+                $arrayDeleteOrdenCompraDetalle = json_decode( isset( $request->arrayDeleteOrdenCompraDetalle ) ? $request->arrayDeleteOrdenCompraDetalle : '[]' );
+                foreach ( $arrayDeleteOrdenCompraDetalle as $idordencompradetalle ) {
+                    $ordcompdet = new OrdenCompraDetalle();
+                    $ordencompradetalle = $ordcompdet->find( $idordencompradetalle );
+                    if ( !is_null( $ordencompradetalle ) ) {
+                        $ordencompradetalle->delete();
+                    }
+                }
+
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Orden Compra actualizado éxitosamente.',
+                ] );
+            }
+
+            DB::rollBack();
+            return response()->json( [
+                'response' => -1,
+                'message'  => 'Hubo conflictos al actualizar Orden Compra.',
+            ] );
+
+        } catch ( \Exception $th ) {
+            DB::rollBack();
+            return response()->json( [
+                'response' => -4,
+                'message'  => 'Error al procesar la solicitud.',
+                'error' => [
+                    'file'    => $th->getFile(),
+                    'line'    => $th->getLine(),
+                    'message' => $th->getMessage()
+                ],
+            ] );
+        }
     }
 
     /**
@@ -269,7 +396,7 @@ class OrdenCompraController extends Controller
             ];
 
             $mensajes = [
-                'idordencompra.required' => 'El ID Orden Compra es requerido.'
+                'idordencompra.required' => 'El ID es requerido.'
             ];
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
@@ -286,7 +413,6 @@ class OrdenCompraController extends Controller
             $ordencompra = $obj->find( $request->idordencompra );
 
             if ( is_null( $ordencompra ) ) {
-                DB::rollBack();
                 return response()->json( [
                     'response'  => -1,
                     'message'   => 'Orden Compra no existe.',
@@ -297,7 +423,6 @@ class OrdenCompraController extends Controller
 
             $ntacomp = new NotaCompra();
             if ( $ntacomp->existsOrdenCompra( $ntacomp, $request->idordencompra ) ) {
-                DB::rollBack();
                 return response()->json( [
                     'response'  => -1,
                     'message'   => 'No se puede eliminar, ya que se encuentra registrado en una nota de compra.',
@@ -307,15 +432,6 @@ class OrdenCompraController extends Controller
             //
 
             /* fin de restriccion */
-
-            if ( !is_null( $ordencompra->fkidsolicitudcompra ) ) {
-                $solicomp = new SolicitudCompra();
-                $solicitudcompra = $solicomp->find( $ordencompra->fkidsolicitudcompra );
-                if ( !is_null( $solicitudcompra ) ) {
-                    $solicitudcompra->isordencompra = "N";
-                    $solicitudcompra->update();
-                }
-            }
 
             $ordencompradelete = $obj->remove( $obj, $request );
 
@@ -329,12 +445,35 @@ class OrdenCompraController extends Controller
                         $ordencompradetalle->delete();
                     }
                 }
+
+                if ( !is_null( $ordencompra->fkidsolicitudcompra ) ) {
+                    $solicomp = new SolicitudCompra();
+                    $solicitudcompra = $solicomp->find( $ordencompra->fkidsolicitudcompra );
+                    if ( !is_null( $solicitudcompra ) ) {
+                        $solicitudcompra->isordencompra = "N";
+                        $solicitudcompra->update();
+                    }
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $ordencompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) - 1;
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Orden Compra eliminado éxitosamente.',
+                ] );
             }
 
-            DB::commit();
+            DB::rollBack();
             return response()->json( [
-                'response' => 1,
-                'message'  => 'Orden Compra eliminado éxitosamente.',
+                'response' => -1,
+                'message'  => 'Hubo conflictos al eliminar, favor de intentar nuevamente.',
             ] );
 
         } catch (\Exception $th) {

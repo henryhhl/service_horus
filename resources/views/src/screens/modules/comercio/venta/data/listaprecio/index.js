@@ -196,6 +196,8 @@ function IndexListaPrecio( props ) {
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
+                    getAllProduct={props.getAllProduct}
+                    quitarProductos={props.quitarProductos}
                 />
             </div>
             <C_Footer
@@ -245,6 +247,9 @@ const mapStateToProps = ( state ) => ( {
 const mapDispatchToProps = {
     initData:     listaPrecioActions.initData,
     onChangePage: listaPrecioActions.onChangePage,
+
+    getAllProduct:   listaPrecioActions.getAllProduct,
+    quitarProductos: listaPrecioActions.quitarProductos,
 
     onChange:   listaPrecioActions.onChange,
     onSetState: listaPrecioActions.setState,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercio\Compra;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\NotaCompraRequest;
+use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\DevolucionCompra;
 use App\Models\Comercio\Compra\LibroCompra;
 use App\Models\Comercio\Compra\NotaCompra;
@@ -12,9 +13,13 @@ use App\Models\Comercio\Compra\NotaCompraDetalle;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\ProveedorProducto;
+use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto;
 use App\Models\Comercio\Inventario\Producto;
+use App\Models\Comercio\Inventario\SeccionInventario;
 use App\Models\Comercio\Inventario\UnidadMedidaProducto;
+use App\Models\Comercio\Venta\Sucursal;
+use App\Models\Comercio\Venta\TipoTransaccion;
 use App\Models\Configuracion\Moneda;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -90,10 +95,22 @@ class NotaCompraController extends Controller
             $obj = new Moneda();
             $moneda = $obj->get_data( $obj, $request );
 
+            $suc = new Sucursal();
+            $arraySucursal = $suc->get_data( $suc, $request );
+
+            $concepcomp = new ConceptoCompra();
+            $arrayConceptoCompra = $concepcomp->get_data( $concepcomp, $request );
+
+            $seccinv = new SeccionInventario();
+            $arraySeccionInventario = $seccinv->get_data( $seccinv, $request );
+
             return response()->json( [
                 'response' => 1,
                 'idnotacompra' => $idnotacompra,
                 'arrayMoneda'   => $moneda,
+                'arraySucursal'   => $arraySucursal,
+                'arrayConceptoCompra'   => $arrayConceptoCompra,
+                'arraySeccionInventario'   => $arraySeccionInventario,
             ] );
 
         } catch ( \Exception $th ) {
@@ -124,6 +141,7 @@ class NotaCompraController extends Controller
 
             $obj = new NotaCompra();
             $notacompra = $obj->store( $obj, $request );
+
             $request->fkidnotacompra = $notacompra->idnotacompra;
 
             if ( !is_null( $notacompra->fkidordencompra ) ) {
@@ -140,40 +158,35 @@ class NotaCompraController extends Controller
                 $proveedor->update();
             }
 
+            $tpotrans = new TipoTransaccion();
+            $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
+            if ( !is_null( $tipotransaccion ) ) {
+                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                $tipotransaccion->update();
+            }
+
             $arrayNotaCompraDetalle = json_decode($request->input('arrayNotaCompraDetalle', '[]'));
             foreach ( $arrayNotaCompraDetalle as $detalle ) {
-
                 if ( !is_null( $detalle->fkidproducto ) ) {
                     $detalle->fkidnotacompra = $notacompra->idnotacompra;
-
-                    $almundmedprod = new AlmacenUnidadMedidaProducto();
-                    if ( !$almundmedprod->existAlmUndMedProd( $almundmedprod, $notacompra->fkidalmacen, $detalle->fkidunidadmedidaproducto ) ) {
-
-                        $almundmedprod->fkidunidadmedidaproducto = $detalle->fkidunidadmedidaproducto;
-                        $almundmedprod->fkidalmacen = $notacompra->fkidalmacen;
-                        $almundmedprod->stockactual = $detalle->cantidad;
-                        $almundmedprod->stockminimo = 0;
-                        $almundmedprod->stockmaximo = 0;
-                        $almundmedprod->ingresos = 0;
-                        $almundmedprod->salidas = 0;
-                        $almundmedprod->traspasos = 0;
-                        $almundmedprod->ventas = 0;
-                        $almundmedprod->compras = 1;
-                        $almundmedprod->fecha = $request->x_fecha;
-                        $almundmedprod->hora = $request->x_hora;
-                        $almundmedprod->estado = "A";
-                        $almundmedprod->save();
-
-                        $detalle->fkidalmacenunidadmedidaproducto = $almundmedprod->idalmacenunidadmedidaproducto;
-
+                    $almproddet = new AlmacenProductoDetalle();
+                    if ( !$almproddet->existAlmacenProducto( $almproddet, $notacompra->fkidalmacen, $detalle->fkidproducto ) ) {
+                        $almproddet->fkidproducto = $detalle->fkidproducto;
+                        $almproddet->fkidalmacen = $notacompra->fkidalmacen;
+                        $almproddet->stockactual = $detalle->cantidad;
+                        $almproddet->compras = 1;
+                        $almproddet->fecha = $request->x_fecha;
+                        $almproddet->hora = $request->x_hora;
+                        $almproddet->save();
+                        $detalle->fkidalmacenproductodetalle = $almproddet->idalmacenproductodetalle;
                     } else {
-                        $firstAlmUndMedProd = $almundmedprod->firstAlmUndMedProd( $almundmedprod, $notacompra->fkidalmacen, $detalle->fkidunidadmedidaproducto );
-                        $almacenunidadmedidaproducto = $almundmedprod->find( $firstAlmUndMedProd->idalmacenunidadmedidaproducto );
-                        $almacenunidadmedidaproducto->stockactual = intval($detalle->cantidad) + intval($almacenunidadmedidaproducto->cantidad);
-                        $almacenunidadmedidaproducto->compras = intval($almundmedprod->compras) + 1;
-                        $almacenunidadmedidaproducto->update();
+                        $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $notacompra->fkidalmacen, $detalle->fkidproducto );
+                        $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenunidadmedidaproducto );
+                        $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->cantidad);
+                        $almacenproductodetalle->compras = intval($almproddet->compras) + 1;
+                        $almacenproductodetalle->update();
 
-                        $detalle->fkidalmacenunidadmedidaproducto = $almacenunidadmedidaproducto->idalmacenunidadmedidaproducto;
+                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                     }
 
                     $notacompradetalle = new NotaCompraDetalle();
@@ -184,18 +197,14 @@ class NotaCompraController extends Controller
                     $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
                     $producto->update();
 
-                    $undmedprod = new UnidadMedidaProducto();
-                    $unidadmedidaproducto = $undmedprod->find( $detalle->fkidunidadmedidaproducto );
-                    $unidadmedidaproducto->stock = intval($unidadmedidaproducto->stock) + intval($detalle->cantidad);
-                    $unidadmedidaproducto->update();
-
                     $provprod = new ProveedorProducto();
                     if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor ) ) {
                         $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor );
                         $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
-                        $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
-                        $proveedorproducto->update();
-
+                        if ( !is_null( $proveedorproducto ) ) {
+                            $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
+                            $proveedorproducto->update();
+                        }
                     }
 
                 }

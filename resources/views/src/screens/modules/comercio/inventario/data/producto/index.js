@@ -22,7 +22,7 @@ import ProductoPDF from './report/productoPDF';
 
 function IndexProducto( props ) {
     const { archivo, producto, disabled, option, paginations } = props;
-    
+
     const [ visible_pdf, setVisiblePDF ] = useState( false );
     const [ visible_action, setVisibleAction ] = useState( false );
 
@@ -41,15 +41,15 @@ function IndexProducto( props ) {
     function onGrabarData() {
         if( producto.update ) {
             let onUpdate = () => props.onUpdate( producto );
-            C_Confirm( { 
-                title: "Actualizar Producto", onOk: onUpdate, 
-                okType: "primary", content: "Estás seguro de actualizar información?", 
+            C_Confirm( {
+                title: "Actualizar Producto", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
             } );
         } else {
             let onGrabar = () => props.onGrabar( producto );
-            C_Confirm( { 
-                title: "Registrar Producto", onOk: onGrabar, 
-                okType: "primary", content: "Estás seguro de registrar información?", 
+            C_Confirm( {
+                title: "Registrar Producto", onOk: onGrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
             } );
         }
     };
@@ -111,7 +111,7 @@ function IndexProducto( props ) {
 
     function componentOption() {
         return (
-            <OptionProducto 
+            <OptionProducto
                 option={option}
                 onChange={props.setPrintOption}
                 onSubmit={ onSubmitOption }
@@ -144,7 +144,7 @@ function IndexProducto( props ) {
 
     function componentArchivo() {
         return (
-            <ArchivoProducto 
+            <ArchivoProducto
                 archivo={archivo}
                 onChange={props.setArchivoOption}
                 onSubmit={ onSubmitArchivo }
@@ -157,17 +157,17 @@ function IndexProducto( props ) {
         return (
             <>
                 <C_ModalDraggable
-                    visible={ visible_pdf } 
+                    visible={ visible_pdf }
                     onClose={ () => {
                         setVisiblePDF( false );
                     } }
                     maskStyle={{ background: "transparent", }}
-                    width={"90%"}  zIndex={ 1200 }  
+                    width={"90%"}  zIndex={ 1200 }
                     title={ "REPORTE PRODUCTO" }
                     bodyStyle={{ padding: '5px 4px', }}
                     style={{ top: 10, }}
                 >
-                    <ProductoPDF 
+                    <ProductoPDF
                         producto={producto.reporte}
                     />
                 </C_ModalDraggable>
@@ -191,19 +191,19 @@ function IndexProducto( props ) {
             />
 
             <div className="pt-2 pb-3 pl-4 pr-4" style={{ flexGrow: 1, width: "100%", }}>
-                <C_Form 
+                <C_Form
                     producto={ producto }
                     onChange={props.onChange}
                     disabled={disabled}
                     onPressEnter={onPressEnterID}
                 />
             </div>
-            <C_Footer 
+            <C_Footer
                 disabled={disabled}
 
                 onCreate={props.onCreate}
                 onGrabar={onGrabarData}
-                onUpdate={ () => props.onEditar( producto ) }
+                onUpdate={ () => props.onEdit( producto ) }
                 onDelete={ onConfirmarDelete }
                 onSearch={ props.onSearch }
 
@@ -251,6 +251,7 @@ const mapDispatchToProps = {
     onCreate:   productoActions.onCreate,
     onGrabar:   productoActions.onGrabar,
     onEditar:   productoActions.onEditar,
+    onEdit:   productoActions.onEdit,
     onUpdate:   productoActions.onUpdate,
     onDelete:   productoActions.onDelete,
     onImprimir: productoActions.onImprimir,

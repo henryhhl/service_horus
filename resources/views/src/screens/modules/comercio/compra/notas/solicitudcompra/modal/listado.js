@@ -18,7 +18,7 @@ function M_ListadoSolicitudCompra( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -58,7 +58,7 @@ M_ListadoSolicitudCompra.defaultProps = {
 
     value: null,
 
-    width: "85%",
+    width: "88%",
     zIndex: 1200,
 
     title: "SOLICITUD COMPRA",

@@ -23,6 +23,7 @@ const getData = async ( page = 1, nroPagination = 1, search = "" ) => {
         orderBy: 'asc',
         search: search,
     } ) . then ( ( result ) => {
+        console.log(result)
         resultData( result );
 
         if ( result.response == 1 ) {
@@ -78,6 +79,7 @@ const onGrabar = async ( notaventa ) => {
         razonsocial: notaventa.razonsocial,
         nit: notaventa.nit,
         glosa: notaventa.glosa,
+        esnotaentrega: notaventa.esnotaentrega,
 
         impuestoiva: notaventa.impuestoiva,
         montototalcobrado: notaventa.montototalcobrado,
@@ -91,8 +93,10 @@ const onGrabar = async ( notaventa ) => {
         descuento: notaventa.descuento,
         montodescuento: notaventa.montodescuento,
         montototal: notaventa.montototal,
+        cantidadtotal: notaventa.cantidadtotal,
         montoanticipo: notaventa.montoanticipo,
         isdevolucionventa: notaventa.isdevolucionventa,
+        arraynotaventadetalle: JSON.stringify( notaventa.notaventadetalle ),
 
         estado: notaventa.estado,
     } ) . then ( ( result ) => {
@@ -163,6 +167,7 @@ const onUpdate = async ( notaventa ) => {
         razonsocial: notaventa.razonsocial,
         nit: notaventa.nit,
         glosa: notaventa.glosa,
+        esnotaentrega: notaventa.esnotaentrega,
 
         impuestoiva: notaventa.impuestoiva,
         montototalcobrado: notaventa.montototalcobrado,
@@ -176,8 +181,11 @@ const onUpdate = async ( notaventa ) => {
         descuento: notaventa.descuento,
         montodescuento: notaventa.montodescuento,
         montototal: notaventa.montototal,
+        cantidadtotal: notaventa.cantidadtotal,
         montoanticipo: notaventa.montoanticipo,
         isdevolucionventa: notaventa.isdevolucionventa,
+        arraynotaventadetalle: JSON.stringify( notaventa.notaventadetalle ),
+        arraynotaventadetalledelete: JSON.stringify( notaventa.notaventadetalledelete ),
 
         estado: notaventa.estado,
     } ) . then ( ( result ) => {
