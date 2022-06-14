@@ -17,18 +17,35 @@ class CreateDevolucioncompradetalleTable extends Migration
             $table->increments('iddevolucioncompradetalle');
             
             $table->integer('fkiddevolucioncompra')->unsigned();
-            $table->integer('fkidalmacenunidadmedidaproducto')->unsigned()->nullable();
-            $table->integer('fkidunidadmedidaproducto')->unsigned();
+            $table->integer('fkidalmacenproductodetalle')->unsigned()->nullable();
+            $table->integer('fkidproducto')->unsigned();
+
+            $table->integer('fkidsucursal')->unsigned();
+            $table->integer('fkidalmacen')->unsigned();
+            $table->integer('fkidseccioninventario')->unsigned()->nullable();
+            $table->integer('fkidproveedor')->unsigned();
+
+            $table->integer('fkidnotacompra')->unsigned()->nullable();
             $table->integer('fkidnotacompradetalle')->unsigned()->nullable();
+
+            $table->integer('fkidordencompra')->unsigned()->nullable();
+            $table->integer('fkidordencompradetalle')->unsigned()->nullable();
+
+            $table->integer('fkidsolicitudcompra')->unsigned()->nullable();
+            $table->integer('fkidsolicitudcompradetalle')->unsigned()->nullable();
 
             $table->integer('cantidadcomprada')->default(0);
             $table->integer('cantidad')->default(0);
 
+            $table->decimal('costobase', 24, 8)->default(0);
             $table->decimal('costounitario', 24, 8)->default(0);
             $table->decimal('costosubtotal', 24, 8)->default(0);
 
             $table->decimal('peso', 24, 8)->default(0);
             $table->decimal('pesosubtotal', 24, 8)->default(0);
+
+            $table->integer('descuento')->default(0);
+            $table->decimal('montodescuento', 24, 8)->default(0);
 
             $table->decimal('volumen', 24, 8)->default(0);
             $table->decimal('volumensubtotal', 24, 8)->default(0);

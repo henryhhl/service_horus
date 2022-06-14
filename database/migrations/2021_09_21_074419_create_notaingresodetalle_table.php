@@ -15,14 +15,26 @@ class CreateNotaingresodetalleTable extends Migration
     {
         Schema::create('notaingresodetalle', function (Blueprint $table) {
             $table->increments('idnotaingresodetalle');
-            
-            $table->integer('fkidnotaingreso')->unsigned();
-            $table->integer('fkidalmacenunidadmedidaproducto')->unsigned();
+            $table->integer('x_idusuario')->unsigned()->nullable();
+            $table->integer('fkidusers')->unsigned()->nullable();
 
+            $table->integer('fkidnotaingreso')->unsigned();
+            $table->integer('fkidalmacenproductodetalle')->unsigned();
+            $table->integer('fkidproducto')->unsigned();
+            $table->integer('fkidsucursal')->unsigned();
+            $table->integer('fkidalmacen')->unsigned();
+
+            $table->integer('stockactualanterior')->default(0);
             $table->integer('cantidad')->default(0);
+            $table->integer('nrocajas')->default(0);
+
+            $table->decimal('costobase', 24, 8)->default(0);
             $table->decimal('costounitario', 24, 8)->default(0);
             $table->decimal('costosubtotal', 24, 8)->default(0);
-            $table->integer('nrocajas')->default(0);
+            $table->decimal('costopromedio', 24, 8)->default(0);
+
+            $table->integer('descuento')->default(0);
+            $table->decimal('montodescuento', 24, 8)->default(0);
 
             $table->decimal('peso', 24, 8)->default(0);
             $table->decimal('pesosubtotal', 24, 8)->default(0);
@@ -30,14 +42,11 @@ class CreateNotaingresodetalleTable extends Migration
             $table->decimal('volumen', 24, 8)->default(0);
             $table->decimal('volumensubtotal', 24, 8)->default(0);
 
+            $table->text('nota')->nullable();
+
             $table->date('fechavencimiento')->nullable();
             $table->decimal('nrolote', 24, 8)->default(0);
             $table->decimal('nrofabrica', 24, 8)->default(0);
-
-            $table->decimal('precio', 24, 8)->default(0);
-
-            $table->text('nota')->nullable();
-            $table->enum('esingresado', ['A', 'N'])->default('N');
 
             $table->date('fecha');
             $table->time('hora');

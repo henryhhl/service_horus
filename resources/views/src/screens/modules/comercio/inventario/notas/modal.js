@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { C_ModalDraggable } from '../../../../../components';
 
 import IndexNotaIngreso from './ingreso';
+import IndexNotaSalida from './salida';
 
 function ModalInventarioNota( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -23,6 +24,20 @@ function ModalInventarioNota( props ) {
                         width={"98%"} style={{ top: 30, }}
                     >
                         <IndexNotaIngreso
+                            onClose={ onClose }
+                        />
+                    </C_ModalDraggable>
+                );
+
+            case "notasalida":
+                return (
+                    <C_ModalDraggable
+                        visible={visible}
+                        onClose={onClose}
+                        title="NOTA SALIDA"
+                        width={"98%"} style={{ top: 30, }}
+                    >
+                        <IndexNotaSalida
                             onClose={ onClose }
                         />
                     </C_ModalDraggable>

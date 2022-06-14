@@ -46,7 +46,7 @@ class SolicitudCompra extends Model
         $column  = 'solicitudcompra.idsolicitudcompra';
 
         $isordencompra = isset($request->isordencompra) ? $request->isordencompra : false;
-        if ( strtolower( $isordencompra ) == 'true' ) {
+        if ( strtolower( $isordencompra ) == 'true' || $isordencompra == true ) {
             $isordencompra = true;
         } else {
             $isordencompra = false;
@@ -133,7 +133,7 @@ class SolicitudCompra extends Model
         $column   = 'solicitudcompra.idsolicitudcompra';
 
         $isordencompra = isset($request->isordencompra) ? $request->isordencompra : false;
-        if ( strtolower( $isordencompra ) == 'true' ) {
+        if ( strtolower( $isordencompra ) == 'true' || $isordencompra == true ) {
             $isordencompra = true;
         } else {
             $isordencompra = false;

@@ -81,8 +81,7 @@ class NotaCompra extends Model
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
-                        ->where('notacompra.idnotacompra', '=', $search)
-                        ->orWhere('notacompra.codigo', $islike, '%' . $search . '%');
+                        ->where('notacompra.idnotacompra', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('notacompra.codigo', $islike, '%' . $search . '%');
@@ -99,6 +98,7 @@ class NotaCompra extends Model
                     ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
                     ->select( [
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompra', 'notacompradetalle.fkidordencompradetalle',
                         'notacompradetalle.fkidsolicitudcompra', 'notacompradetalle.fkidsolicitudcompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
@@ -169,8 +169,7 @@ class NotaCompra extends Model
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
-                        ->where('notacompra.idnotacompra', '=', $search)
-                        ->orWhere('notacompra.codigo', $islike, '%' . $search . '%');
+                        ->where('notacompra.idnotacompra', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('notacompra.codigo', $islike, '%' . $search . '%');
@@ -187,6 +186,7 @@ class NotaCompra extends Model
                     ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
                     ->select( [
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompra', 'notacompradetalle.fkidordencompradetalle',
                         'notacompradetalle.fkidsolicitudcompra', 'notacompradetalle.fkidsolicitudcompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
@@ -261,6 +261,10 @@ class NotaCompra extends Model
         $volumentotal = isset( $request->volumentotal ) ? $request->volumentotal : null;
         $pesototal = isset( $request->pesototal ) ? $request->pesototal : null;
 
+        $isdevolucioncompra = isset( $request->isdevolucioncompra ) ? $request->isdevolucioncompra : "N";
+        $isordencompra = isset( $request->isordencompra ) ? $request->isordencompra : "N";
+        $issolicitudcompra = isset( $request->issolicitudcompra ) ? $request->issolicitudcompra : "N";
+
         $nota            = isset( $request->nota ) ? $request->nota : null;
         $tipocompra   = isset( $request->tipocompra ) ? $request->tipocompra : null;
 
@@ -299,6 +303,10 @@ class NotaCompra extends Model
             'nrocajastotal' => $nrocajastotal,
             'volumentotal' => $volumentotal,
             'pesototal' => $pesototal,
+
+            'isdevolucioncompra' => $isdevolucioncompra,
+            'isordencompra' => $isordencompra,
+            'issolicitudcompra' => $issolicitudcompra,
 
             'nota'       => $nota,
             'tipocompra' => $tipocompra,
@@ -347,6 +355,7 @@ class NotaCompra extends Model
                     ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
                     ->select( [
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompra', 'notacompradetalle.fkidordencompradetalle',
                         'notacompradetalle.fkidsolicitudcompra', 'notacompradetalle.fkidsolicitudcompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',
@@ -431,6 +440,7 @@ class NotaCompra extends Model
                     ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
                     ->select( [
                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra', 'notacompradetalle.fkidordencompra', 'notacompradetalle.fkidordencompradetalle',
                         'notacompradetalle.fkidsolicitudcompra', 'notacompradetalle.fkidsolicitudcompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.cantidadsolicitada',

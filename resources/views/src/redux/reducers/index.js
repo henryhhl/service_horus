@@ -47,6 +47,7 @@ import { ActividadEconomicaReducer } from './comercio/venta/actividadEconomicaRe
 import { DosificacionReducer } from './comercio/venta/dosificacionReducers';
 import { NotaVentaReducer } from './comercio/venta/notaVentaReducers';
 import { DevolucionNotaVentaReducer } from './comercio/venta/devolucionNotaVentaReducers';
+import { NotaSalidaReducer } from './comercio/inventario/notaSalidaReducers';
 
 const rootReducer = combineReducers( {
     visible:     VisibleReducer,
@@ -70,6 +71,7 @@ const rootReducer = combineReducers( {
     seccionInventario:   SeccionInventarioReducer,
     producto:            ProductoReducer,
     notaIngreso:         NotaIngresoReducer,
+    notaSalida:          NotaSalidaReducer,
 
     unionSucursal: UnionSucursalReducer,
     sucursal:      SucursalReducer,

@@ -128,6 +128,9 @@ export const OrdenCompraCompraReducer = ( state = initialState, action = { paylo
             state.internacion = "0.00";
             state.otrosgastos = "0.00";
             state.nrofactura = 0;
+
+            state.iscompra = "N";
+            state.issolicitudcompra = "N";
             
             state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
             state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;

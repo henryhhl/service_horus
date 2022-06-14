@@ -8,7 +8,7 @@ import { C_Confirm, C_Footer, C_Loading, C_Message, C_ModalDraggable } from '../
 import M_ListadoNotaIngreso from './modal/listado';
 import C_Form from './components/form';
 
-import { notaIngresoActions } from '../../../../../../redux/actions/comercio/inventario/notaIngresoActions';
+import { NotaIngresoActions } from '../../../../../../redux/actions/comercio/inventario/notaIngresoActions';
 
 import { disabledActions } from '../../../../../../redux/actions/config/disabledActions';
 import { printOptionActions } from '../../../../../../redux/actions/config/printOptionActions';
@@ -39,8 +39,19 @@ function IndexNotaIngreso( props ) {
     }
 
     function onGrabarData() {
-        if( notaIngreso.update )  props.onUpdate( notaIngreso );
-        else props.onGrabar( notaIngreso )
+        if( notaIngreso.update ) { 
+            let onUpdate = () => props.onUpdate( notaIngreso );
+            C_Confirm( { 
+                title: "Editar Nota Ingreso", onOk: onUpdate, 
+                okType: "primary", content: "Estás seguro de actualizar información?", 
+            } );
+        } else {
+            let ongrabar = () => props.onGrabar( notaIngreso );
+            C_Confirm( { 
+                title: "Registrar Nota Ingreso", onOk: ongrabar, 
+                okType: "primary", content: "Estás seguro de registrar información?", 
+            } );
+        }
     };
 
     function onConfirmarDelete() {
@@ -192,7 +203,7 @@ function IndexNotaIngreso( props ) {
 
                 onCreate={props.onCreate}
                 onGrabar={onGrabarData}
-                // onUpdate={ () => props.onEditar( notaIngreso ) }
+                onUpdate={ () => props.onEditar( notaIngreso ) }
                 onDelete={ onConfirmarDelete }
                 onSearch={ props.onSearch }
 
@@ -232,23 +243,23 @@ const mapStateToProps = ( state ) => ( {
 } );
 
 const mapDispatchToProps = {
-    initData:     notaIngresoActions.initData,
-    onChangePage: notaIngresoActions.onChangePage,
+    initData:     NotaIngresoActions.initData,
+    onChangePage: NotaIngresoActions.onChangePage,
 
-    onChange:   notaIngresoActions.onChange,
-    onSetState: notaIngresoActions.setState,
+    onChange:   NotaIngresoActions.onChange,
+    onSetState: NotaIngresoActions.setState,
 
-    onCreate:   notaIngresoActions.onCreate,
-    onGrabar:   notaIngresoActions.onGrabar,
-    onEditar:   notaIngresoActions.onEditar,
-    onUpdate:   notaIngresoActions.onUpdate,
-    onDelete:   notaIngresoActions.onDelete,
-    onImprimir: notaIngresoActions.onImprimir,
+    onCreate:   NotaIngresoActions.onCreate,
+    onGrabar:   NotaIngresoActions.onGrabar,
+    onEditar:   NotaIngresoActions.onEditar,
+    onUpdate:   NotaIngresoActions.onUpdate,
+    onDelete:   NotaIngresoActions.onDelete,
+    onImprimir: NotaIngresoActions.onImprimir,
 
-    onSearch:     notaIngresoActions.onSearch,
-    onSearchData: notaIngresoActions.onSearchData,
+    onSearch:     NotaIngresoActions.onSearch,
+    onSearchData: NotaIngresoActions.onSearchData,
 
-    onCancelar: notaIngresoActions.onCancelar,
+    onCancelar: NotaIngresoActions.onCancelar,
 
     onDisabledEvent: disabledActions.onAction,
 

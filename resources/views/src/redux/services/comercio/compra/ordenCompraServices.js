@@ -75,6 +75,8 @@ const onGrabar = async ( ordencompra ) => {
         montodescuento:  ordencompra.montodescuento,
         fkidtipotransaccion: 5,
         fkidusers: null,
+        iscompra: ordencompra.iscompra,
+        issolicitudcompra: ordencompra.issolicitudcompra,
         arrayOrdenCompraDetalle: JSON.stringify(ordencompra.arrayOrdenCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
@@ -141,6 +143,8 @@ const onUpdate = async ( ordencompra ) => {
         montodescuento:  ordencompra.montodescuento,
         fkidtipotransaccion: 5,
         fkidusers: null,
+        iscompra: ordencompra.iscompra,
+        issolicitudcompra: ordencompra.issolicitudcompra,
         arrayOrdenCompraDetalle: JSON.stringify(ordencompra.arrayOrdenCompraDetalle),
         arrayDeleteOrdenCompraDetalle: JSON.stringify(ordencompra.arrayDeleteOrdenCompraDetalle),
     } ) . then ( ( result ) => {

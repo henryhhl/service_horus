@@ -16,6 +16,7 @@ import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmed
 import M_ListadoOrdenCompra from '../../ordencompra/modal/listado';
 
 import { columns } from './column';
+import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
 
 function C_Form( props ) {
     const { notaCompra, disabled, onChange } = props;
@@ -334,6 +335,13 @@ function C_Form( props ) {
         notaCompra.nombrerazonsocial = data.nombre;
         notaCompra.nroautorizacion = "168401000000724";
         notaCompra.codigocontrol = "98-FD-8D-E7";
+
+        for (let index = 0; index < notaCompra.arrayNotaCompraDetalle.length; index++) {
+            let element = notaCompra.arrayNotaCompraDetalle[index];
+            element.fkidproveedor = data.idproveedor;
+            element.proveedor = data.nombre;
+        }
+
         onChange( notaCompra );
         setVisibleProveedor(false);
     };
@@ -360,42 +368,62 @@ function C_Form( props ) {
     function existProducto( value ) {
         for (let index = 0; index < notaCompra.arrayNotaCompraDetalle.length; index++) {
             const element = notaCompra.arrayNotaCompraDetalle[index];
-            if ( element.fkidunidadmedidaproducto === value ) return true;
+            if ( element.fkidproducto === value ) return true;
         }
         return false;
     };
 
-    function onFKIDUnidadMedidaProducto( data ) {
-        if ( !existProducto( data.idunidadmedidaproducto ) ) {
+    function onFKIDProducto( producto ) {
+        if ( !existProducto( producto.idproducto ) ) {
             let detalle = notaCompra.arrayNotaCompraDetalle[row_detalle.index];
-            detalle.fkidproducto = data.idproducto;
-            detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-            detalle.unidadmedidaproducto = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.unidadmedida}`;
-            detalle.codigo = data.codigo ? data.codigo : "";
-            detalle.producto = data.producto;
-            detalle.stockactual = parseInt(data.stock);
-            detalle.ciudadorigen = data.origen;
 
-            detalle.cantidadsolicitada = "0";
-            detalle.cantidadrecibida = "0";
-            detalle.cantidadfaltante = "0";
-            detalle.cantidadsobrante = "0";
+            detalle.fkidproducto = producto.idproducto;
+            detalle.codigo = producto.codigo ? producto.codigo : "";
+            detalle.producto = producto.nombre;
+            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
 
+            detalle.fkidciudadorigen = producto.fkidciudadorigen;
+            detalle.ciudadorigen = producto.ciudadorigen;
+
+            detalle.fkidproductomarca = producto.fkidproductomarca;
+            detalle.productomarca = producto.productomarca;
+
+            detalle.fkidproductotipo = producto.fkidproductotipo;
+            detalle.productotipo = producto.productotipo;
+
+            detalle.stockactual = parseInt(producto.stockactual);
+            detalle.cantidadsolicitada = 0;
+            detalle.cantidadrecibida = 0;
+            detalle.cantidadfaltante = 0;
+            detalle.cantidadsobrante = 0;
             detalle.cantidad = 0;
 
-            detalle.costounitario = parseFloat(data.costo).toFixed(2);
+            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
+            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
             detalle.costosubtotal = "0.00";
-            detalle.productomarca = data.marca;
 
-            detalle.peso = parseFloat(data.peso).toFixed(2);
+            detalle.peso = parseFloat(producto.peso).toFixed(2);
             detalle.pesosubtotal = "0.00";
 
-            detalle.volumen = parseFloat(data.volumen).toFixed(2);
+            detalle.volumen = parseFloat(producto.volumen).toFixed(2);
             detalle.volumensubtotal = "0.00";
 
             detalle.nrolote = "0.00";
             detalle.nrofabrica = "0.00";
             detalle.nrocajas = "0";
+
+            detalle.isdevolucioncompra = "N";
+            detalle.isordencompra = "N";
+            detalle.issolicitudcompra = "N";
+
+            detalle.fkidnotacompra = null;
+            detalle.fkidordencompra = null;
+            detalle.fkidordencompradetalle = null;
+            detalle.fkidsolicitudcompradetalle = null;
+            detalle.fkidsolicitudcompra = null;
+
+            detalle.idnotacompradetalle = null;
+            detalle.fkidalmacenproductodetalle = null;
 
             onChange(notaCompra);
             setRowDetalle(null);
@@ -408,11 +436,11 @@ function C_Form( props ) {
         if ( row_detalle === null ) return null;
         if ( !row_detalle.visible_producto ) return null;
         return (
-            <M_ListadoUnidadMedidaProducto
+            <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
                 value={row_detalle.fkidproducto}
-                onChange={ onFKIDUnidadMedidaProducto }
+                onChange={ onFKIDProducto }
             />
         );
     };
@@ -447,7 +475,6 @@ function C_Form( props ) {
     };
 
     function onChangeFKIDOrdenCompra( data ) {
-        console.log(data)
         notaCompra.fkidordencompra = data.idordencompra;
         notaCompra.tipocompra = data.tiposolicitud;
 
@@ -478,6 +505,9 @@ function C_Form( props ) {
 
         notaCompra.nrofactura = data.nrofactura ? 0 : parseInt(data.nrofactura);
 
+        notaCompra.isordencompra = "A";
+        notaCompra.issolicitudcompra = data.fkidsolicitudcompra ? "A" : "N";
+
         let montodescuento = parseFloat(notaCompra.montodescuento);
         let montosubtotal = parseFloat(notaCompra.montosubtotal);
         let fletes = parseFloat(notaCompra.fletes);
@@ -492,26 +522,49 @@ function C_Form( props ) {
         notaCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos - montodescuento - impuestototal).toFixed(2);
 
         let array = [];
-        for (let index = 0; index < data.ordencompradetalle.length; index++) {
-            const detalle = data.ordencompradetalle[index];
+        for (let index = 0; index < data.arrayordencompradetalle.length; index++) {
+            const detalle = data.arrayordencompradetalle[index];
             let element = {
                 key: index,
+
+                fkidproducto: detalle.fkidproducto,
                 codigo: detalle.codigo,
-                producto: detalle.nombre,
+                producto: detalle.producto,
+                unidadmedida: `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}`,
+
+                fkidciudadorigen: detalle.fkidciudadorigen,
                 ciudadorigen: detalle.ciudadorigen,
+
+                fkidproductomarca: detalle.fkidproductomarca,
                 productomarca: detalle.productomarca,
 
-                fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-                unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
+                fkidproductotipo: detalle.fkidproductotipo,
+                productotipo: detalle.productotipo,
+
+                fkidsucursal: detalle.fkidsucursal,
+                sucursal: detalle.sucursal,
+
+                fkidalmacen: detalle.fkidalmacen,
+                almacen: detalle.almacen,
+
+                fkidproveedor: detalle.fkidproveedor,
+                proveedor: detalle.proveedor,
+
+                fkidseccioninventario: detalle.fkidseccioninventario,
+                seccioninventario: detalle.seccioninventario,
 
                 cantidad: parseInt(detalle.cantidad),
-                cantidadsolicitada: "0",
+                cantidadsolicitada: parseInt(detalle.cantidad),
                 cantidadrecibida: "0",
                 cantidadfaltante: "0",
                 cantidadsobrante: "0",
 
+                costobase: parseFloat(detalle.costounitario).toFixed(2),
                 costounitario: parseFloat(detalle.costounitario).toFixed(2),
                 costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
+
+                descuento: parseInt(detalle.descuento),
+                montodescuento: parseFloat(detalle.montodescuento).toFixed(2),
 
                 peso: parseFloat(detalle.peso).toFixed(2),
                 pesosubtotal: parseFloat(detalle.peso * detalle.cantidad).toFixed(2),
@@ -527,16 +580,25 @@ function C_Form( props ) {
                 nrocajas: "0",
                 nota: null,
 
-                isdevolucioncompra: "",
-                isordencompra: "",
-                issolicitudcompra: "",
+                isdevolucioncompra: "N",
+                isordencompra: "A",
+                issolicitudcompra: detalle.fkidsolicitudcompra ? "A" : "N",
+
+                fkidnotacompra: null,
+                fkidordencompra: detalle.fkidordencompra,
+                fkidordencompradetalle: detalle.idordencompradetalle,
+                fkidsolicitudcompradetalle: detalle.fkidsolicitudcompradetalle,
+                fkidsolicitudcompra: detalle.fkidsolicitudcompra,
+
+                idnotacompradetalle: null,
+                fkidalmacenproductodetalle: null,
 
                 visible_producto: false,
-                fkidproducto: detalle.idproducto,
-                fkidordencompradetalle: detalle.idordencompradetalle,
-                fkidalmacenunidadmedidaproducto: null,
-                fkidnotacompra: null,
-                idnotacompradetalle: null,
+                visible_sucursal: false,
+                visible_almacen: false,
+                visible_proveedor: false,
+                errorcantidad: false,
+                errorcostounitario: false,
             };
             array = [ ...array, element ]
         }
@@ -554,7 +616,7 @@ function C_Form( props ) {
                 onClose={ () => setVisibleOrdenCompra(false) }
                 value={notaCompra.fkidordencompra}
                 onChange={onChangeFKIDOrdenCompra}
-                isordencompra={true}
+                iscompra={"N"}
             />
         );
     };
@@ -771,13 +833,13 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( notaCompra, disabled, onChange, onVisibleProducto  ) }
                     dataSource={notaCompra.arrayNotaCompraDetalle}
-                    scroll={{ x: 2500, y: notaCompra.arrayNotaCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2600, y: notaCompra.arrayNotaCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>
-                <Col xs={{ span: 24, }} sm={{ span: 14, }}>
+                <Col xs={{ span: 24, }} sm={{ span: 10, }}>
                     <Row gutter={ [12, 8] }>
-                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                             <C_Input
                                 label={ "N.I.T."}
                                 placeholder={ "INGRESAR ENCARGADO..." }
@@ -786,7 +848,7 @@ function C_Form( props ) {
                                 readOnly
                             />
                         </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                             <C_Input
                                 label={ "Fecha fac."}
                                 placeholder={ "INGRESAR ENCARGADO..." }
@@ -795,7 +857,9 @@ function C_Form( props ) {
                                 readOnly
                             />
                         </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                    </Row>
+                    <Row gutter={ [12, 8] }>
+                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                             <C_Input
                                 label={ "Razon social"}
                                 placeholder={ "INGRESAR ENCARGADO..." }
@@ -804,7 +868,9 @@ function C_Form( props ) {
                                 readOnly
                             />
                         </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                    </Row>
+                    <Row gutter={ [12, 8] }>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                             <C_Input
                                 label={ "Nº Autorizacion"}
                                 placeholder={ "INGRESAR ENCARGADO..." }
@@ -813,7 +879,7 @@ function C_Form( props ) {
                                 readOnly
                             />
                         </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                             <C_Input
                                 label={ "Cod. control"}
                                 placeholder={ "INGRESAR ENCARGADO..." }
@@ -870,6 +936,32 @@ function C_Form( props ) {
                         />
                     </Col>
                 </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                        <C_Input
+                            label={"Fletes"}
+                            value={ notaCompra.fletes }
+                            onChange={ onChangeFletes }
+                            disabled={ disabled.data }
+                        />
+                    </Col>
+                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                        <C_Input
+                            label={"Internación"}
+                            value={ notaCompra.internacion }
+                            onChange={ onChangeInternacion }
+                            disabled={ disabled.data }
+                        />
+                    </Col>
+                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                        <C_Input
+                            label={"Otros gastos"}
+                            value={ notaCompra.otrosgastos }
+                            onChange={ onChangeOtrosGastos }
+                            disabled={ disabled.data }
+                        />
+                    </Col>
+                </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 6, }}>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                         <C_Input
@@ -903,30 +995,6 @@ function C_Form( props ) {
                             value={ parseFloat(notaCompra.montosubtotal * 1 - notaCompra.montodescuento * 1).toFixed(2) }
                             disabled={ disabled.data }
                             readOnly
-                        />
-                    </Col>
-                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input
-                            label={"Fletes"}
-                            value={ notaCompra.fletes }
-                            onChange={ onChangeFletes }
-                            disabled={ disabled.data }
-                        />
-                    </Col>
-                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input
-                            label={"Internación"}
-                            value={ notaCompra.internacion }
-                            onChange={ onChangeInternacion }
-                            disabled={ disabled.data }
-                        />
-                    </Col>
-                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input
-                            label={"Otros gastos"}
-                            value={ notaCompra.otrosgastos }
-                            onChange={ onChangeOtrosGastos }
-                            disabled={ disabled.data }
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>

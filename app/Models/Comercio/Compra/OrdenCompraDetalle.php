@@ -82,6 +82,9 @@ class OrdenCompraDetalle extends Model
 
         $volumen = is_numeric( $detalle->volumen )  ? $detalle->volumen : 0;
         $volumensubtotal = is_numeric( $detalle->volumensubtotal )  ? $detalle->volumensubtotal : 0;
+        
+        $iscompra = $detalle->iscompra;
+        $issolicitudcompra = $detalle->issolicitudcompra;
 
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
@@ -116,6 +119,9 @@ class OrdenCompraDetalle extends Model
 
             'volumen' => $volumen,
             'volumensubtotal' => $volumensubtotal,
+
+            'iscompra' => $iscompra,
+            'issolicitudcompra' => $issolicitudcompra,
 
             'fecha'  => $fecha,
             'hora'   => $hora
@@ -157,6 +163,9 @@ class OrdenCompraDetalle extends Model
         $volumen = is_numeric( $detalle->volumen )  ? $detalle->volumen : 0;
         $volumensubtotal = is_numeric( $detalle->volumensubtotal )  ? $detalle->volumensubtotal : 0;
 
+        $iscompra = $detalle->iscompra;
+        $issolicitudcompra = $detalle->issolicitudcompra;
+
         $ordencompradetalle = $query->where( 'idordencompradetalle', '=', $idordencompradetalle )
             ->update( [
                 'fkidordencompra' => $fkidordencompra,
@@ -188,6 +197,9 @@ class OrdenCompraDetalle extends Model
 
                 'volumen' => $volumen,
                 'volumensubtotal' => $volumensubtotal,
+
+                'iscompra' => $iscompra,
+                'issolicitudcompra' => $issolicitudcompra,
             ] );
 
         return $ordencompradetalle;

@@ -27,7 +27,9 @@ class CreateAlmacenproductodetalleTable extends Migration
             $table->integer('salidas')->default(0);
             $table->integer('traspasos')->default(0);
             $table->integer('ventas')->default(0);
+            $table->integer('devolucionventas')->default(0);
             $table->integer('compras')->default(0);
+            $table->integer('devolucioncompras')->default(0);
 
             $table->date('fecha');
             $table->time('hora');

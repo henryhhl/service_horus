@@ -95,7 +95,7 @@ const onChangePage = ( page ) => {
                 };
                 await dispatch( disabledActions.onAction() );
                 await dispatch( paginationActions.setPagination( obj ) );
-                await dispatch( setState( result.notaingreso[0] ) );
+                await dispatch( setState( result.arrayNotaIngreso[0] ) );
             }
         } );
 
@@ -258,7 +258,7 @@ const onImprimir = ( ) => {
 };
 
 function onValidate( notaingreso ) {
-    const { codigo } = notaingreso;
+    const { codigo, nrofactura, nrorefprov } = notaingreso;
     let bandera = true;
     if ( codigo?.toString().length > 150 ) {
         notaingreso.error.codigo   = true;
@@ -285,13 +285,35 @@ function onValidate( notaingreso ) {
         notaingreso.message.fkidmoneda = "Campo requerido";
         bandera = false;
     }
+    let contador = 0;
+    for (let index = 0; index < notaingreso.arrayNotaIngresoDetalle.length; index++) {
+        const element = notaingreso.arrayNotaIngresoDetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+            if ( parseInt(element.costounitario) <= 0 ) {
+                element.errorcosto = true;
+                C_Message( "warning", `El costo de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === notaingreso.arrayNotaIngresoDetalle.length ) {
+        C_Message( "warning", `Campo Producto requerido` );
+        bandera = false;
+    }
     if ( !bandera ) {
         C_Message( "error", "Problemas al registrar" );
     }
     return bandera;
 };
 
-export const notaIngresoActions = {
+export const NotaIngresoActions = {
     initData,
     getData,
     onChangePage,

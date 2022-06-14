@@ -161,6 +161,7 @@ Route::get($submodulocomercioinventario  . '/unidadmedidaproducto/index', 'Comer
 Route::get($submodulocomercioinventario  . '/almacenunidadmedidaproducto/index', 'Comercio\Inventario\AlmacenUnidadMedidaProductoController@index');
 Route::get($submodulocomercioinventario  . '/almacenproductodetalle/index', 'Comercio\Inventario\AlmacenProductoDetalleController@index');
 
+
 Route::get($submodulocomercioinventario  . '/notaingreso/index', 'Comercio\Inventario\NotaIngresoController@index');
 Route::get($submodulocomercioinventario  . '/notaingreso/create', 'Comercio\Inventario\NotaIngresoController@create');
 Route::get($submodulocomercioinventario  . '/notaingreso/editar/{idnotaingreso}', 'Comercio\Inventario\NotaIngresoController@edit');
@@ -170,6 +171,16 @@ Route::get($submodulocomercioinventario  . '/notaingreso/show/{idnotaingreso}', 
 Route::post($submodulocomercioinventario . '/notaingreso/delete', 'Comercio\Inventario\NotaIngresoController@delete');
 Route::get($submodulocomercioinventario  . '/notaingreso/searchByID', 'Comercio\Inventario\NotaIngresoController@searchByID');
 Route::post($submodulocomercioinventario . '/notaingreso/reporte', 'Comercio\Inventario\NotaIngresoController@reporte');
+
+Route::get($submodulocomercioinventario  . '/notasalida/index', 'Comercio\Inventario\NotaSalidaController@index');
+Route::get($submodulocomercioinventario  . '/notasalida/create', 'Comercio\Inventario\NotaSalidaController@create');
+Route::get($submodulocomercioinventario  . '/notasalida/editar/{idnotasalida}', 'Comercio\Inventario\NotaSalidaController@edit');
+Route::post($submodulocomercioinventario . '/notasalida/store', 'Comercio\Inventario\NotaSalidaController@store');
+Route::post($submodulocomercioinventario . '/notasalida/update', 'Comercio\Inventario\NotaSalidaController@update');
+Route::get($submodulocomercioinventario  . '/notasalida/show/{idnotasalida}', 'Comercio\Inventario\NotaSalidaController@show');
+Route::post($submodulocomercioinventario . '/notasalida/delete', 'Comercio\Inventario\NotaSalidaController@delete');
+Route::get($submodulocomercioinventario  . '/notasalida/searchByID', 'Comercio\Inventario\NotaSalidaController@searchByID');
+Route::post($submodulocomercioinventario . '/notasalida/reporte', 'Comercio\Inventario\NotaSalidaController@reporte');
 
 
 

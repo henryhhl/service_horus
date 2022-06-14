@@ -100,6 +100,10 @@ class NotaCompraDetalle extends Model
         $volumen = is_numeric( $detalle->volumen )  ? $detalle->volumen : 0;
         $volumensubtotal = is_numeric( $detalle->volumensubtotal )  ? $detalle->volumensubtotal : 0;
 
+        $isdevolucioncompra = $detalle->isdevolucioncompra;
+        $isordencompra = $detalle->isordencompra;
+        $issolicitudcompra = $detalle->issolicitudcompra;
+
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
 
@@ -144,6 +148,10 @@ class NotaCompraDetalle extends Model
 
             'volumen' => $volumen,
             'volumensubtotal' => $volumensubtotal,
+
+            'isdevolucioncompra' => $isdevolucioncompra,
+            'isordencompra' => $isordencompra,
+            'issolicitudcompra' => $issolicitudcompra,
 
             'fecha'  => $fecha,
             'hora'   => $hora

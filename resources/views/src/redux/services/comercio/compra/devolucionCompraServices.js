@@ -70,6 +70,7 @@ const onGrabar = async ( devolucioncompra ) => {
         pesototal: devolucioncompra.pesototal,
         nota:  devolucioncompra.nota,
         tipocompra:  devolucioncompra.tipocompra,
+        fkidtipotransaccion: 7,
         arrayDevolucionCompraDetalle: JSON.stringify(devolucioncompra.arrayDevolucionCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
@@ -131,7 +132,9 @@ const onUpdate = async ( devolucioncompra ) => {
         pesototal: devolucioncompra.pesototal,
         nota:  devolucioncompra.nota,
         tipocompra:  devolucioncompra.tipocompra,
+        fkidtipotransaccion: 7,
         arrayDevolucionCompraDetalle: JSON.stringify(devolucioncompra.arrayDevolucionCompraDetalle),
+        arrayDeleteDevolucionCompraDetalle: JSON.stringify(devolucioncompra.arrayDeleteDevolucionCompraDetalle),
     } ) . then ( ( result ) => {
         resultData( result );
         if ( result.response == 0 ) {

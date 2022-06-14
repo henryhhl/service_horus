@@ -88,14 +88,16 @@ const initialState = {
 };
 
 export const DevolucionCompraCompraReducer = ( state = initialState, action = { payload, type} ) => {
+    const { payload, type } = action;
 
-    switch ( action.type ) {
+    switch ( type ) {
 
         case Strings.devolucioncompra_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.devolucioncompra_onCreate:
+            const { arrayConceptoCompra, arrayMoneda } = payload;
             cleanObejct( state );
             state.iddevolucioncompra = action.payload.iddevolucioncompra;
 
@@ -113,10 +115,17 @@ export const DevolucionCompraCompraReducer = ( state = initialState, action = { 
             state.montodescuento = '0.00';
             state.montototal = "0.00";
 
-            state.arrayDevolucionCompraDetalle = loadDetailBuyDevolution();
+            state.isnotacompra = "N";
+            state.isordencompra = "N";
+            state.issolicitudcompra = "N";
+            
+            state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
+            state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;
 
-            state.fkidmoneda  = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].idmoneda;
-            state.moneda      = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].descripcion;
+            state.fkidconceptocompra = Functions.initValueServiceInArray( arrayConceptoCompra, "idconceptocompra" );
+            state.conceptocompra     = Functions.initValueServiceInArray( arrayConceptoCompra, "descripcion" );
+            
+            state.arrayDevolucionCompraDetalle = loadDetailBuyDevolution();
 
             state.loading = false;
             state = Object.assign( {}, state );
@@ -215,115 +224,99 @@ function onSetData( state, payload ) {
     state.isordencompra = payload.isordencompra;
     state.isnotacompra = payload.isnotacompra;
 
-    state.arrayDevolucionCompraDetalle = setStateDetailsBuyDevolution(payload.devolucioncompradetalle);
+    state.arrayDevolucionCompraDetalle = setStateDetailsBuyDevolution(payload.arraydevolucioncompradetalle, state);
 };
 
 function loadDetailBuyDevolution() {
     let array = [];
-    // for ( let index = 0; index < 10; index++ ) {
-    //     const element = {
-    //         key: index,
-
-    //         codigo: "",
-    //         producto: "",
-    //         ciudadorigen: "",
-    //         productomarca: "",
-
-    //         fkidunidadmedidaproducto: null,
-    //         unidadmedidaproducto: "",
-
-    //         cantidad: "",
-    //         cantidadcomprada: "",
-
-    //         costounitario: "",
-    //         costosubtotal: "",
-
-    //         peso: "",
-    //         pesosubtotal: "",
-
-    //         volumen: "",
-    //         volumensubtotal: "",
-
-    //         fechavencimiento: null,
-    //         fvencimiento: null,
-    //         nota: null,
-
-    //         nrolote: "",
-    //         nrofabrica: "",
-
-    //         isnotacompra: "",
-    //         isordencompra: "",
-    //         issolicitudcompra: "",
-
-    //         visible_producto: false,
-    //         visible_unidadmedida: false,
-
-    //         array_unidadmedidaproducto: [],
-
-    //         fkiddevolucioncompra: null,
-    //         fkidproducto: null,
-    //         fkidalmacenunidadmedidaproducto: null,
-    //         fkidnotacompradetalle: null,
-    //         iddevolucioncompradetalle: null,
-    //     };
-    //     array = [ ...array, element];
-    // }
     return array;
 };
 
-function setStateDetailsBuyDevolution( devolucioncompradetalle ) {
+function setStateDetailsBuyDevolution( devolucioncompradetalle, state ) {
     let array = [];
     for (let index = 0; index < devolucioncompradetalle.length; index++) {
         let detalle = devolucioncompradetalle[index];
-
-        const element = {
-            key: index,
-
-            codigo: detalle.codigo,
-            producto: detalle.nombre,
-            ciudadorigen: detalle.ciudadorigen,
-            productomarca: detalle.productomarca,
-
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
-
-            cantidad: parseInt(detalle.cantidad),
-            cantidadcomprada: parseInt(detalle.cantidadcomprada),
-
-            costounitario: parseFloat(detalle.costounitario).toFixed(2),
-            costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
-
-            peso: parseFloat(detalle.peso).toFixed(2),
-            pesosubtotal: parseFloat(detalle.pesosubtotal).toFixed(2),
-
-            volumen: parseFloat(detalle.volumen).toFixed(2),
-            volumensubtotal: parseFloat(detalle.volumensubtotal).toFixed(2),
-
-            fechavencimiento: detalle.fechavencimiento,
-            fvencimiento: Functions.convertYMDToDMY(detalle.fechavencimiento),
-            
-            nota: detalle.nota,
-            nrolote: parseFloat(detalle.nrolote).toFixed(2),
-            nrofabrica: parseFloat(detalle.nrofabrica).toFixed(2),
-
-            isnotacompra: detalle.isnotacompra,
-            isordencompra: detalle.isordencompra,
-            issolicitudcompra: detalle.issolicitudcompra,
-
-            visible_producto: false,
-            visible_unidadmedida: false,
-
-            array_unidadmedidaproducto: [],
-
-            fkiddevolucioncompra: detalle.fkiddevolucioncompra,
-            fkidproducto: detalle.idproducto,
-            fkidalmacenunidadmedidaproducto: detalle.fkidalmacenunidadmedidaproducto,
-            fkidnotacompradetalle: detalle.fkidnotacompradetalle,
-            nota: detalle.nota,
-            iddevolucioncompradetalle: detalle.iddevolucioncompradetalle,
-            errorcantidad: false,
-        };
+        const element = defaultDevolucionNotaCompraDetalle(index, state, detalle);
         array = [ ...array, element];
     };
     return array;
 };
+
+function defaultDevolucionNotaCompraDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        producto: detalle ? detalle.producto : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` :  "",
+
+        fkidciudadorigen: detalle ? detalle.fkidciudadorigen : null,
+        ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        fkidproveedor: detalle ? detalle.fkidproveedor : state.fkidproveedor,
+        proveedor: detalle ? detalle.proveedor : state.proveedor,
+
+        fkidseccioninventario: detalle ? detalle.fkidseccioninventario : state.fkidseccioninventario,
+        seccioninventario: detalle ? detalle.seccioninventario : state.seccioninventario,
+
+        cantidad: detalle ? detalle.cantidad : "",
+        cantidadcomprada: detalle ? detalle.cantidadcomprada : "",
+
+        descuento: detalle ? detalle.descuento : "",
+        montodescuento: detalle ? parseFloat(detalle.montodescuento).toFixed(2) : "",
+
+        costobase: detalle ? parseFloat(detalle.costobase).toFixed(2) : "",
+        costounitario: detalle ? parseFloat(detalle.costounitario).toFixed(2) : "",
+        costosubtotal: detalle ? parseFloat(detalle.costosubtotal).toFixed(2) : "",
+
+        peso: detalle ? parseFloat(detalle.peso).toFixed(2) : "",
+        pesosubtotal: detalle ? parseFloat(detalle.pesosubtotal).toFixed(2) : "",
+
+        volumen: detalle ? parseFloat(detalle.volumen).toFixed(2) : "",
+        volumensubtotal: detalle ? parseFloat(detalle.volumensubtotal).toFixed(2) : "",
+
+        fechavencimiento: detalle ? detalle.fechavencimiento : null,
+        fvencimiento: detalle ? Functions.convertYMDToDMY(detalle.fechavencimiento) : null,
+
+        nota: detalle ? detalle.nota : null,
+        nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
+        nrofabrica: detalle ? parseFloat(detalle.nrofabrica).toFixed(2) : "",
+
+        isnotacompra: detalle ? detalle.isnotacompra : "N",
+        isordencompra: detalle ? detalle.isordencompra : "N",
+        issolicitudcompra: detalle ? detalle.issolicitudcompra : "N",
+
+        fkidnotacompra: detalle ? detalle.fkidnotacompra : null,
+        fkidnotacompradetalle: detalle ? detalle.fkidnotacompradetalle : null,
+
+        fkidordencompra: detalle ? detalle.fkidordencompra : null,
+        fkidordencompradetalle: detalle ? detalle.fkidordencompradetalle : null,
+
+        fkidsolicitudcompradetalle: detalle ? detalle.fkidsolicitudcompradetalle : null,
+        fkidsolicitudcompra: detalle ? detalle.fkidsolicitudcompra : null,
+
+        fkidalmacenproductodetalle: detalle ? detalle.fkidalmacenproductodetalle : null,
+        fkiddevolucioncompra:  detalle ? detalle.fkiddevolucioncompra : null,
+        iddevolucioncompradetalle:  detalle ? detalle.iddevolucioncompradetalle : null,
+
+        visible_producto: false,
+        visible_sucursal: false,
+        visible_almacen: false,
+        visible_proveedor: false,
+        errorcantidad: false,
+        errorcostounitario: false,
+    };
+}

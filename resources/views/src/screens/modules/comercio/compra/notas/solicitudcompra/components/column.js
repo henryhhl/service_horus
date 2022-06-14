@@ -97,13 +97,13 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
     return ( [
         {
             title: <span style={{ fontSize: 11, }}> { 'Nro.' } </span>,
-            width: 30,
+            width: 20,
             dataIndex: 'nro',
             key: 'nro',
             fixed: 'left',
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 11, }}>
-                    <label style={{ color: '#387DFF', cursor: 'pointer', }} > 
+                    <label style={{ cursor: 'pointer', }} > 
                         { parseInt( index ) + 1 }
                     </label>
                 </span>
@@ -111,7 +111,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Código' } </span>,
-            width: 70,
+            width: 60,
             dataIndex: 'codigo',
             key: 'codigo',
             fixed: 'left',
@@ -140,7 +140,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         { 
             title: <span style={{ fontSize: 11, }}> { 'Producto' } </span>, 
             dataIndex: 'producto', 
-            key: 'producto', width: 110,
+            key: 'producto', width: 80,
             render: ( text, data, index ) => (
                 disabled.data ?
                 <span style={{ fontSize: 10, display: 'flex', }}>
@@ -165,7 +165,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
-            width: 40,
+            width: 25,
             dataIndex: 'stockactual',
             key: 'stockactual',
             render: ( text, data, index ) => (
@@ -178,7 +178,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Cantidad' } </span>, 
-            dataIndex: 'cantidadsolicitada', key: 'cantidadsolicitada', width: 40,
+            dataIndex: 'cantidadsolicitada', key: 'cantidadsolicitada', width: 25,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( typeof data.cantidadsolicitada != "number" ) ?
@@ -235,7 +235,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             }
                         >
                             <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.cantidadsolicitada} { data.error === true && 
+                                {data.cantidadsolicitada} { data.errorcantidad === true && 
                                     <ExclamationOutlined 
                                         style={{ position: 'relative', top: -2, padding: 4, borderRadius: 30, color: 'white', backgroundColor: 'red', }} 
                                     /> 
@@ -248,7 +248,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Costo Base' } </span>,
-            width: 50,
+            width: 40,
             dataIndex: 'costobase',
             key: 'costobase',
             render: ( text, data, index ) => (
@@ -261,7 +261,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
-            dataIndex: 'costounitario', key: 'costounitario', width: 50,
+            dataIndex: 'costounitario', key: 'costounitario', width: 40,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costounitario.toString().length == 0 ) ?
@@ -315,7 +315,11 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             }
                         >
                             <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.costounitario}
+                                {data.costounitario} { data.errorcostounitario === true && 
+                                    <ExclamationOutlined 
+                                        style={{ position: 'relative', top: -2, padding: 4, borderRadius: 30, color: 'white', backgroundColor: 'red', }} 
+                                    /> 
+                                }
                             </label>
                         </Popover>
                     }
@@ -408,7 +412,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Nota' } </span>,
-            dataIndex: 'nota', key: 'nota', width: 200,
+            dataIndex: 'nota', key: 'nota', width: 150,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { disabled.data ?

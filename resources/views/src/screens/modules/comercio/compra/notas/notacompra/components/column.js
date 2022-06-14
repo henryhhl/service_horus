@@ -2,9 +2,9 @@
 import React from 'react';
 
 import { Popconfirm, Popover, Tooltip } from "antd";
-import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationOutlined, FileSearchOutlined, PlusOutlined, StopOutlined } from "@ant-design/icons";
 
-import { C_Date, C_Input } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
 export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle = () => {}, onVisibleProducto = () => {} ) => {
@@ -48,11 +48,29 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             key: detalle.arrayNotaCompraDetalle.length,
             codigo: "",
             producto: "",
-            ciudadorigen: "",
+            fkidproducto: null,
+            unidadmedida: "",
+
+            fkidciudadorigen: null,
+            ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+            fkidproductomarca: null,
             productomarca: "",
 
-            fkidunidadmedidaproducto: null,
-            unidadmedidaproducto: "",
+            fkidproductotipo: null,
+            productotipo: "",
+
+            fkidsucursal: detalle.fkidsucursal,
+            sucursal: detalle.sucursal,
+
+            fkidalmacen: detalle.fkidalmacen,
+            almacen: detalle.almacen,
+
+            fkidproveedor: detalle.fkidproveedor,
+            proveedor: detalle.proveedor,
+
+            fkidseccioninventario: null,
+            seccioninventario: "",
 
             cantidad: "",
             cantidadsolicitada: "",
@@ -61,6 +79,10 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             cantidadsobrante: "",
             nrocajas: "",
 
+            descuento: "",
+            montodescuento: "",
+
+            costobase: "",
             costounitario: "",
             costosubtotal: "",
 
@@ -77,26 +99,42 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             nrolote: "",
             nrofabrica: "",
 
-            isdevolucioncompra: "",
-            isordencompra: "",
-            issolicitudcompra: "",
+            isdevolucioncompra: "N",
+            isordencompra: "N",
+            issolicitudcompra: "N",
+
+            fkidnotacompra: null,
+            fkidordencompra: null,
+            fkidordencompradetalle: null,
+            fkidsolicitudcompradetalle: null,
+            fkidsolicitudcompra: null,
+
+            idnotacompradetalle: null,
+            fkidalmacenproductodetalle: null,
 
             visible_producto: false,
-            fkidnotacompra: null,
-            fkidproducto: null,
-            fkidalmacenunidadmedidaproducto: null,
-            fkidordencompradetalle: null,
-            nota: null,
-            idnotacompradetalle: null,
+            visible_sucursal: false,
+            visible_almacen: false,
+            visible_proveedor: false,
             errorcantidad: false,
-            errorcosto: false,
+            errorcostounitario: false,
         };
         detalle.arrayNotaCompraDetalle = [ ...detalle.arrayNotaCompraDetalle, element ];
         onChangeDetalle( detalle );
     };
 
-    function onDeleteRowDetalle( index ) {
+    function onDeleteRowDetalle( data, index ) {
         detalle.arrayNotaCompraDetalle = detalle.arrayNotaCompraDetalle.filter( (item, key) => key !== index );
+
+        for (let index = 0; index < detalle.arrayNotaCompraDetalle.length; index++) {
+            let element = detalle.arrayNotaCompraDetalle[index];
+            element.key = index;
+        }
+
+        if ( data.idnotacompradetalle != null ) {
+            detalle.arrayDeleteNotaCompraDetalle = [ ...detalle.arrayDeleteNotaCompraDetalle, data.idnotacompradetalle ];
+        }
+
         updateTotales();
         onChangeDetalle( detalle );
     };
@@ -118,11 +156,17 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Código' } </span>,
-            width: 70,
+            width: 80,
             dataIndex: 'codigo',
             key: 'codigo',
             fixed: 'left',
             render: ( text, data, index ) => (
+                disabled.data ? 
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.codigo != null && data.codigo }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -141,8 +185,14 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         { 
             title: <span style={{ fontSize: 11, }}> { 'Producto' } </span>, 
             dataIndex: 'producto', 
-            key: 'producto', width: 90,
+            key: 'producto', width: 120,
             render: ( text, data, index ) => (
+                disabled.data ?
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.producto != null && <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </> }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -151,38 +201,10 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                     <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}
                         onClick={ () => ( !disabled.data ) && onVisibleProducto(data, index) }
                     > 
-                        { ( data.producto.toString().length == 0 ) ?
-                            "SELECCIONAR" : data.producto
+                        { ( data.producto == null || data.producto == "" ) ?
+                            "SELECCIONAR" : <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </>
                         }
                     </label>
-                </span>
-            ),
-        },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>,
-            width: 60,
-            dataIndex: 'ciudadorigen',
-            key: 'ciudadorigen',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    <label> 
-                        { data.ciudadorigen }
-                    </label>
-                </span>
-            ),
-        },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Und.' } </span>,
-            width: 55,
-            dataIndex: 'unidadmedidaproducto',
-            key: 'unidadmedidaproducto',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.unidadmedidaproducto.toString().length == 0 ) ? "" :
-                        <label> 
-                            { data.unidadmedidaproducto }
-                        </label>
-                    }
                 </span>
             ),
         },
@@ -255,6 +277,19 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             </label>
                         </Popover>
                     }
+                </span>
+            ),
+        },
+        {
+            title: <span style={{ fontSize: 11, }}> { 'Costo Base' } </span>,
+            width: 50,
+            dataIndex: 'costobase',
+            key: 'costobase',
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label> 
+                        { data.costobase }
+                    </label>
                 </span>
             ),
         },
@@ -333,6 +368,62 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                         "" : 
                         <label> 
                             {data.costosubtotal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
+            dataIndex: 'almacen', key: 'almacen', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.almacen == null ) ?
+                        "" : 
+                        <label> 
+                            {data.almacen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
+            dataIndex: 'productomarca', key: 'productomarca', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productomarca == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productomarca}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>, 
+            dataIndex: 'ciudadorigen', key: 'ciudadorigen', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.ciudadorigen == null ) ?
+                        "" : 
+                        <label> 
+                            {data.ciudadorigen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Tipo' } </span>, 
+            dataIndex: 'productotipo', key: 'productotipo', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productotipo == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productotipo}
                         </label>
                     }
                 </span>
@@ -602,6 +693,12 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             title: <span style={{ fontSize: 11, }}> { 'Nota' } </span>,
             dataIndex: 'nota', key: 'nota', width: 180,
             render: ( text, data, index ) => (
+                disabled.data ?
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.nota == null ? "" : data.nota }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <Popover title={"Nota"} trigger="click"
                         content={
@@ -643,22 +740,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             key: 'accion',
             fixed: 'right',
             width: 50,
-            render: ( text, data, index ) => (
-                <Popconfirm title={"Estas seguro de eliminar?"}
-                    onConfirm={ () => {
-                        if ( disabled.data ) return;
-                        onDeleteRowDetalle(index);
-                    } }
-                >
-                    <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
-                        <DeleteOutlined className="icon-table-horus" 
-                            // onClick={ () => {
-                            //     if ( disabled.data ) return;
-                            //     onDeleteRowDetalle(index);
-                            // } }
-                        />
-                    </Tooltip>
-                </Popconfirm>
+            render: ( text, data, index ) => !disabled.data ? (
+                <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
+                    <DeleteOutlined className="icon-table-horus"
+                        onClick={ () => {
+                            let onDeleteRowDetalles = () => onDeleteRowDetalle( data, index );
+                            C_Confirm( {
+                                title: "Quitar Producto", onOk: onDeleteRowDetalles,
+                                okType: "primary", content: "Estás seguro de realizar acción.?",
+                            } );
+                        } }
+                    />
+                </Tooltip>
+            ) : (
+                <StopOutlined className="icon-table-horus" style={{ color: 'red', }} /> 
             ),
         },
     ] ); 

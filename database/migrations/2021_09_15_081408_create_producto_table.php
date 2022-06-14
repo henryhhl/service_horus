@@ -37,6 +37,16 @@ class CreateProductoTable extends Migration
             $table->integer('stockactual')->default(0);
             $table->integer('nivel')->default(0);
 
+            $table->integer('ingresos')->default(0);
+            $table->integer('salidas')->default(0);
+            $table->integer('traspasos')->default(0);
+            $table->integer('solicitudcompra')->default(0);
+            $table->integer('ordencompra')->default(0);
+            $table->integer('notacompra')->default(0);
+            $table->integer('devolucioncompra')->default(0);
+            $table->integer('notaventa')->default(0);
+            $table->integer('devolucionventa')->default(0);
+
             $table->decimal('costobase', 24, 8)->default(0);
             $table->integer('costodescuento')->default(0);
             $table->decimal('costomontodescuento', 24, 8)->default(0);

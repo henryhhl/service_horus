@@ -38,6 +38,7 @@ class NotaIngresoRequest extends FormRequest
             'fkidalmacen'            => 'required|numeric',
             'fkidconceptoinventario' => 'required|numeric',
             'fkidmoneda'             => 'required|numeric',
+            'fkidtipotransaccion'    => 'required|numeric',
 
             'tipocambio'     => 'required|numeric',
             'cantidadtotal'  => 'required|numeric',
@@ -45,6 +46,12 @@ class NotaIngresoRequest extends FormRequest
             'pesototal'      => 'required|numeric',
             'volumentotal'   => 'required|numeric',
             'nrocajastotal'  => 'required|numeric',
+
+            'actualizarcostos' => 'nullable|in:A,N',
+            'esnotaingreso' => 'nullable|in:A,N',
+            'esingresado' => 'nullable|in:A,N',
+            'estado' => 'nullable|in:A,N',
+            'isdelete' => 'nullable|in:A,N',
         ];
     }
 
@@ -63,6 +70,9 @@ class NotaIngresoRequest extends FormRequest
 
             'fkidmoneda.required' => 'El :attribute es obligatorio.',
             'fkidmoneda.numeric'  => 'El :attribute solo se permite numero.',
+
+            'fkidtipotransaccion.required' => 'El :attribute es obligatorio.',
+            'fkidtipotransaccion.numeric'  => 'El :attribute solo se permite numero.',
 
             'codigo.max' => 'Campo :attribute permite máximo de 150 caracteres.',
 
@@ -86,6 +96,12 @@ class NotaIngresoRequest extends FormRequest
 
             'nrocajastotal.required' => 'El :attribute es obligatorio.',
             'nrocajastotal.numeric'  => 'El :attribute solo se permite numero.',
+
+            'actualizarcostos.in' => 'Campo :attribute es permitido ingresar A o N.',
+            'esnotaingreso.in' => 'Campo :attribute es permitido ingresar A o N.',
+            'esingresado.in' => 'Campo :attribute es permitido ingresar A o N.',
+            'estado.in' => 'Campo :attribute es permitido ingresar A o N.',
+            'isdelete.in' => 'Campo :attribute es permitido ingresar A o N.',
         ];
     }
 
@@ -96,6 +112,7 @@ class NotaIngresoRequest extends FormRequest
             'fkidalmacen'            => 'ID Álmacen',
             'fkidconceptoinventario' => 'ID Concepto Inventario',
             'fkidmoneda'             => 'ID Moneda',
+            'fkidtipotransaccion'    => 'ID',
 
             'codigo'           => 'código',
             'fechanotaingreso' => 'fecha Nota Ingreso',
@@ -106,6 +123,13 @@ class NotaIngresoRequest extends FormRequest
             'pesototal'     => 'Peso Total',
             'volumentotal'  => 'Volumen Total',
             'nrocajastotal' => 'Nro. Cajas Total',
+
+            'actualizarcostos' => '',
+            'esnotaingreso' => '',
+            'esingresado' => '',
+            'estado' => '',
+            'isdelete' => '',
+
         ];
     }
 

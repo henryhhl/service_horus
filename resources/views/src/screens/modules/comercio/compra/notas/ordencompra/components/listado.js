@@ -35,8 +35,9 @@ function C_ListadoOrdenCompra( props ) {
 
     function get_data( search = "" ) {
         httpRequest( 'get', webservices.wscomerciocompraordencompra_index, {
-            search: search, orderBy: 'asc', esPaginado: 0,
+            search: search, orderBy: 'asc', esPaginado: 0, iscompra: props.iscompra,
         } ) . then( (result) => {
+            console.log(result)
             resultData( result );
             if ( result.response == 1 ) {
                 C_Message( "success", "Servicio realizado exitosamente." );
@@ -202,6 +203,7 @@ function C_ListadoOrdenCompra( props ) {
 C_ListadoOrdenCompra.propTypes = {
     value:  PropTypes.any,
     create: PropTypes.bool,
+    iscompra: PropTypes.string,
     
     onCreate:  PropTypes.func,
     onChecked: PropTypes.func,
@@ -210,6 +212,7 @@ C_ListadoOrdenCompra.propTypes = {
 C_ListadoOrdenCompra.defaultProps = {
     value: null,
     create: false,
+    iscompra: null,
 }
 
 export default C_ListadoOrdenCompra;

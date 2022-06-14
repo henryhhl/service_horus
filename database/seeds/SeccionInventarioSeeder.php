@@ -31,20 +31,6 @@ class SeccionInventarioSeeder extends Seeder
                 'estado'      => 'A',
                 'isdelete'    => 'N',
             ],
-            [
-                'descripcion' => 'Comercial',
-                'fecha'       => $mytime->toDateString(),
-                'hora'        => $mytime->toTimeString(),
-                'estado'      => 'A',
-                'isdelete'    => 'A',
-            ],
-            [
-                'descripcion' => 'Taller',
-                'fecha'       => $mytime->toDateString(),
-                'hora'        => $mytime->toTimeString(),
-                'estado'      => 'A',
-                'isdelete'    => 'A',
-            ],
         ];
     }
 }

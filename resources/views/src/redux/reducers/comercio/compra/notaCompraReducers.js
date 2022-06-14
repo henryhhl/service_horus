@@ -114,14 +114,16 @@ const initialState = {
 };
 
 export const NotaCompraCompraReducer = ( state = initialState, action = { payload, type} ) => {
+    const { payload, type } = action;
 
-    switch ( action.type ) {
+    switch ( type ) {
 
         case Strings.notacompra_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.notacompra_onCreate:
+            const { arrayConceptoCompra, arrayMoneda, arraySeccionInventario, arraySucursal } = payload;
             cleanObejct( state );
             state.idnotacompra = action.payload.idnotacompra;
 
@@ -151,11 +153,29 @@ export const NotaCompraCompraReducer = ( state = initialState, action = { payloa
             state.internacion = "0.00";
             state.otrosgastos = "0.00";
             state.nrocajastotal = '0';
+            
+            state.isdevolucioncompra = "N";
+            state.isordencompra = "N";
+            state.issolicitudcompra = "N";
+            
+            state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
+            state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;
 
-            state.arrayNotaCompraDetalle = loadDetailBuyNote();
-
-            state.fkidmoneda  = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].idmoneda;
-            state.moneda      = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].descripcion;
+            state.fkidconceptocompra = Functions.initValueServiceInArray( arrayConceptoCompra, "idconceptocompra" );
+            state.conceptocompra     = Functions.initValueServiceInArray( arrayConceptoCompra, "descripcion" );
+            
+            state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
+            state.sucursal     = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
+            
+            let arrayAlmacen = ( typeof state.fkidsucursal == "number" ) ? arraySucursal[0].arrayalmacen : [];
+            
+            state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
+            state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
+            
+            state.fkidseccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "idseccioninventario" );
+            state.seccioninventario = Functions.initValueServiceInArray( arraySeccionInventario, "descripcion" );
+            
+            state.arrayNotaCompraDetalle = loadDetailBuyNote( state );
 
             state.loading = false;
             state = Object.assign( {}, state );
@@ -274,118 +294,102 @@ function onSetData( state, payload ) {
     state.nroautorizacion = payload.nroautorizacion;
     state.codigocontrol = payload.codigocontrol;
 
-    state.arrayNotaCompraDetalle = setStateDetailsBuyNote(payload.notacompradetalle);
+    state.arrayNotaCompraDetalle = setStateDetailsBuyNote( payload.arraynotacompradetalle, state );
 };
 
-function loadDetailBuyNote() {
+function loadDetailBuyNote( state ) {
     let array = [];
     for ( let index = 0; index < 10; index++ ) {
-        const element = {
-            key: index,
-
-            codigo: "",
-            producto: "",
-            ciudadorigen: "",
-            productomarca: "",
-
-            fkidunidadmedidaproducto: null,
-            unidadmedidaproducto: "",
-
-            cantidad: "",
-            cantidadsolicitada: "",
-            cantidadrecibida: "",
-            cantidadfaltante: "",
-            cantidadsobrante: "",
-            nrocajas: "",
-
-            costounitario: "",
-            costosubtotal: "",
-
-            peso: "",
-            pesosubtotal: "",
-
-            volumen: "",
-            volumensubtotal: "",
-
-            fechavencimiento: null,
-            fvencimiento: null,
-            nota: null,
-
-            nrolote: "",
-            nrofabrica: "",
-
-            isdevolucioncompra: "",
-            isordencompra: "",
-            issolicitudcompra: "",
-
-            visible_producto: false,
-            fkidnotacompra: null,
-            fkidproducto: null,
-            fkidalmacenunidadmedidaproducto: null,
-            fkidordencompradetalle: null,
-            idnotacompradetalle: null,
-            errorcantidad: false,
-            errorcosto: false,
-        };
+        const element = defaultNotaCompraDetalle( index, state );
         array = [ ...array, element];
     }
     return array;
 };
 
-function setStateDetailsBuyNote( notacompradetalle ) {
+function defaultNotaCompraDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        producto: detalle ? detalle.producto : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` :  "",
+
+        fkidciudadorigen: detalle ? detalle.fkidciudadorigen : null,
+        ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        fkidproveedor: detalle ? detalle.fkidproveedor : state.fkidproveedor,
+        proveedor: detalle ? detalle.proveedor : state.proveedor,
+
+        fkidseccioninventario: null,
+        seccioninventario: "",
+
+        cantidad: detalle ? detalle.cantidad : "",
+        cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
+        cantidadrecibida: detalle ? detalle.cantidadrecibida : "",
+        cantidadfaltante: detalle ? detalle.cantidadfaltante : "",
+        cantidadsobrante: detalle ? detalle.cantidadsobrante : "",
+        nrocajas: detalle ? detalle.nrocajas : "",
+
+        descuento: detalle ? detalle.descuento : "",
+        montodescuento: detalle ? parseFloat(detalle.montodescuento).toFixed(2) : "",
+
+        costobase: detalle ? parseFloat(detalle.costobase).toFixed(2) : "",
+        costounitario: detalle ? parseFloat(detalle.costounitario).toFixed(2) : "",
+        costosubtotal: detalle ? parseFloat(detalle.costosubtotal).toFixed(2) : "",
+
+        peso: detalle ? parseFloat(detalle.peso).toFixed(2) : "",
+        pesosubtotal: detalle ? parseFloat(detalle.pesosubtotal).toFixed(2) : "",
+
+        volumen: detalle ? parseFloat(detalle.volumen).toFixed(2) : "",
+        volumensubtotal: detalle ? parseFloat(detalle.volumensubtotal).toFixed(2) : "",
+
+        fechavencimiento: detalle ? detalle.fechavencimiento : null,
+        fvencimiento: detalle ? Functions.convertYMDToDMY(detalle.fechavencimiento) : null,
+        nota: detalle ? detalle.nota : null,
+
+        nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
+        nrofabrica: detalle ? parseFloat(detalle.nrofabrica).toFixed(2) : "",
+
+        isdevolucioncompra: detalle ? detalle.isdevolucioncompra : "N",
+        isordencompra: detalle ? detalle.isordencompra : "N",
+        issolicitudcompra: detalle ? detalle.issolicitudcompra : "N",
+
+        fkidnotacompra: detalle ? detalle.fkidnotacompra : null,
+        fkidordencompra: detalle ? detalle.fkidordencompra : null,
+        fkidordencompradetalle: detalle ? detalle.fkidordencompradetalle : null,
+        fkidsolicitudcompradetalle: detalle ? detalle.fkidsolicitudcompradetalle : null,
+        fkidsolicitudcompra: detalle ? detalle.fkidsolicitudcompra : null,
+
+        idnotacompradetalle: detalle ? detalle.idnotacompradetalle : null,
+        fkidalmacenproductodetalle: detalle ? detalle.fkidalmacenproductodetalle : null,
+
+        visible_producto: false,
+        visible_sucursal: false,
+        visible_almacen: false,
+        visible_proveedor: false,
+        errorcantidad: false,
+        errorcostounitario: false,
+    };
+}
+
+function setStateDetailsBuyNote( notacompradetalle, state ) {
     let array = [];
     for (let index = 0; index < notacompradetalle.length; index++) {
         let detalle = notacompradetalle[index];
-
-        const element = {
-            key: index,
-
-            codigo: detalle.codigo,
-            producto: detalle.nombre,
-            ciudadorigen: detalle.ciudadorigen,
-            productomarca: detalle.productomarca,
-
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
-
-            cantidad: parseInt(detalle.cantidad),
-            cantidadsolicitada: parseInt(detalle.cantidadsolicitada),
-            cantidadrecibida: parseInt(detalle.cantidadrecibida),
-            cantidadfaltante: parseInt(detalle.cantidadfaltante),
-            cantidadsobrante: parseInt(detalle.cantidadsobrante),
-            nrocajas: parseInt(detalle.nrocajas),
-
-            costounitario: parseFloat(detalle.costounitario).toFixed(2),
-            costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
-
-            peso: parseFloat(detalle.peso).toFixed(2),
-            pesosubtotal: parseFloat(detalle.pesosubtotal).toFixed(2),
-
-            volumen: parseFloat(detalle.volumen).toFixed(2),
-            volumensubtotal: parseFloat(detalle.volumensubtotal).toFixed(2),
-
-            fechavencimiento: detalle.fechavencimiento,
-            fvencimiento: Functions.convertYMDToDMY(detalle.fechavencimiento),
-            
-            nota: detalle.nota,
-            nrolote: parseFloat(detalle.nrolote).toFixed(2),
-            nrofabrica: parseFloat(detalle.nrofabrica).toFixed(2),
-
-            isdevolucioncompra: detalle.isdevolucioncompra,
-            isordencompra: detalle.isordencompra,
-            issolicitudcompra: detalle.issolicitudcompra,
-
-            visible_producto: false,
-
-            fkidnotacompra: detalle.fkidnotacompra,
-            fkidproducto: detalle.idproducto,
-            fkidalmacenunidadmedidaproducto: detalle.fkidalmacenunidadmedidaproducto,
-            fkidordencompradetalle: detalle.fkidordencompradetalle,
-            nota: detalle.nota,
-            idnotacompradetalle: detalle.idnotacompradetalle,
-            errorcantidad: false,
-            errorcosto: false,
-        };
+        const element = defaultNotaCompraDetalle( index, state, detalle );
         array = [ ...array, element];
     };
     return array;

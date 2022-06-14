@@ -422,7 +422,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( solicitudCompra, disabled, onChange, onVisibleProducto ) } 
                     dataSource={solicitudCompra.arraySolicitudCompraDetalle}
-                    scroll={{ x: 2200, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2300, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

@@ -170,9 +170,9 @@ class NotaCompraController extends Controller
                 if ( !is_null( $detalle->fkidproducto ) ) {
                     $detalle->fkidnotacompra = $notacompra->idnotacompra;
                     $almproddet = new AlmacenProductoDetalle();
-                    if ( !$almproddet->existAlmacenProducto( $almproddet, $notacompra->fkidalmacen, $detalle->fkidproducto ) ) {
+                    if ( !$almproddet->existAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto ) ) {
                         $almproddet->fkidproducto = $detalle->fkidproducto;
-                        $almproddet->fkidalmacen = $notacompra->fkidalmacen;
+                        $almproddet->fkidalmacen = $detalle->fkidalmacen;
                         $almproddet->stockactual = $detalle->cantidad;
                         $almproddet->compras = 1;
                         $almproddet->fecha = $request->x_fecha;
@@ -180,10 +180,10 @@ class NotaCompraController extends Controller
                         $almproddet->save();
                         $detalle->fkidalmacenproductodetalle = $almproddet->idalmacenproductodetalle;
                     } else {
-                        $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $notacompra->fkidalmacen, $detalle->fkidproducto );
-                        $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenunidadmedidaproducto );
-                        $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->cantidad);
-                        $almacenproductodetalle->compras = intval($almproddet->compras) + 1;
+                        $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                        $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenproductodetalle );
+                        $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->stockactual);
+                        $almacenproductodetalle->compras = intval($almacenproductodetalle->compras) + 1;
                         $almacenproductodetalle->update();
 
                         $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
@@ -198,8 +198,8 @@ class NotaCompraController extends Controller
                     $producto->update();
 
                     $provprod = new ProveedorProducto();
-                    if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor ) ) {
-                        $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $notacompra->fkidproveedor );
+                    if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor ) ) {
+                        $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor );
                         $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
                         if ( !is_null( $proveedorproducto ) ) {
                             $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
@@ -348,7 +348,7 @@ class NotaCompraController extends Controller
             ];
 
             $mensajes = [
-                'idnotacompra.required' => 'El ID Nota Compra es requerido.'
+                'idnotacompra.required' => 'El ID es requerido.'
             ];
 
             $validator = Validator::make( $request->all(), $regla, $mensajes );
@@ -372,6 +372,13 @@ class NotaCompraController extends Controller
                 ] );
             }
 
+            if ( $notacompra->isdevolucioncompra == "A" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Funcionalidad no permitido. Ya que se encuentra en DEVOLUCIÓN DE COMPRA registrado.',
+                ] );
+            }
+
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
             $devcomp = new DevolucionCompra();
@@ -386,22 +393,6 @@ class NotaCompraController extends Controller
 
             /* fin de restriccion */
 
-            $prov = new Proveedor();
-            $proveedor = $prov->find( $notacompra->fkidproveedor );
-            if ( !is_null( $proveedor ) ) {
-                $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
-                $proveedor->update();
-            }
-
-            if ( !is_null( $notacompra->fkidordencompra ) ) {
-                $ordcomp = new OrdenCompra();
-                $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
-                if ( !is_null( $ordencompra ) ) {
-                    $ordencompra->iscompra = "N";
-                    $ordencompra->update();
-                }
-            }
-
             $notacompradelete = $obj->remove( $obj, $request );
 
             if ( $notacompradelete ) {
@@ -411,36 +402,66 @@ class NotaCompraController extends Controller
                 foreach ( $arrayNotaCompraDetalle as $detalle ) {
                     $notacompradetalle = $ntacompdet->find( $detalle->idnotacompradetalle );
                     if ( !is_null( $notacompradetalle ) ) {
-                        $almundmedprod = new AlmacenUnidadMedidaProducto();
-                        $almacenunidadmedidaproducto = $almundmedprod->find($notacompradetalle->fkidalmacenunidadmedidaproducto);
-                        if ( !is_null( $almacenunidadmedidaproducto ) ) {
-                            $almacenunidadmedidaproducto->stockactual = intval( $almacenunidadmedidaproducto->stockactual ) - intval( $notacompradetalle->cantidad );
-                            $almacenunidadmedidaproducto->compras = intval( $almacenunidadmedidaproducto->compras ) - 1;
-                            $almacenunidadmedidaproducto->update();
+                        $almproddet = new AlmacenProductoDetalle();
+                        $almacenproductodetalle = $almproddet->find($notacompradetalle->fkidalmacenproductodetalle);
+                        if ( !is_null( $almacenproductodetalle ) ) {
+                            $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $notacompradetalle->cantidad );
+                            $almacenproductodetalle->update();
+                        }
+                        $prod = new Producto();
+                        $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
+                            $producto->update();
                         }
 
-                        $undmedprod = new UnidadMedidaProducto();
-                        $unidadmedidaproducto = $undmedprod->find($notacompradetalle->fkidunidadmedidaproducto);
-                        if ( !is_null( $unidadmedidaproducto ) ) {
-                            $unidadmedidaproducto->stock = intval( $unidadmedidaproducto->stock ) - intval( $notacompradetalle->cantidad );
-                            $unidadmedidaproducto->update();
-
-                            $prod = new Producto();
-                            $producto = $prod->find($unidadmedidaproducto->fkidproducto);
-                            if ( !is_null( $producto ) ) {
-                                $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
-                                $producto->update();
+                        $provprod = new ProveedorProducto();
+                        if ( $provprod->existProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor ) ) {
+                            $firstProvProd = $provprod->firstProvProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor );
+                            $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
+                            if ( !is_null( $proveedorproducto ) ) {
+                                $proveedorproducto->stock = intval($proveedorproducto->stock) - intval($detalle->cantidad);
+                                $proveedorproducto->update();
                             }
                         }
                         $notacompradetalle->delete();
                     }
                 }
+
+                $prov = new Proveedor();
+                $proveedor = $prov->find( $notacompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
+                    $proveedor->update();
+                }
+
+                if ( !is_null( $notacompra->fkidordencompra ) ) {
+                    $ordcomp = new OrdenCompra();
+                    $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
+                    if ( !is_null( $ordencompra ) ) {
+                        $ordencompra->iscompra = "N";
+                        $ordencompra->update();
+                    }
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                DB::commit();
+                return response()->json( [
+                    'response' => 1,
+                    'message'  => 'Nota Compra eliminado éxitosamente.',
+                ] );
             }
 
-            DB::commit();
+            DB::rollBack();
             return response()->json( [
-                'response' => 1,
-                'message'  => 'Nota Compra eliminado éxitosamente.',
+                'response' => -1,
+                'message'  => 'Hubo conflictos al eliminar Nota Compra.',
             ] );
 
         } catch (\Exception $th) {

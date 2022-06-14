@@ -14,6 +14,7 @@ const initialState = {
     idnotaingreso: "",
     codigo: "",
     nromanual: "",
+    nro: "",
     tipocambio: "",
     fechanotaingreso: "",
 
@@ -25,6 +26,8 @@ const initialState = {
     
     nota: "",
     esingresado: "",
+    esnotaingreso: "",
+    actualizarcostos: "",
 
     fkidsucursal: "",
     sucursal: "",
@@ -70,31 +73,48 @@ const initialState = {
 };
 
 export const NotaIngresoReducer = ( state = initialState, action = { payload, type} ) => {
+    const { payload, type } = action;
 
-    switch ( action.type ) {
+    switch ( type ) {
 
         case Strings.notaingreso_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.notaingreso_onCreate:
+            const { arrayConceptoInventario, arrayMoneda, arraySucursal } = payload;
             cleanObejct( state );
             state.idnotaingreso = action.payload.idnotaingreso;
             state.fechanotaingreso   = dateToString( new Date() );
             state.nromanual    = "0";
             state.esingresado  = "N";
+            state.esnotaingreso  = "N";
+            state.actualizarcostos  = "N";
             state.tipocambio  = "6.95";
 
-            state.arrayNotaIngresoDetalle = loadDetailEntryNote();
-
+            
             state.cantidadtotal = "0",
             state.montototal = "0.00",
             state.pesototal = "0.00",
             state.volumentotal = "0.00",
             state.nrocajastotal = "0.00",
-    
-            state.fkidmoneda  = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].idmoneda;
-            state.moneda      = action.payload.arrayMoneda.length == 0 ? "" : action.payload.arrayMoneda[0].descripcion;
+            
+            state.fkidmoneda  = arrayMoneda.length == 0 ? "" : arrayMoneda[0].idmoneda;
+            state.moneda      = arrayMoneda.length == 0 ? "" : arrayMoneda[0].descripcion;
+
+            state.fkidconceptoinventario = Functions.initValueServiceInArray( arrayConceptoInventario, "idconceptoinventario" );
+            state.conceptoinventario     = Functions.initValueServiceInArray( arrayConceptoInventario, "descripcion" );
+
+            state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
+            state.sucursal     = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
+            
+            let arrayAlmacen = ( typeof state.fkidsucursal == "number" ) ? arraySucursal[0].arrayalmacen : [];
+            
+            state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
+            state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
+
+            state.arrayNotaIngresoDetalle = loadDetailEntryNote( state );
+
             state.loading = false;
             state = Object.assign( {}, state );
             return state;
@@ -153,6 +173,7 @@ function onSetData( state, payload ) {
     state.idnotaingreso   = payload.idnotaingreso;
     
     state.codigo = payload.codigo ? payload.codigo : "";
+    state.nro = payload.nro;
     state.nromanual = payload.nromanual;
     state.tipocambio = parseFloat(payload.tipocambio).toFixed(2);
     state.fechanotaingreso = Functions.convertYMDToDMY(payload.fechanotaingreso);
@@ -165,6 +186,8 @@ function onSetData( state, payload ) {
     
     state.nota = payload.nota ? payload.nota : "";
     state.esingresado = payload.esingresado;
+    state.esnotaingreso = payload.esnotaingreso;
+    state.actualizarcostos = payload.actualizarcostos;
 
     state.fkidsucursal = payload.fkidsucursal;
     state.sucursal = payload.sucursal;
@@ -178,86 +201,85 @@ function onSetData( state, payload ) {
     state.fkidmoneda = payload.fkidmoneda;
     state.moneda = payload.moneda;
 
-    state.arrayNotaIngresoDetalle = setStateDetailsEntryNote(payload.notaingresodetalle);
+    state.arrayNotaIngresoDetalle = setStateDetailsEntryNote(payload.arraynotaingresodetalle, state);
 };
 
-function loadDetailEntryNote() {
+function loadDetailEntryNote( state ) {
     let array = [];
     for ( let index = 0; index < 10; index++ ) {
-        const element = {
-            key: index,
-            codigo: "",
-            producto: "",
-            ciudadorigen: "",
-            cantidad: "",
-            costounitario: "",
-            costosubtotal: "",
-            nrocajas: "",
-            peso: "",
-            pesosubtotal: "",
-            volumen: "",
-            volumensubtotal: "",
-            productomarca: "",
-            fechavencimiento: null,
-            vencimiento: null,
-            nrolote: "",
-            nrofabrica: "",
-            precio: "",
-            nota: null,
-            unidadmedidaproducto: "",
-
-            visible_producto: false,
-            visible_unidadmedida: false,
-
-            array_unidadmedidaproducto: [],
-            array_unidadmedida: [],
-
-            fkidproducto: null,
-            fkidunidadmedidaproducto: null,
-            idnotaingresodetalle: null,
-        };
+        const element = defaultNotaIngresoDetalle( index, state );
         array = [ ...array, element];
     }
     return array;
 };
 
-function setStateDetailsEntryNote( notaingresodetalle ) {
+function setStateDetailsEntryNote( notaingresodetalle, state ) {
     let array = [];
     for (let index = 0; index < notaingresodetalle.length; index++) {
         let detalle = notaingresodetalle[index];
-        let element = {
-            key: index,
-            codigo: detalle.codigo,
-            producto: detalle.nombre,
-            ciudadorigen: detalle.ciudadorigen,
-            cantidad: detalle.cantidad,
-            costounitario: parseFloat(detalle.costounitario).toFixed(2),
-            costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
-            nrocajas: parseInt(detalle.nrocajas),
-            peso: parseFloat(detalle.peso).toFixed(2),
-            pesosubtotal: parseFloat(detalle.pesosubtotal).toFixed(2),
-            volumen: parseFloat(detalle.volumen).toFixed(2),
-            volumensubtotal: parseFloat(detalle.volumensubtotal).toFixed(2),
-            productomarca: detalle.productomarca,
-            fechavencimiento: detalle.fechavencimiento,
-            vencimiento: Functions.convertYMDToDMY(detalle.fechavencimiento),
-            nrolote: parseFloat(detalle.nrolote).toFixed(2),
-            nrofabrica: parseFloat(detalle.nrofabrica).toFixed(2),
-            precio: parseFloat(detalle.precio).toFixed(2),
-            nota: detalle.nota,
-            unidadmedidaproducto: parseFloat(detalle.pesounidadmedida).toFixed(2) + " " + detalle.abreviatura,
-
-            visible_producto: false,
-            visible_unidadmedida: false,
-
-            array_unidadmedidaproducto: [],
-            array_unidadmedida: [],
-
-            fkidproducto: detalle.idproducto,
-            fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-            idnotaingresodetalle: detalle.idnotaingresodetalle,
-        };
+        let element = defaultNotaIngresoDetalle( index, state, detalle );
         array = [ ...array, element];
     }
     return array;
 };
+
+function defaultNotaIngresoDetalle( index = 0, state = initialState, detalle = null ) {
+    return {
+        key: index,
+
+        codigo: detalle ? detalle.codigo : "",
+        producto: detalle ? detalle.producto : "",
+        fkidproducto: detalle ? detalle.fkidproducto : null,
+        unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` :  "",
+
+        fkidciudadorigen: detalle ? detalle.fkidciudadorigen : null,
+        ciudadorigen: detalle ? detalle.ciudadorigen : "",
+
+        fkidproductomarca: detalle ? detalle.fkidproductomarca : null,
+        productomarca: detalle ? detalle.productomarca : "",
+
+        fkidproductotipo: detalle ? detalle.fkidproductotipo : null,
+        productotipo: detalle ? detalle.productotipo : "",
+
+        fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
+        almacen: detalle ? detalle.almacen : state.almacen,
+
+        stockactualanterior: detalle ? detalle.stockactualanterior : "",
+        cantidad: detalle ? detalle.cantidad : "",
+        nrocajas: detalle ? detalle.nrocajas : "",
+
+        descuento: detalle ? detalle.descuento : "",
+        montodescuento: detalle ? parseFloat(detalle.montodescuento).toFixed(2) : "",
+
+        costobase: detalle ? parseFloat(detalle.costobase).toFixed(2) : "",
+        costounitario: detalle ? parseFloat(detalle.costounitario).toFixed(2) : "",
+        costosubtotal: detalle ? parseFloat(detalle.costosubtotal).toFixed(2) : "",
+        costopromedio: detalle ? parseFloat(detalle.costopromedio).toFixed(2) : "",
+
+        peso: detalle ? parseFloat(detalle.peso).toFixed(2) : "",
+        pesosubtotal: detalle ? parseFloat(detalle.pesosubtotal).toFixed(2) : "",
+
+        volumen: detalle ? parseFloat(detalle.volumen).toFixed(2) : "",
+        volumensubtotal: detalle ? parseFloat(detalle.volumensubtotal).toFixed(2) : "",
+
+        fechavencimiento: detalle ? detalle.fechavencimiento : null,
+        fvencimiento: detalle ? Functions.convertYMDToDMY(detalle.fechavencimiento) : null,
+        nota: detalle ? detalle.nota : null,
+
+        nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
+        nrofabrica: detalle ? parseFloat(detalle.nrofabrica).toFixed(2) : "",
+
+        fkidnotaingreso: detalle ? detalle.fkidnotaingreso : null,
+        idnotaingresodetalle: detalle ? detalle.idnotaingresodetalle : null,
+        fkidalmacenproductodetalle: detalle ? detalle.fkidalmacenproductodetalle : null,
+
+        visible_producto: false,
+        visible_sucursal: false,
+        visible_almacen: false,
+        errorcantidad: false,
+        errorcostounitario: false,
+    };
+}

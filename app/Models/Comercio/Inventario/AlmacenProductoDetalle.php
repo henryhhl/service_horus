@@ -22,11 +22,12 @@ class AlmacenProductoDetalle extends Model
         'estado' => 'A',  'isdelete' => 'A',
         'stockactual' => 0, 'stockminimo' => 0, 'stockmaximo' => 0,
         'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'ventas' => 0, 'compras' => 0,
+        'devolucionventas' => 0, 'devolucioncompras' => 0,
     ];
 
     protected $fillable = [
         'fkidproducto', 'fkidalmacen', 'stockactual', 'stockminimo', 'stockmaximo',
-        'ingresos', 'salidas', 'traspasos', 'ventas', 'compras',
+        'ingresos', 'salidas', 'traspasos', 'ventas', 'compras', 'devolucionventas', 'devolucioncompras',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
 

@@ -20,20 +20,20 @@ class NotaIngreso extends Model
     ];
 
     protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
-        'codigo' => null, 'nromanual' => '0', 'tipocambio' => 0,
-        'cantidadtotal' => 0, 'montototal' => 0, 'pesototal' => 0, 'volumentotal' => 0, 
-        'nota' => null, 'esingresado' => 'N', 'nrocajastotal' => 0,
+        'codigo' => null, 'nro' => null, 'nromanual' => null, 'tipocambio' => 0, 'cantidadtotal' => 0,
+        'montototal' => 0, 'volumentotal' => 0, 'pesototal' => 0, 'nrocajastotal' => 0, 'nota' => null,
+        'esnotaingreso' => 'N', 'esingresado' => 'N', 'actualizarcostos' => 'N',
+        'fkidusers' => null, 'x_idusuario' => null, 'estado' => 'A',  'isdelete' => 'A', 
     ];
 
     protected $fillable = [ 
-        'fkidsucursal', 'fkidalmacen', 'fkidconceptoinventario', 'fkidmoneda',
-        'codigo', 'nromanual', 'tipocambio', 'fechanotaingreso', 'cantidadtotal',
-        'montototal', 'pesototal', 'volumentotal', 'nota', 'esingresado', 'nrocajastotal',
-        'isdelete', 'estado', 'fecha', 'hora',
+        'fkidsucursal', 'fkidalmacen', 'fkidconceptoinventario', 'fkidmoneda', 'fkidtipotransaccion',
+        'codigo', 'nro', 'nromanual', 'fechanotaingreso', 'tipocambio', 'cantidadtotal', 'montototal',
+        'volumentotal', 'pesototal', 'nrocajastotal', 'nota', 'esnotaingreso', 'esingresado', 'actualizarcostos',
+        'fkidusers', 'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
-    public function notaingresodetalle() {
+    public function arraynotaingresodetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Inventario\NotaIngresoDetalle',
             'fkidnotaingreso',
@@ -48,7 +48,6 @@ class NotaIngreso extends Model
         $column  = 'notaingreso.idnotaingreso';
 
         if ( strtoupper( $orderBy ) != 'DESC' ) $orderBy = 'ASC';
-
         $islike =  Functions::isLikeAndIlike();
 
         $notaingreso = $query
@@ -57,48 +56,53 @@ class NotaIngreso extends Model
             ->leftJoin('conceptoinventario as concepinv', 'notaingreso.fkidconceptoinventario', '=', 'concepinv.idconceptoinventario')
             ->leftJoin('moneda as mon', 'notaingreso.fkidmoneda', '=', 'mon.idmoneda')
             ->select( [
-                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nromanual', 'notaingreso.tipocambio',
-                'notaingreso.fechanotaingreso', 'notaingreso.cantidadtotal', 'notaingreso.montototal', 'notaingreso.pesototal',
-                'notaingreso.volumentotal', 'notaingreso.nrocajastotal', 'notaingreso.nota', 'notaingreso.esingresado',
+                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nro', 'notaingreso.nromanual', 'notaingreso.fechanotaingreso', 
+                'notaingreso.tipocambio', 'notaingreso.cantidadtotal', 'notaingreso.montototal',
+                'notaingreso.volumentotal', 'notaingreso.pesototal', 'notaingreso.nrocajastotal', 'notaingreso.estado', 
+                'notaingreso.nota', 'notaingreso.esnotaingreso', 'notaingreso.esingresado', 'notaingreso.actualizarcostos',
                 'notaingreso.fkidsucursal', 'sucu.descripcion as sucursal',
                 'notaingreso.fkidalmacen', 'alm.descripcion as almacen',
                 'notaingreso.fkidmoneda', 'mon.descripcion as moneda',
                 'notaingreso.fkidconceptoinventario', 'concepinv.descripcion as conceptoinventario',
-                'notaingreso.estado', 'notaingreso.isdelete', 'notaingreso.fecha', 'notaingreso.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
-                    return $query
-                        ->where('notaingreso.idnotaingreso', '=', $search)
-                        ->orWhere('notaingreso.codigo', $islike, '%' . $search . '%');
+                    return $query->where('notaingreso.idnotaingreso', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('notaingreso.codigo', $islike, '%' . $search . '%');
                 }
                 return;
             } )
-            ->with( [ 'notaingresodetalle' => function( $query ) {
+            ->with( [ 'arraynotaingresodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('almacenunidadmedidaproducto as almunidmedprod', 'notaingresodetalle.fkidalmacenunidadmedidaproducto', '=', 'almunidmedprod.idalmacenunidadmedidaproducto')
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'almunidmedprod.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'notaingresodetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'notaingresodetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('producto as prod', 'notaingresodetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
-                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
-                        'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
-                        'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
-                        'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
-                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
-                        'notaingresodetalle.nota', 'notaingresodetalle.esingresado', 'notaingresodetalle.estado',
-                        'unidmedprod.peso as pesounidadmedida', 'unidmedprod.costo', 'unidmedprod.stock',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 'notaingresodetalle.fkidalmacenproductodetalle', 
+                        'notaingresodetalle.stockactualanterior', 'notaingresodetalle.cantidad', 'notaingresodetalle.nrocajas', 
+                        'notaingresodetalle.costobase', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal', 'notaingresodetalle.costopromedio',
+                        'notaingresodetalle.descuento', 'notaingresodetalle.montodescuento', 
+                        'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal', 'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal',
+                        'notaingresodetalle.nota', 'notaingresodetalle.fechavencimiento', 
+                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica',
+
+                        'notaingresodetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'notaingresodetalle.fkidalmacen', 'alm.descripcion as almacen',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'notaingresodetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('notaingresodetalle.idnotaingresodetalle');
             } ] )
             ->whereNull( 'notaingreso.deleted_at' )
@@ -127,48 +131,54 @@ class NotaIngreso extends Model
             ->leftJoin('conceptoinventario as concepinv', 'notaingreso.fkidconceptoinventario', '=', 'concepinv.idconceptoinventario')
             ->leftJoin('moneda as mon', 'notaingreso.fkidmoneda', '=', 'mon.idmoneda')
             ->select( [
-                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nromanual', 'notaingreso.tipocambio',
-                'notaingreso.fechanotaingreso', 'notaingreso.cantidadtotal', 'notaingreso.montototal', 'notaingreso.pesototal',
-                'notaingreso.volumentotal', 'notaingreso.nrocajastotal', 'notaingreso.nota', 'notaingreso.esingresado',
+                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nro', 'notaingreso.nromanual', 'notaingreso.fechanotaingreso', 
+                'notaingreso.tipocambio', 'notaingreso.cantidadtotal', 'notaingreso.montototal',
+                'notaingreso.volumentotal', 'notaingreso.pesototal', 'notaingreso.nrocajastotal', 'notaingreso.estado', 
+                'notaingreso.nota', 'notaingreso.esnotaingreso', 'notaingreso.esingresado', 'notaingreso.actualizarcostos',
                 'notaingreso.fkidsucursal', 'sucu.descripcion as sucursal',
                 'notaingreso.fkidalmacen', 'alm.descripcion as almacen',
                 'notaingreso.fkidmoneda', 'mon.descripcion as moneda',
                 'notaingreso.fkidconceptoinventario', 'concepinv.descripcion as conceptoinventario',
-                'notaingreso.estado', 'notaingreso.isdelete', 'notaingreso.fecha', 'notaingreso.hora'
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
                     return $query
-                        ->where('notaingreso.idnotaingreso', '=', $search)
-                        ->orWhere('notaingreso.codigo', $islike, '%' . $search . '%');
+                        ->where('notaingreso.idnotaingreso', '=', $search);
                 }
                 if ( !is_null( $search ) ) {
                     return $query->where('notaingreso.codigo', $islike, '%' . $search . '%');
                 }
                 return;
             } )
-            ->with( [ 'notaingresodetalle' => function( $query ) {
+            ->with( [ 'arraynotaingresodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('almacenunidadmedidaproducto as almunidmedprod', 'notaingresodetalle.fkidalmacenunidadmedidaproducto', '=', 'almunidmedprod.idalmacenunidadmedidaproducto')
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'almunidmedprod.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'notaingresodetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'notaingresodetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('producto as prod', 'notaingresodetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
-                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
-                        'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
-                        'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
-                        'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
-                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
-                        'notaingresodetalle.nota', 'notaingresodetalle.esingresado', 'notaingresodetalle.estado',
-                        'unidmedprod.peso as pesounidadmedida', 'unidmedprod.costo', 'unidmedprod.stock',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 'notaingresodetalle.fkidalmacenproductodetalle', 
+                        'notaingresodetalle.stockactualanterior', 'notaingresodetalle.cantidad', 'notaingresodetalle.nrocajas', 
+                        'notaingresodetalle.costobase', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal', 'notaingresodetalle.costopromedio',
+                        'notaingresodetalle.descuento', 'notaingresodetalle.montodescuento', 
+                        'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal', 'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal',
+                        'notaingresodetalle.nota', 'notaingresodetalle.fechavencimiento', 
+                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica',
+
+                        'notaingresodetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'notaingresodetalle.fkidalmacen', 'alm.descripcion as almacen',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'notaingresodetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('notaingresodetalle.idnotaingresodetalle');
             } ] )
             ->whereNull( 'notaingreso.deleted_at' )
@@ -194,18 +204,25 @@ class NotaIngreso extends Model
         $fkidsucursal = isset( $request->fkidsucursal ) ? $request->fkidsucursal : null;
         $fkidalmacen  = isset( $request->fkidalmacen )  ? $request->fkidalmacen : null;
         $fkidmoneda   = isset( $request->fkidmoneda )   ? $request->fkidmoneda : null;
+        $fkidtipotransaccion = isset( $request->fkidtipotransaccion ) ? $request->fkidtipotransaccion : null;
 
         $codigo     = isset( $request->codigo )     ? $request->codigo : null;
+        $nro  = isset( $request->nro )  ? $request->nro : '0';
         $nromanual  = isset( $request->nromanual )  ? $request->nromanual : '0';
         $tipocambio = isset( $request->tipocambio ) ? $request->tipocambio : 0;
         $fechanotaingreso = isset( $request->fechanotaingreso ) ? $request->fechanotaingreso : null;
+
         $cantidadtotal = isset( $request->cantidadtotal ) ? $request->cantidadtotal : 0;
         $montototal    = isset( $request->montototal )    ? $request->montototal : 0;
         $pesototal     = isset( $request->pesototal )     ? $request->pesototal : 0;
         $volumentotal  = isset( $request->volumentotal )  ? $request->volumentotal : 0;
         $nrocajastotal = isset( $request->nrocajastotal ) ? $request->nrocajastotal : 0;
         $nota          = isset( $request->nota )          ? $request->nota : null;
-        $esingresado   = isset( $request->esingresado )   ? $request->esingresado : null;
+
+        $esingresado = isset( $request->esingresado ) ? $request->esingresado : "N";
+        $esnotaingreso = isset( $request->esnotaingreso ) ? $request->esnotaingreso : "N";
+        $actualizarcostos = isset( $request->actualizarcostos ) ? $request->actualizarcostos : "N";
+        $estado = isset( $request->estado ) ? $request->estado : "N";
 
         $fecha = $request->x_fecha;
         $hora  = $request->x_hora;
@@ -215,8 +232,10 @@ class NotaIngreso extends Model
             'fkidsucursal' => $fkidsucursal,
             'fkidalmacen'  => $fkidalmacen,
             'fkidmoneda'   => $fkidmoneda,
+            'fkidtipotransaccion' => $fkidtipotransaccion,
 
             'codigo'     => $codigo,
+            'nro'  => $nro,
             'nromanual'  => $nromanual,
             'tipocambio' => $tipocambio,
             'fechanotaingreso' => $fechanotaingreso,
@@ -225,7 +244,12 @@ class NotaIngreso extends Model
             'pesototal'  => $pesototal,
             'volumentotal'  => $volumentotal,
             'nrocajastotal' => $nrocajastotal,
-            'esingresado'   => $esingresado,
+
+            'esingresado' => $esingresado,
+            'esnotaingreso' => $esnotaingreso,
+            'actualizarcostos' => $actualizarcostos,
+            'estado' => $estado,
+            
             'nota'  => $nota,
             'fecha' => $fecha,
             'hora'  => $hora
@@ -242,18 +266,25 @@ class NotaIngreso extends Model
         $fkidsucursal = isset( $request->fkidsucursal ) ? $request->fkidsucursal : null;
         $fkidalmacen  = isset( $request->fkidalmacen )  ? $request->fkidalmacen : null;
         $fkidmoneda   = isset( $request->fkidmoneda )   ? $request->fkidmoneda : null;
+        $fkidtipotransaccion = isset( $request->fkidtipotransaccion ) ? $request->fkidtipotransaccion : null;
 
         $codigo     = isset( $request->codigo )     ? $request->codigo : null;
+        $nro  = isset( $request->nro )  ? $request->nro : '0';
         $nromanual  = isset( $request->nromanual )  ? $request->nromanual : '0';
         $tipocambio = isset( $request->tipocambio ) ? $request->tipocambio : 0;
         $fechanotaingreso = isset( $request->fechanotaingreso ) ? $request->fechanotaingreso : null;
+
         $cantidadtotal = isset( $request->cantidadtotal ) ? $request->cantidadtotal : 0;
         $montototal    = isset( $request->montototal )    ? $request->montototal : 0;
         $pesototal     = isset( $request->pesototal )     ? $request->pesototal : 0;
         $volumentotal  = isset( $request->volumentotal )  ? $request->volumentotal : 0;
         $nrocajastotal = isset( $request->nrocajastotal ) ? $request->nrocajastotal : 0;
         $nota          = isset( $request->nota )          ? $request->nota : null;
-        $esingresado   = isset( $request->esingresado )   ? $request->esingresado : null;
+
+        $esingresado = isset( $request->esingresado ) ? $request->esingresado : "N";
+        $esnotaingreso = isset( $request->esnotaingreso ) ? $request->esnotaingreso : "N";
+        $actualizarcostos = isset( $request->actualizarcostos ) ? $request->actualizarcostos : "N";
+        $estado = isset( $request->estado ) ? $request->estado : "N";
 
         $notaingreso = $query->where( 'idnotaingreso', '=', $idnotaingreso )
             ->update( [
@@ -261,8 +292,10 @@ class NotaIngreso extends Model
                 'fkidsucursal' => $fkidsucursal,
                 'fkidalmacen'  => $fkidalmacen,
                 'fkidmoneda'   => $fkidmoneda,
+                'fkidtipotransaccion' => $fkidtipotransaccion,
 
                 'codigo'     => $codigo,
+                'nro'  => $nro,
                 'nromanual'  => $nromanual,
                 'tipocambio' => $tipocambio,
                 'fechanotaingreso' => $fechanotaingreso,
@@ -271,7 +304,13 @@ class NotaIngreso extends Model
                 'pesototal'  => $pesototal,
                 'volumentotal'  => $volumentotal,
                 'nrocajastotal' => $nrocajastotal,
-                'esingresado'   => $esingresado,
+
+                'esingresado' => $esingresado,
+                'esnotaingreso' => $esnotaingreso,
+                'actualizarcostos' => $actualizarcostos,
+                'estado' => $estado,
+                
+                'nota'  => $nota,
             ] );
 
         return $notaingreso;
@@ -285,37 +324,44 @@ class NotaIngreso extends Model
             ->leftJoin('conceptoinventario as concepinv', 'notaingreso.fkidconceptoinventario', '=', 'concepinv.idconceptoinventario')
             ->leftJoin('moneda as mon', 'notaingreso.fkidmoneda', '=', 'mon.idmoneda')
             ->select( [
-                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nromanual', 'notaingreso.tipocambio',
-                'notaingreso.fechanotaingreso', 'notaingreso.cantidadtotal', 'notaingreso.montototal', 'notaingreso.pesototal',
-                'notaingreso.volumentotal', 'notaingreso.nrocajastotal', 'notaingreso.nota', 'notaingreso.esingresado',
+                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nro', 'notaingreso.nromanual', 'notaingreso.fechanotaingreso', 
+                'notaingreso.tipocambio', 'notaingreso.cantidadtotal', 'notaingreso.montototal',
+                'notaingreso.volumentotal', 'notaingreso.pesototal', 'notaingreso.nrocajastotal', 'notaingreso.estado', 
+                'notaingreso.nota', 'notaingreso.esnotaingreso', 'notaingreso.esingresado', 'notaingreso.actualizarcostos',
                 'notaingreso.fkidsucursal', 'sucu.descripcion as sucursal',
                 'notaingreso.fkidalmacen', 'alm.descripcion as almacen',
                 'notaingreso.fkidmoneda', 'mon.descripcion as moneda',
                 'notaingreso.fkidconceptoinventario', 'concepinv.descripcion as conceptoinventario',
-                'notaingreso.estado', 'notaingreso.isdelete', 'notaingreso.fecha', 'notaingreso.hora'
             ] )
-            ->with( [ 'notaingresodetalle' => function( $query ) {
+            ->with( [ 'arraynotaingresodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('almacenunidadmedidaproducto as almunidmedprod', 'notaingresodetalle.fkidalmacenunidadmedidaproducto', '=', 'almunidmedprod.idalmacenunidadmedidaproducto')
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'almunidmedprod.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'notaingresodetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'notaingresodetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('producto as prod', 'notaingresodetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
-                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
-                        'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
-                        'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
-                        'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
-                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
-                        'notaingresodetalle.nota', 'notaingresodetalle.esingresado', 'notaingresodetalle.estado',
-                        'unidmedprod.peso as pesounidadmedida', 'unidmedprod.costo', 'unidmedprod.stock',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 'notaingresodetalle.fkidalmacenproductodetalle', 
+                        'notaingresodetalle.stockactualanterior', 'notaingresodetalle.cantidad', 'notaingresodetalle.nrocajas', 
+                        'notaingresodetalle.costobase', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal', 'notaingresodetalle.costopromedio',
+                        'notaingresodetalle.descuento', 'notaingresodetalle.montodescuento', 
+                        'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal', 'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal',
+                        'notaingresodetalle.nota', 'notaingresodetalle.fechavencimiento', 
+                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica',
+
+                        'notaingresodetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'notaingresodetalle.fkidalmacen', 'alm.descripcion as almacen',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'notaingresodetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('notaingresodetalle.idnotaingresodetalle');
             } ] )
             ->where( 'notaingreso.idnotaingreso', '=', $idnotaingreso )
@@ -341,7 +387,7 @@ class NotaIngreso extends Model
     public function remove( $query, $request )
     {
         $idnotaingreso = $request->idnotaingreso;
-        $query->where('idnotaingreso', '=', $idnotaingreso)->delete();
+        return $query->where('idnotaingreso', '=', $idnotaingreso)->delete();
     }
 
     public function searchByID( $query, $idnotaingreso ) {
@@ -351,37 +397,44 @@ class NotaIngreso extends Model
             ->leftJoin('conceptoinventario as concepinv', 'notaingreso.fkidconceptoinventario', '=', 'concepinv.idconceptoinventario')
             ->leftJoin('moneda as mon', 'notaingreso.fkidmoneda', '=', 'mon.idmoneda')
             ->select( [
-                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nromanual', 'notaingreso.tipocambio',
-                'notaingreso.fechanotaingreso', 'notaingreso.cantidadtotal', 'notaingreso.montototal', 'notaingreso.pesototal',
-                'notaingreso.volumentotal', 'notaingreso.nrocajastotal', 'notaingreso.nota', 'notaingreso.esingresado',
+                'notaingreso.idnotaingreso', 'notaingreso.codigo', 'notaingreso.nro', 'notaingreso.nromanual', 'notaingreso.fechanotaingreso', 
+                'notaingreso.tipocambio', 'notaingreso.cantidadtotal', 'notaingreso.montototal',
+                'notaingreso.volumentotal', 'notaingreso.pesototal', 'notaingreso.nrocajastotal', 'notaingreso.estado', 
+                'notaingreso.nota', 'notaingreso.esnotaingreso', 'notaingreso.esingresado', 'notaingreso.actualizarcostos',
                 'notaingreso.fkidsucursal', 'sucu.descripcion as sucursal',
                 'notaingreso.fkidalmacen', 'alm.descripcion as almacen',
                 'notaingreso.fkidmoneda', 'mon.descripcion as moneda',
                 'notaingreso.fkidconceptoinventario', 'concepinv.descripcion as conceptoinventario',
-                'notaingreso.estado', 'notaingreso.isdelete', 'notaingreso.fecha', 'notaingreso.hora'
             ] )
-            ->with( [ 'notaingresodetalle' => function( $query ) {
+            ->with( [ 'arraynotaingresodetalle' => function( $query ) {
                 $query
-                    ->leftJoin('almacenunidadmedidaproducto as almunidmedprod', 'notaingresodetalle.fkidalmacenunidadmedidaproducto', '=', 'almunidmedprod.idalmacenunidadmedidaproducto')
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'almunidmedprod.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('sucursal as suc', 'notaingresodetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'notaingresodetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('producto as prod', 'notaingresodetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select( 
-                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 
-                        'notaingresodetalle.fkidalmacenunidadmedidaproducto', 'almunidmedprod.fkidunidadmedidaproducto',
-                        'notaingresodetalle.cantidad', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal',
-                        'notaingresodetalle.nrocajas', 'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal',
-                        'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal', 'notaingresodetalle.fechavencimiento',
-                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica', 'notaingresodetalle.precio',
-                        'notaingresodetalle.nota', 'notaingresodetalle.esingresado', 'notaingresodetalle.estado',
-                        'unidmedprod.peso as pesounidadmedida', 'unidmedprod.costo', 'unidmedprod.stock',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+                        'notaingresodetalle.idnotaingresodetalle', 'notaingresodetalle.fkidnotaingreso', 'notaingresodetalle.fkidalmacenproductodetalle', 
+                        'notaingresodetalle.stockactualanterior', 'notaingresodetalle.cantidad', 'notaingresodetalle.nrocajas', 
+                        'notaingresodetalle.costobase', 'notaingresodetalle.costounitario', 'notaingresodetalle.costosubtotal', 'notaingresodetalle.costopromedio',
+                        'notaingresodetalle.descuento', 'notaingresodetalle.montodescuento', 
+                        'notaingresodetalle.peso', 'notaingresodetalle.pesosubtotal', 'notaingresodetalle.volumen', 'notaingresodetalle.volumensubtotal',
+                        'notaingresodetalle.nota', 'notaingresodetalle.fechavencimiento', 
+                        'notaingresodetalle.nrolote', 'notaingresodetalle.nrofabrica',
+
+                        'notaingresodetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'notaingresodetalle.fkidalmacen', 'alm.descripcion as almacen',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'notaingresodetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('notaingresodetalle.idnotaingresodetalle');
             } ] )
             ->where('notaingreso.idnotaingreso', '=', $idnotaingreso)

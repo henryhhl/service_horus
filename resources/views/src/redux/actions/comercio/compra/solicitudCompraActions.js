@@ -302,7 +302,12 @@ function onValidate( solicitudcompra ) {
             if ( parseInt(element.cantidadsolicitada) <= 0 ) {
                 C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
                 bandera = false;
-                element.error = true;
+                element.errorcantidad = true;
+            }
+            if ( parseInt(element.costounitario) <= 0 ) {
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
+                bandera = false;
+                element.errorcostounitario = true;
             }
         } else {
             contador++;

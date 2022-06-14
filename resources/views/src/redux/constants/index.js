@@ -113,6 +113,17 @@ const moduleInventario = {
     notaingreso_onFocus:      '[Nota Ingreso] On Focus',
     notaingreso_offFocus:     '[Nota Ingreso] Off Focus',
 
+    notasalida_setLimpiar:   '[Nota Salida] Set Limpiar',
+    notasalida_setLoad:      '[Nota Salida] Set Load',
+    notasalida_onChange:     '[Nota Salida] On Change',
+    notasalida_setImprimir:  '[Nota Salida] Set Imprimir',
+    notasalida_setState:     '[Nota Salida] Set Nota Salida',
+    notasalida_onCreate:     '[Nota Salida] on Create',
+    notasalida_onEditar:     '[Nota Salida] on Editar',
+    notasalida_onShow:       '[Nota Salida] on Show',
+    notasalida_onFocus:      '[Nota Salida] On Focus',
+    notasalida_offFocus:     '[Nota Salida] Off Focus',
+
     ciudad_setArray: '[Ciudad] Set Array',
 };
 

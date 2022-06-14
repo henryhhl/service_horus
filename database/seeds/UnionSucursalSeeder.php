@@ -25,7 +25,7 @@ class UnionSucursalSeeder extends Seeder
         
         return [
             [
-                'descripcion' => 'Horus S.R.L.',
+                'descripcion' => 'ALNETH',
                 'fecha'       => $mytime->toDateString(),
                 'hora'        => $mytime->toTimeString(),
                 'isdelete'    => 'A',

@@ -436,8 +436,7 @@ class SolicitudCompraController extends Controller
                 $tpotrans = new TipoTransaccion();
                 $tipotransaccion = $tpotrans->find( $solicitudcompra->fkidtipotransaccion );
                 if ( !is_null( $tipotransaccion ) ) {
-                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) - 1;
-                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
                     $tipotransaccion->update();
                 }
 

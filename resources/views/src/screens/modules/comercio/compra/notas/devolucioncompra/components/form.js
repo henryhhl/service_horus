@@ -133,53 +133,90 @@ function C_Form( props ) {
 
         devolucionCompra.fkidproveedor = data.fkidproveedor;
         devolucionCompra.proveedor = data.proveedor;
+        devolucionCompra.nrofactura = data.nrofactura;
+
+        devolucionCompra.isnotacompra = "A";
+        devolucionCompra.isordencompra = data.isordencompra;
+        devolucionCompra.issolicitudcompra = data.issolicitudcompra;
 
         let array = [];
-        for (let index = 0; index < data.notacompradetalle.length; index++) {
-            const detalle = data.notacompradetalle[index];
+        for (let index = 0; index < data.arraynotacompradetalle.length; index++) {
+            const detalle = data.arraynotacompradetalle[index];
             let element = {
                 key: index,
+
                 codigo: detalle.codigo,
-                producto: detalle.nombre,
+                producto: detalle.producto,
+                fkidproducto: detalle.fkidproducto,
+                unidadmedida: `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}`,
+
+                fkidciudadorigen: detalle.fkidciudadorigen,
                 ciudadorigen: detalle.ciudadorigen,
+
+                fkidproductomarca: detalle.fkidproductomarca,
                 productomarca: detalle.productomarca,
 
-                fkidunidadmedidaproducto: detalle.fkidunidadmedidaproducto,
-                unidadmedidaproducto: parseFloat(detalle.valorequivalente).toFixed(2) + " " + detalle.abreviatura,
+                fkidproductotipo: detalle.fkidproductotipo,
+                productotipo: detalle.productotipo,
 
-                cantidad: "0",
-                cantidadcomprada: parseInt(detalle.cantidad),
+                fkidsucursal: detalle.fkidsucursal,
+                sucursal: detalle.sucursal,
 
+                fkidalmacen: detalle.fkidalmacen,
+                almacen: detalle.almacen,
+
+                fkidproveedor: detalle.fkidproveedor,
+                proveedor: detalle.proveedor,
+
+                fkidseccioninventario: detalle.fkidseccioninventario,
+                seccioninventario: detalle.seccioninventario,
+
+                cantidad: 0,
+                cantidadcomprada: detalle.cantidad,
+
+                descuento: detalle.descuento,
+                montodescuento: parseFloat(detalle.montodescuento).toFixed(2),
+
+                costobase: parseFloat(detalle.costobase).toFixed(2),
                 costounitario: parseFloat(detalle.costounitario).toFixed(2),
                 costosubtotal: parseFloat(detalle.costosubtotal).toFixed(2),
 
                 peso: parseFloat(detalle.peso).toFixed(2),
-                pesosubtotal: parseFloat(detalle.peso * detalle.cantidad).toFixed(2),
+                pesosubtotal: parseFloat(detalle.pesosubtotal).toFixed(2),
 
                 volumen: parseFloat(detalle.volumen).toFixed(2),
-                volumensubtotal: parseFloat(detalle.volumen * detalle.cantidad).toFixed(2),
+                volumensubtotal: parseFloat(detalle.volumensubtotal).toFixed(2),
 
                 fechavencimiento: detalle.fechavencimiento,
                 fvencimiento: Functions.convertYMDToDMY(detalle.fechavencimiento),
-                
+
+                nota: null,
                 nrolote: parseFloat(detalle.nrolote).toFixed(2),
                 nrofabrica: parseFloat(detalle.nrofabrica).toFixed(2),
-                nota: null,
 
-                isdevolucioncompra: "",
-                isordencompra: "",
-                issolicitudcompra: "",
+                isnotacompra: "A",
+                isordencompra: detalle.fkidordencompra ? "A" : "N",
+                issolicitudcompra: detalle.fkidsolicitudcompra ? "A" : "N",
 
-                visible_producto: false,
-                visible_unidadmedida: false,
-
-                array_unidadmedidaproducto: [],
-
-                fkidproducto: detalle.idproducto,
+                fkidnotacompra: detalle.fkidnotacompra,
                 fkidnotacompradetalle: detalle.idnotacompradetalle,
-                fkidalmacenunidadmedidaproducto: null,
+
+                fkidordencompra: detalle.fkidordencompra,
+                fkidordencompradetalle: detalle.fkidordencompradetalle,
+
+                fkidsolicitudcompradetalle: detalle.fkidsolicitudcompradetalle,
+                fkidsolicitudcompra: detalle.fkidsolicitudcompra,
+
+                fkidalmacenproductodetalle: detalle.fkidalmacenproductodetalle,
                 fkiddevolucioncompra: null,
                 iddevolucioncompradetalle: null,
+
+                visible_producto: false,
+                visible_sucursal: false,
+                visible_almacen: false,
+                visible_proveedor: false,
+                errorcantidad: false,
+                errorcostounitario: false,
             };
             array = [ ...array, element ]
         }
@@ -361,7 +398,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( devolucionCompra, disabled, onChange  ) } 
                     dataSource={devolucionCompra.arrayDevolucionCompraDetalle}
-                    scroll={{ x: 2000, y: devolucionCompra.arrayDevolucionCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2400, y: devolucionCompra.arrayDevolucionCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

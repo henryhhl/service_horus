@@ -27,13 +27,13 @@ class DevolucionCompra extends Model
     ];
 
     protected $fillable = [
-        'fkidnotacompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidproveedor', 'fkidmoneda',
+        'fkidnotacompra', 'fkidsucursal', 'fkidalmacen', 'fkidconceptocompra', 'fkidproveedor', 'fkidmoneda', 'fkidtipotransaccion',
         'codigo', 'nrofactura', 'tipocambio', 'tipomoneda', 'fechadevolucioncompra',
         'cantidadtotal', 'montosubtotal', 'descuento', 'montodescuento', 'montototal', 'nota',
         'tipocompra', 'issolicitudcompra', 'isordencompra', 'isnotacompra', 'estado', 'fecha', 'hora', 'isdelete',
     ];
 
-    public function devolucioncompradetalle() {
+    public function arraydevolucioncompradetalle() {
         return $this->hasMany(
             'App\Models\Comercio\Compra\DevolucionCompraDetalle',
             'fkiddevolucioncompra',
@@ -82,26 +82,44 @@ class DevolucionCompra extends Model
                 }
                 return;
             } )
-            ->with( [ 'devolucioncompradetalle' => function( $query ) {
+            ->with( [ 'arraydevolucioncompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'devolucioncompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+
+                    ->leftJoin('sucursal as suc', 'devolucioncompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'devolucioncompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'devolucioncompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'devolucioncompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'devolucioncompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
-                        'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
-                        'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
-                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+
+                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidalmacenproductodetalle', 
+                        'devolucioncompradetalle.fkidproducto', 'devolucioncompradetalle.fkidnotacompra', 'devolucioncompradetalle.fkidnotacompradetalle',
+                        'devolucioncompradetalle.fkidordencompra', 'devolucioncompradetalle.fkidordencompradetalle', 
+                        'devolucioncompradetalle.fkidsolicitudcompra', 'devolucioncompradetalle.fkidsolicitudcompradetalle', 
+                        'devolucioncompradetalle.cantidadcomprada', 'devolucioncompradetalle.cantidad', 
+                        'devolucioncompradetalle.costobase', 'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 
+                        'devolucioncompradetalle.descuento', 'devolucioncompradetalle.montodescuento',
+                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 
+                        'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal', 
+                        'devolucioncompradetalle.nota', 'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
-                        'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'devolucioncompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'devolucioncompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'devolucioncompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'devolucioncompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'devolucioncompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('devolucioncompradetalle.iddevolucioncompradetalle');
             } ] )
             ->whereNull( 'devolucioncompra.deleted_at' )
@@ -155,26 +173,44 @@ class DevolucionCompra extends Model
                 }
                 return;
             } )
-            ->with( [ 'devolucioncompradetalle' => function( $query ) {
+            ->with( [ 'arraydevolucioncompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'devolucioncompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+
+                    ->leftJoin('sucursal as suc', 'devolucioncompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'devolucioncompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'devolucioncompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'devolucioncompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'devolucioncompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
-                        'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
-                        'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
-                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+
+                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidalmacenproductodetalle', 
+                        'devolucioncompradetalle.fkidproducto', 'devolucioncompradetalle.fkidnotacompra', 'devolucioncompradetalle.fkidnotacompradetalle',
+                        'devolucioncompradetalle.fkidordencompra', 'devolucioncompradetalle.fkidordencompradetalle', 
+                        'devolucioncompradetalle.fkidsolicitudcompra', 'devolucioncompradetalle.fkidsolicitudcompradetalle', 
+                        'devolucioncompradetalle.cantidadcomprada', 'devolucioncompradetalle.cantidad', 
+                        'devolucioncompradetalle.costobase', 'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 
+                        'devolucioncompradetalle.descuento', 'devolucioncompradetalle.montodescuento',
+                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 
+                        'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal', 
+                        'devolucioncompradetalle.nota', 'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
-                        'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'devolucioncompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'devolucioncompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'devolucioncompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'devolucioncompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'devolucioncompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('devolucioncompradetalle.iddevolucioncompradetalle');
             } ] )
             ->whereNull( 'devolucioncompra.deleted_at' )
@@ -202,6 +238,7 @@ class DevolucionCompra extends Model
         $fkidproveedor      = isset( $request->fkidproveedor )         ? $request->fkidproveedor : null;
         $fkidmoneda         = isset( $request->fkidmoneda )            ? $request->fkidmoneda : null;
         $fkidnotacompra    = isset( $request->fkidnotacompra )   ? $request->fkidnotacompra : null;
+        $fkidtipotransaccion = isset( $request->fkidtipotransaccion )   ? $request->fkidtipotransaccion : null;
 
         $codigo      = isset( $request->codigo )      ? $request->codigo : null;
         $nrofactura  = isset( $request->nrofactura )  ? $request->nrofactura : null;
@@ -229,6 +266,7 @@ class DevolucionCompra extends Model
             'fkidproveedor' => $fkidproveedor,
             'fkidmoneda'    => $fkidmoneda,
             'fkidnotacompra' => $fkidnotacompra,
+            'fkidtipotransaccion' => $fkidtipotransaccion,
 
             'codigo'     => $codigo,
             'nrofactura' => $nrofactura,
@@ -246,6 +284,61 @@ class DevolucionCompra extends Model
 
             'fecha'  => $fecha,
             'hora'   => $hora
+        ] );
+
+        return $devolucioncompra;
+    }
+
+    public function upgrade( $query, $request )
+    {
+        $iddevolucioncompra = isset( $request->iddevolucioncompra ) ? $request->iddevolucioncompra : null;
+
+        $fkidsucursal       = isset( $request->fkidsucursal )          ? $request->fkidsucursal : null;
+        $fkidalmacen        = isset( $request->fkidalmacen )           ? $request->fkidalmacen : null;
+        $fkidconceptocompra = isset( $request->fkidconceptocompra )    ? $request->fkidconceptocompra : null;
+        $fkidproveedor      = isset( $request->fkidproveedor )         ? $request->fkidproveedor : null;
+        $fkidmoneda         = isset( $request->fkidmoneda )            ? $request->fkidmoneda : null;
+        $fkidnotacompra    = isset( $request->fkidnotacompra )   ? $request->fkidnotacompra : null;
+        $fkidtipotransaccion = isset( $request->fkidtipotransaccion )   ? $request->fkidtipotransaccion : null;
+
+        $codigo      = isset( $request->codigo )      ? $request->codigo : null;
+        $nrofactura  = isset( $request->nrofactura )  ? $request->nrofactura : null;
+        $tipocambio  = isset( $request->tipocambio )  ? $request->tipocambio : null;
+        $tipomoneda  = isset( $request->tipomoneda )  ? $request->tipomoneda : null;
+
+        $fechadevolucioncompra  = isset( $request->fechadevolucioncompra )  ? $request->fechadevolucioncompra : null;
+
+        $cantidadtotal   = isset( $request->cantidadtotal ) ? $request->cantidadtotal : null;
+        $montosubtotal   = isset( $request->montosubtotal ) ? $request->montosubtotal : null;
+        $descuento       = isset( $request->descuento ) ? $request->descuento : null;
+        $montodescuento  = isset( $request->montodescuento ) ? $request->montodescuento : null;
+        $montototal      = isset( $request->montototal ) ? $request->montototal : null;
+
+        $nota            = isset( $request->nota ) ? $request->nota : null;
+        $tipocompra   = isset( $request->tipocompra ) ? $request->tipocompra : null;
+
+        $devolucioncompra = $query->where('iddevolucioncompra', '=', $iddevolucioncompra)->update( [
+            'fkidsucursal' => $fkidsucursal,
+            'fkidalmacen'  => $fkidalmacen,
+            'fkidconceptocompra' => $fkidconceptocompra,
+            'fkidproveedor' => $fkidproveedor,
+            'fkidmoneda'    => $fkidmoneda,
+            'fkidnotacompra' => $fkidnotacompra,
+            'fkidtipotransaccion' => $fkidtipotransaccion,
+
+            'codigo'     => $codigo,
+            'nrofactura' => $nrofactura,
+            'tipocambio' => $tipocambio,
+            'tipomoneda' => $tipomoneda,
+            'tipocompra' => $tipocompra,
+            'fechadevolucioncompra' => $fechadevolucioncompra,
+
+            'cantidadtotal' => $cantidadtotal,
+            'montototal'    => $montototal,
+            'montosubtotal' => $montosubtotal,
+            'descuento' => $descuento,
+            'montodescuento' => $montodescuento,
+            'nota'       => $nota,
         ] );
 
         return $devolucioncompra;
@@ -274,26 +367,44 @@ class DevolucionCompra extends Model
                 'devolucioncompra.estado', 'devolucioncompra.isdelete', 'devolucioncompra.fecha', 'devolucioncompra.hora',
             ] )
             ->where( 'devolucioncompra.iddevolucioncompra', '=', $iddevolucioncompra )
-            ->with( [ 'devolucioncompradetalle' => function( $query ) {
+            ->with( [ 'arraydevolucioncompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'devolucioncompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+
+                    ->leftJoin('sucursal as suc', 'devolucioncompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'devolucioncompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'devolucioncompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'devolucioncompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'devolucioncompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
-                        'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
-                        'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
-                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+
+                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidalmacenproductodetalle', 
+                        'devolucioncompradetalle.fkidproducto', 'devolucioncompradetalle.fkidnotacompra', 'devolucioncompradetalle.fkidnotacompradetalle',
+                        'devolucioncompradetalle.fkidordencompra', 'devolucioncompradetalle.fkidordencompradetalle', 
+                        'devolucioncompradetalle.fkidsolicitudcompra', 'devolucioncompradetalle.fkidsolicitudcompradetalle', 
+                        'devolucioncompradetalle.cantidadcomprada', 'devolucioncompradetalle.cantidad', 
+                        'devolucioncompradetalle.costobase', 'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 
+                        'devolucioncompradetalle.descuento', 'devolucioncompradetalle.montodescuento',
+                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 
+                        'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal', 
+                        'devolucioncompradetalle.nota', 'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
-                        'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'devolucioncompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'devolucioncompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'devolucioncompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'devolucioncompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'devolucioncompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('devolucioncompradetalle.iddevolucioncompradetalle');
             } ] )
             ->whereNull('devolucioncompra.deleted_at')
@@ -318,7 +429,7 @@ class DevolucionCompra extends Model
     public function remove( $query, $request )
     {
         $iddevolucioncompra = $request->iddevolucioncompra;
-        $query->where('iddevolucioncompra', '=', $iddevolucioncompra)->delete();
+        return $query->where('iddevolucioncompra', '=', $iddevolucioncompra)->delete();
     }
 
     public function searchByID( $query, $iddevolucioncompra ) {
@@ -343,26 +454,44 @@ class DevolucionCompra extends Model
                 'devolucioncompra.estado', 'devolucioncompra.isdelete', 'devolucioncompra.fecha', 'devolucioncompra.hora',
             ] )
             ->where( 'devolucioncompra.iddevolucioncompra', '=', $iddevolucioncompra )
-            ->with( [ 'devolucioncompradetalle' => function( $query ) {
+            ->with( [ 'arraydevolucioncompradetalle' => function( $query ) {
                 $query
-                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'devolucioncompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+
+                    ->leftJoin('sucursal as suc', 'devolucioncompradetalle.fkidsucursal', '=', 'suc.idsucursal')
+                    ->leftJoin('almacen as alm', 'devolucioncompradetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('seccioninventario as seccinv', 'devolucioncompradetalle.fkidseccioninventario', '=', 'seccinv.idseccioninventario')
+                    ->leftJoin('proveedor as provdor', 'devolucioncompradetalle.fkidproveedor', '=', 'provdor.idproveedor')
+                    ->leftJoin('producto as prod', 'devolucioncompradetalle.fkidproducto', '=', 'prod.idproducto')
+                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->select(
-                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidnotacompradetalle',
-                        'devolucioncompradetalle.fkidunidadmedidaproducto', 'devolucioncompradetalle.cantidad', 'devolucioncompradetalle.nota',
-                        'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 'devolucioncompradetalle.cantidadcomprada',
-                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal',
+                    ->leftJoin('productotipo as prodtpo', 'prod.fkidproductotipo', '=', 'prodtpo.idproductotipo')
+                    ->select( [
+
+                        'devolucioncompradetalle.iddevolucioncompradetalle', 'devolucioncompradetalle.fkiddevolucioncompra', 'devolucioncompradetalle.fkidalmacenproductodetalle', 
+                        'devolucioncompradetalle.fkidproducto', 'devolucioncompradetalle.fkidnotacompra', 'devolucioncompradetalle.fkidnotacompradetalle',
+                        'devolucioncompradetalle.fkidordencompra', 'devolucioncompradetalle.fkidordencompradetalle', 
+                        'devolucioncompradetalle.fkidsolicitudcompra', 'devolucioncompradetalle.fkidsolicitudcompradetalle', 
+                        'devolucioncompradetalle.cantidadcomprada', 'devolucioncompradetalle.cantidad', 
+                        'devolucioncompradetalle.costobase', 'devolucioncompradetalle.costounitario', 'devolucioncompradetalle.costosubtotal', 
+                        'devolucioncompradetalle.descuento', 'devolucioncompradetalle.montodescuento',
+                        'devolucioncompradetalle.peso', 'devolucioncompradetalle.pesosubtotal', 
+                        'devolucioncompradetalle.volumen', 'devolucioncompradetalle.volumensubtotal', 
+                        'devolucioncompradetalle.nota', 'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica',
                         'devolucioncompradetalle.isnotacompra', 'devolucioncompradetalle.isordencompra', 'devolucioncompradetalle.issolicitudcompra',
-                        'devolucioncompradetalle.fechavencimiento', 'devolucioncompradetalle.nrolote', 'devolucioncompradetalle.nrofabrica', 'devolucioncompradetalle.estado',
-                        'unidmedprod.stock', 'unidmedprod.valorequivalente',
-                        'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'prod.idproducto', 'prod.nombre', 'prod.codigo',
-                        'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
-                        'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
-                    )
+
+                        'devolucioncompradetalle.fkidsucursal', 'suc.descripcion as sucursal',
+                        'devolucioncompradetalle.fkidalmacen', 'alm.descripcion as almacen',
+                        'devolucioncompradetalle.fkidseccioninventario', 'seccinv.descripcion as seccioninventario',
+                        'devolucioncompradetalle.fkidproveedor', 'provdor.nombre as proveedor', 'provdor.nit as nitproveedor',
+
+                        'prod.fkidunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                        'devolucioncompradetalle.fkidproducto', 'prod.codigo', 'prod.valorequivalente', 'prod.stockactual as stocktotal', 'prod.nombre as producto',
+                        'prod.fkidciudadorigen', 'ciud.descripcion as ciudadorigen',
+                        'prod.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                        'prod.fkidproductotipo', 'prodtpo.descripcion as productotipo',
+
+                    ] )
                     ->orderBy('devolucioncompradetalle.iddevolucioncompradetalle');
             } ] )
             ->whereNull('devolucioncompra.deleted_at')

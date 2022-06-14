@@ -15,24 +15,31 @@ class CreateNotaingresoTable extends Migration
     {
         Schema::create('notaingreso', function (Blueprint $table) {
             $table->increments('idnotaingreso');
+            $table->integer('x_idusuario')->unsigned()->nullable();
+            $table->integer('fkidusers')->unsigned()->nullable();
 
             $table->integer('fkidsucursal')->unsigned();
             $table->integer('fkidalmacen')->unsigned();
             $table->integer('fkidconceptoinventario')->unsigned();
             $table->integer('fkidmoneda')->unsigned();
+            $table->integer('fkidtipotransaccion')->unsigned();
 
             $table->string('codigo', 150)->nullable();
-            $table->text('nromanual')->default('0')->nullable();
-            $table->decimal('tipocambio', 24, 8)->default(0);
+            $table->text('nro')->nullable();
+            $table->text('nromanual')->nullable();
             $table->date('fechanotaingreso');
+            $table->decimal('tipocambio', 24, 8)->default(0);
 
             $table->integer('cantidadtotal')->default(0);
             $table->decimal('montototal', 24, 8)->default(0);
-            $table->decimal('pesototal', 24, 8)->default(0);
+
             $table->decimal('volumentotal', 24, 8)->default(0);
+            $table->decimal('pesototal', 24, 8)->default(0);
             $table->decimal('nrocajastotal', 24, 8)->default(0);
 
             $table->text('nota')->nullable();
+            $table->enum('actualizarcostos', ['A', 'N'])->default('N');
+            $table->enum('esnotaingreso', ['A', 'N'])->default('N');
             $table->enum('esingresado', ['A', 'N'])->default('N');
 
             $table->date('fecha');

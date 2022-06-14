@@ -84,6 +84,11 @@ const onGrabar = async ( notacompra ) => {
         nitproveedor:  notacompra.nitproveedor,
         nroautorizacion:  notacompra.nroautorizacion,
         codigocontrol:  notacompra.codigocontrol,
+        isdevolucioncompra:notacompra.isdevolucioncompra,
+        isordencompra: notacompra.isordencompra,
+        issolicitudcompra: notacompra.issolicitudcompra,
+        fkidtipotransaccion: 6,
+        fkidusers: null,
         fechafactura:  Functions.convertDMYToYMD(notacompra.fechafactura),
     } ) . then ( ( result ) => {
         resultData( result );
@@ -158,6 +163,11 @@ const onUpdate = async ( notacompra ) => {
         nitproveedor:  notacompra.nitproveedor,
         nroautorizacion:  notacompra.nroautorizacion,
         codigocontrol:  notacompra.codigocontrol,
+        fkidtipotransaccion: 6,
+        isdevolucioncompra:notacompra.isdevolucioncompra,
+        isordencompra: notacompra.isordencompra,
+        issolicitudcompra: notacompra.issolicitudcompra,
+        fkidusers: null,
         fechafactura:  Functions.convertDMYToYMD(notacompra.fechafactura),
     } ) . then ( ( result ) => {
         resultData( result );

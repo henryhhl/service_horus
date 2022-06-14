@@ -305,6 +305,13 @@ function onValidate( devolucioncompra ) {
                 C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
                 bandera = false;
             }
+            if ( parseInt(element.cantidad) > 0 ) {
+                if ( parseInt(element.cantidad) > parseInt(element.cantidadcomprada) ) {
+                    element.errorcantidad = true;
+                    C_Message( "warning", `La cantidad de ${element.producto} debe ser menor o igual a la cantidad comprada` );
+                    bandera = false;
+                }
+            }
         } else {
             contador++;
         }

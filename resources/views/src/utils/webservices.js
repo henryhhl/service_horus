@@ -146,6 +146,16 @@ const webservices = {
     wscomercioinventarionotaingreso_reporte:    module.comercio.inventario + '/notaingreso/reporte',
     wscomercioinventarionotaingreso_searchByID: module.comercio.inventario + '/notaingreso/searchByID',
 
+    wscomercioinventarionotasalida_index:      module.comercio.inventario + '/notasalida/index',
+    wscomercioinventarionotasalida_create:     module.comercio.inventario + '/notasalida/create',
+    wscomercioinventarionotasalida_store:      module.comercio.inventario + '/notasalida/store',
+    wscomercioinventarionotasalida_editar:     module.comercio.inventario + '/notasalida/editar',
+    wscomercioinventarionotasalida_update:     module.comercio.inventario + '/notasalida/update',
+    wscomercioinventarionotasalida_show:       module.comercio.inventario + '/notasalida/show',
+    wscomercioinventarionotasalida_delete:     module.comercio.inventario + '/notasalida/delete',
+    wscomercioinventarionotasalida_reporte:    module.comercio.inventario + '/notasalida/reporte',
+    wscomercioinventarionotasalida_searchByID: module.comercio.inventario + '/notasalida/searchByID',
+
 
 
     wscomercioventaunionsucursal_index:      module.comercio.venta + '/unionsucursal/index',

@@ -396,11 +396,13 @@ function C_Form( props ) {
         ordenCompra.fkidalmacen = data.fkidalmacen;
         ordenCompra.almacen = data.almacen;
 
-        // ordenCompra.fkidconceptocompra = data.fkidconceptocompra;
-        // ordenCompra.conceptocompra = data.conceptocompra;
+        ordenCompra.fkidconceptocompra = data.fkidconceptocompra;
+        ordenCompra.conceptocompra = data.conceptocompra;
 
         ordenCompra.fkidproveedor = data.fkidproveedor;
         ordenCompra.proveedor = data.proveedor;
+
+        ordenCompra.issolicitudcompra = "A";
 
         ordenCompra.cantidadtotal = parseInt(data.cantidadsolicitadatotal);
 

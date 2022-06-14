@@ -2,12 +2,12 @@
 import React from 'react';
 
 import { Popover, Tooltip } from "antd";
-import { DeleteOutlined, FileSearchOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FileSearchOutlined, PlusOutlined, StopOutlined } from "@ant-design/icons";
 
-import { C_Date, C_Input } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
-export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProducto = () => {}, onChangeDetalle = () => {}, notaIngreso, disabled ) => {
+export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, onChangeDetalle = () => {} ) => {
 
     function updateTotales() {
         let cantidadtotal = 0;
@@ -36,40 +36,75 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             key: notaIngreso.arrayNotaIngresoDetalle.length,
             codigo: "",
             producto: "",
+            fkidproducto: null,
+            unidadmedida: "",
+
+            fkidciudadorigen: null,
             ciudadorigen: "",
+
+            fkidproductomarca: null,
+            productomarca: "",
+
+            fkidproductotipo: null,
+            productotipo: "",
+
+            fkidsucursal: notaIngreso.fkidsucursal,
+            sucursal: notaIngreso.sucursal,
+
+            fkidalmacen: notaIngreso.fkidalmacen,
+            almacen: notaIngreso.almacen,
+
+            stockactualanterior: "",
             cantidad: "",
+            nrocajas: "",
+
+            descuento: "",
+            montodescuento: "",
+
+            costobase: "",
             costounitario: "",
             costosubtotal: "",
-            nrocajas: "",
+            costopromedio: "",
+
             peso: "",
             pesosubtotal: "",
+
             volumen: "",
             volumensubtotal: "",
-            productomarca: "",
+
             fechavencimiento: null,
-            vencimiento: null,
+            fvencimiento: null,
+            nota: null,
+
             nrolote: "",
             nrofabrica: "",
-            precio: "",
-            nota: null,
-            unidadmedidaproducto: "",
+
+            fkidnotaingreso: null,
+            idnotaingresodetalle: null,
+            fkidalmacenproductodetalle: null,
 
             visible_producto: false,
-            visible_unidadmedida: false,
-
-            array_unidadmedidaproducto: [],
-            array_unidadmedida: [],
-
-            fkidproducto: null,
-            fkidunidadmedidaproducto: null,
-            idnotaingresodetalle: null,
+            visible_sucursal: false,
+            visible_almacen: false,
+            errorcantidad: false,
+            errorcostounitario: false,
         };
         notaIngreso.arrayNotaIngresoDetalle = [ ...notaIngreso.arrayNotaIngresoDetalle, element ];
         onChangeDetalle( notaIngreso );
     };
 
-    function onDeleteRowDetalle( index ) {
+    function onDeleteRowDetalle( data, index ) {
         notaIngreso.arrayNotaIngresoDetalle = notaIngreso.arrayNotaIngresoDetalle.filter( (item, key) => key !== index );
+
+        for (let index = 0; index < detalle.arrayNotaIngresoDetalle.length; index++) {
+            let element = detalle.arrayNotaIngresoDetalle[index];
+            element.key = index;
+        }
+
+        if ( data.idnotaingresodetalle != null ) {
+            detalle.arrayDeleteNotaIngresoDetalle = [ ...detalle.arrayDeleteNotaIngresoDetalle, data.idnotaingresodetalle ];
+        }
+
         updateTotales();
         onChangeDetalle( notaIngreso );
     };
@@ -77,13 +112,13 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
     return ( [
         {
             title: <span style={{ fontSize: 11, }}> { 'Nro.' } </span>,
-            width: 50,
+            width: 30,
             dataIndex: 'nro',
             key: 'nro',
             fixed: 'left',
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 11, }}>
-                    <label style={{ color: '#387DFF', cursor: 'pointer', }} > 
+                    <label style={{ cursor: 'pointer', }} > 
                         { parseInt( index ) + 1 }
                     </label>
                 </span>
@@ -91,11 +126,17 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Código' } </span>,
-            width: 120,
+            width: 90,
             dataIndex: 'codigo',
             key: 'codigo',
             fixed: 'left',
             render: ( text, data, index ) => (
+                disabled.data ? 
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.codigo != null && data.codigo }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -114,8 +155,14 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
         { 
             title: <span style={{ fontSize: 11, }}> { 'Producto' } </span>, 
             dataIndex: 'producto', 
-            key: 'producto', width: 180,
+            key: 'producto', width: 140,
             render: ( text, data, index ) => (
+                disabled.data ?
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label style={{ cursor: 'pointer', }}> 
+                        { data.producto != null && <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </> }
+                    </label>
+                </span> : 
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <FileSearchOutlined 
                         className="icon-table-horus" style={{ padding: 2, marginRight: 2, height: 16, }}
@@ -124,49 +171,19 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
                     <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}
                         onClick={ () => ( !disabled.data ) && onVisibleProducto(data, index) }
                     > 
-                        { ( data.producto.toString().length == 0 ) ?
-                            "SELECCIONAR" : data.producto
+                        { ( data.producto == null || data.producto == "" ) ?
+                            "SELECCIONAR" : <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </>
                         }
                     </label>
                 </span>
             ),
         },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>,
-            width: 100,
-            dataIndex: 'ciudadorigen',
-            key: 'ciudadorigen',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    <label> 
-                        { data.ciudadorigen }
-                    </label>
-                </span>
-            ),
-        },
-        {
-            title: <span style={{ fontSize: 11, }}> { 'Und.' } </span>,
-            width: 60,
-            dataIndex: 'unidadmedidaproducto',
-            key: 'unidadmedidaproducto',
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.unidadmedidaproducto.toString().length == 0 ) ? "" :
-                        <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}
-                            onClick={ () => ( !disabled.data ) && onVisibleUnidadMedidaProducto(data, index) }
-                        > 
-                            { data.unidadmedidaproducto }
-                        </label>
-                    }
-                </span>
-            ),
-        },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Cantidad' } </span>, 
-            dataIndex: 'cantidad', key: 'cantidad', width: 70,
+            dataIndex: 'cantidad', key: 'cantidad', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.cantidad.toString().length == 0 ) ?
+                    { ( typeof parseInt(data.cantidad) != "number" ) ?
                         "" : 
                         <Popover title={"Cantidad"} trigger="click"
                             content={
@@ -223,11 +240,25 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             ),
         },
         { 
-            title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
-            dataIndex: 'costounitario', key: 'costounitario', width: 100,
+            title: <span style={{ fontSize: 11, }}> { 'Costo Base' } </span>, 
+            dataIndex: 'costobase', key: 'costobase', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.costounitario.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.costobase) != "number" ) ?
+                        "" : 
+                        <label> 
+                            {data.costobase}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
+            dataIndex: 'costounitario', key: 'costounitario', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( typeof parseFloat(data.costounitario) != "number" ) ?
                         "" : 
                         <Popover title={"Costo Unitario"} trigger="click"
                             content={
@@ -283,13 +314,83 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 120,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 90,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.costosubtotal.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.costosubtotal) != "number" ) ?
                         "" : 
                         <label> 
                             {data.costosubtotal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
+            dataIndex: 'sucursal', key: 'sucursal', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.sucursal == null ) ?
+                        "" : 
+                        <label> 
+                            {data.sucursal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
+            dataIndex: 'almacen', key: 'almacen', width: 70,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.almacen == null ) ?
+                        "" : 
+                        <label> 
+                            {data.almacen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
+            dataIndex: 'productomarca', key: 'productomarca', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productomarca == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productomarca}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>, 
+            dataIndex: 'productociudad', key: 'productociudad', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productociudad == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productociudad}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Tipo' } </span>, 
+            dataIndex: 'productotipo', key: 'productotipo', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.productotipo == null ) ?
+                        "" : 
+                        <label> 
+                            {data.productotipo}
                         </label>
                     }
                 </span>
@@ -300,7 +401,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'nrocajas', key: 'nrocajas', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.nrocajas.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.nrocajas) != "number" ) ?
                         "" : 
                         <Popover title={"Nro Cajas"} trigger="click"
                             content={
@@ -356,7 +457,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'peso', key: 'peso', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.peso.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.peso) != "number" ) ?
                         "" : 
                         <label> 
                             {data.peso}
@@ -370,7 +471,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'pesosubtotal', key: 'pesosubtotal', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.pesosubtotal.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.pesosubtotal) != "number" ) ?
                         "" : 
                         <label> 
                             {data.pesosubtotal}
@@ -384,7 +485,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'volumen', key: 'volumen', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.volumen.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.volumen) != "number" ) ?
                         "" : 
                         <label> 
                             {data.volumen}
@@ -398,24 +499,10 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'volumensubtotal', key: 'volumensubtotal', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.volumensubtotal.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.volumensubtotal) != "number" ) ?
                         "" : 
                         <label> 
                             {data.volumensubtotal}
-                        </label>
-                    }
-                </span>
-            ),
-        },
-        { 
-            title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
-            dataIndex: 'productomarca', key: 'productomarca', width: 90,
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.productomarca.toString().length == 0 ) ?
-                        "" : 
-                        <label> 
-                            {data.productomarca}
                         </label>
                     }
                 </span>
@@ -454,7 +541,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'nrolote', key: 'nrolote', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.nrolote.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.nrolote) != "number" ) ?
                         "" : 
                         <Popover title={"Nro. Lote"} trigger="click"
                             content={
@@ -507,7 +594,7 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             dataIndex: 'nrofabrica', key: 'nrofabrica', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.nrofabrica.toString().length == 0 ) ?
+                    { ( typeof parseFloat(data.nrofabrica) != "number" ) ?
                         "" : 
                         <Popover title={"Nro. Fabrica"} trigger="click"
                             content={
@@ -556,61 +643,8 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             ),
         },
         { 
-            title: <span style={{ fontSize: 11, }}> { 'Precio' } </span>, 
-            dataIndex: 'precio', key: 'precio', width: 90,
-            render: ( text, data, index ) => (
-                <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.precio.toString().length == 0 ) ?
-                        "" : 
-                        <Popover title={"Precio"} trigger="click"
-                            content={
-                                <div>
-                                    <C_Input 
-                                        style={{ width: 200, marginTop: -10, }}
-                                        value={data.precio}
-                                        onChange={ (value) => {
-                                            if ( disabled.data ) return;
-                                            if ( value == "" ) value = 0;
-                                            if ( !isNaN( value ) ) {
-                                                if ( Functions.esDecimal( value, 2 ) ) {
-                                                    data.precio = Functions.onChangeNumberDecimal(value);
-                                                    onChangeDetalle( notaIngreso );
-                                                }
-                                            };
-                                        } }
-                                        suffix={
-                                            <i className="fa fa-plus icon-table-horus"
-                                                onClick={ () => {
-                                                    if ( disabled.data ) return;
-                                                    data.precio = Functions.onIncrementarNumberDecimal(data.precio);
-                                                    onChangeDetalle(notaIngreso);
-                                                } }
-                                            ></i>
-                                        }
-                                        prefix={
-                                            <i className="fa fa-minus icon-table-horus"
-                                                onClick={ () => {
-                                                    if ( disabled.data ) return;
-                                                    data.precio = Functions.onDecrementarNumberDecimal(data.precio);
-                                                    onChangeDetalle(notaIngreso);
-                                                } }
-                                            ></i>
-                                        }
-                                    />
-                                </div>
-                            }
-                        >
-                            <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.precio}
-                            </label>
-                        </Popover>
-                    }
-                </span>
-            ),
-        },
-        { 
             title: <span style={{ fontSize: 11, }}> { 'Nota' } </span>,
-            dataIndex: 'nota', key: 'nota', width: 200,
+            dataIndex: 'nota', key: 'nota', width: 150,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     <Popover title={"Nota"} trigger="click"
@@ -653,19 +687,20 @@ export const columns = ( onVisibleProducto = () => {}, onVisibleUnidadMedidaProd
             key: 'accion',
             fixed: 'right',
             width: 50,
-            render: ( text, data, index ) => (
-                // <Popconfirm title={"Estas seguro de eliminar?"}
-                //     onConfirm={() => onDeleteRowDetalle(data)}
-                // >
-                    <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
-                        <DeleteOutlined className="icon-table-horus" 
-                            onClick={ () => {
-                                if ( disabled.data ) return;
-                                onDeleteRowDetalle(index);
-                            } }
-                        />
-                    </Tooltip>
-                // </Popconfirm>
+            render: ( text, data, index ) => !disabled.data ? (
+                <Tooltip title="ELIMINAR" placement="top" color={'#2db7f5'}>
+                    <DeleteOutlined className="icon-table-horus"
+                        onClick={ () => {
+                            let onDeleteRowDetalles = () => onDeleteRowDetalle( data, index );
+                            C_Confirm( {
+                                title: "Quitar Producto", onOk: onDeleteRowDetalles,
+                                okType: "primary", content: "Estás seguro de realizar acción.?",
+                            } );
+                        } }
+                    />
+                </Tooltip>
+            ) : (
+                <StopOutlined className="icon-table-horus" style={{ color: 'red', }} /> 
             ),
         },
     ] ); 

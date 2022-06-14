@@ -18,7 +18,7 @@ function M_ListadoOrdenCompra( props ) {
     return (
         <C_ModalDraggable
             visible={ props.visible } onClose={ props.onClose }
-            maskStyle={{ background: "transparent", }}
+            // maskStyle={{ background: "transparent", }}
             width={props.width}  zIndex={ props.zIndex }  
             title={ props.title }
         >
@@ -26,6 +26,7 @@ function M_ListadoOrdenCompra( props ) {
                 onChecked={ onChecked }
                 value={ value }
                 create={ create }
+                iscompra={props.iscompra}
                 // onCreate={ props.onCreate }
             />
         </C_ModalDraggable>
@@ -43,6 +44,7 @@ M_ListadoOrdenCompra.propTypes = {
     zIndex: PropTypes.number,
 
     title:    PropTypes.string,
+    iscompra: PropTypes.string,
     onClose:  PropTypes.func,
     onCreate: PropTypes.func,
     onChange: PropTypes.func,
@@ -59,6 +61,7 @@ M_ListadoOrdenCompra.defaultProps = {
     zIndex: 1200,
 
     title: "ORDEN COMPRA",
+    iscompra: null,
 }
 
 export default M_ListadoOrdenCompra;

@@ -101,7 +101,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         onChangeDetalle( detalle );
     };
 
-    function onDeleteRowDetalle( index ) {
+    function onDeleteRowDetalle( data, index ) {
         detalle.arrayOrdenCompraDetalle = detalle.arrayOrdenCompraDetalle.filter( (item, key) => key !== index );
 
         for (let index = 0; index < detalle.arrayOrdenCompraDetalle.length; index++) {
@@ -306,7 +306,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             if ( value == "" ) value = 0;
                                             if ( !isNaN( value ) ) {
                                                 if ( Functions.esDecimal( value, 2 ) ) {
-                                                    data.errorcosto = false;
+                                                    data.errorcostounitario = false;
                                                     data.costounitario = Functions.onChangeNumberDecimal(value);
                                                     data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
@@ -318,7 +318,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             <i className="fa fa-plus icon-table-horus"
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
-                                                    data.errorcosto = false;
+                                                    data.errorcostounitario = false;
                                                     data.costounitario = Functions.onIncrementarNumberDecimal(data.costounitario);
                                                     data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
@@ -330,7 +330,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                             <i className="fa fa-minus icon-table-horus"
                                                 onClick={ () => {
                                                     if ( disabled.data ) return;
-                                                    data.errorcosto = false;
+                                                    data.errorcostounitario = false;
                                                     data.costounitario = Functions.onDecrementarNumberDecimal(data.costounitario);
                                                     data.costosubtotal = parseFloat( data.cantidad * data.costounitario ).toFixed(2);
                                                     updateTotales();
@@ -343,7 +343,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                             }
                         >
                             <label style={{ color: '#387DFF', cursor: 'pointer', borderBottom: '1px dashed #387DFF', }}> 
-                                {data.costounitario} { data.errorcosto === true && 
+                                {data.costounitario} { data.errorcostounitario === true && 
                                     <ExclamationOutlined 
                                         style={{ position: 'relative', top: -2, padding: 4, borderRadius: 30, color: 'white', backgroundColor: 'red', }} 
                                     /> 

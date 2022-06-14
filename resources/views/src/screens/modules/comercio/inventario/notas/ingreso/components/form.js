@@ -144,7 +144,6 @@ function C_Form( props ) {
     function onVisibleProducto( detalle, index ) {
         detalle.index = index;
         detalle.visible_producto = true;
-        detalle.visible_unidadmedida = false;
         setRowDetalle(detalle);
     };
 
@@ -160,95 +159,66 @@ function C_Form( props ) {
                     console.log(data);
                     let detalle = notaIngreso.arrayNotaIngresoDetalle[row_detalle.index];
 
-                    let array_unidadmedida = data.unidadmedidaproducto;
-
-                    detalle.fkidproducto = data.idproducto;
-                    detalle.array_unidadmedidaproducto = array_unidadmedida;
-                    detalle.array_unidadmedida = data.idproducto;
-
-                    detalle.fkidunidadmedidaproducto = array_unidadmedida.length > 0 ? array_unidadmedida[0].idunidadmedidaproducto : null;
-                    detalle.unidadmedidaproducto = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].peso).toFixed(2) + " " + array_unidadmedida[0].abreviatura : "";
-                    detalle.peso = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].peso).toFixed(2) : null;
-                    detalle.volumen = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].volumen).toFixed(2) : null;
-
-                    detalle.codigo = data.codigo ? data.codigo : "";
+                    detalle.codigo = data.codigo;
                     detalle.producto = data.nombre;
+                    detalle.fkidproducto = data.idproducto;
+                    detalle.unidadmedida = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}`;
+
+                    detalle.fkidciudadorigen = data.fkidciudadorigen;
                     detalle.ciudadorigen = data.ciudadorigen;
-                    detalle.cantidad = 0;
-                    detalle.costounitario = array_unidadmedida.length > 0 ? parseFloat(array_unidadmedida[0].costo).toFixed(2) : "0.00";
-                    detalle.costosubtotal = "0.00";
-                    detalle.nrocajas = 0;
-                    detalle.pesosubtotal = "0.00";
-                    detalle.volumensubtotal = "0.00";
+
+                    detalle.fkidproductomarca = data.fkidproductomarca;
                     detalle.productomarca = data.productomarca;
-                    detalle.nrolote = 0;
-                    detalle.nrofabrica = 0;
-                    detalle.precio = "0.00";
-                    onChange(notaIngreso);
-                    setRowDetalle(null);
-                } }
-            />
-        );
-    };
 
-    function onVisibleUnidadMedidaProducto( detalle, index ) {
-        detalle.index = index;
-        detalle.visible_producto = false;
-        detalle.visible_unidadmedida = true;
-        setRowDetalle(detalle);
-    };
+                    detalle.fkidproductotipo = data.fkidproductotipo;
+                    detalle.productotipo = data.productotipo;
 
-    function componentUnidadMedidaProducto() {
-        if ( row_detalle === null ) return null;
-        if ( !row_detalle.visible_unidadmedida ) return null;
-        return (
-            <M_ListadoUnidadMedidaProducto
-                visible={row_detalle.visible_unidadmedida}
-                onClose={ () => setRowDetalle(null) }
-                value={row_detalle.fkidunidadmedidaproducto}
-                onChange={ ( data ) => {
-                    console.log( data )
-                    let detalle = notaIngreso.arrayNotaIngresoDetalle[row_detalle.index];
-                    detalle.fkidunidadmedidaproducto = data.idunidadmedidaproducto;
-                    detalle.unidadmedidaproducto = parseFloat(data.peso).toFixed(2) + " " + data.abreviatura;
-                    detalle.costounitario = parseFloat(data.costo).toFixed(2);
-                    detalle.costosubtotal = parseFloat( detalle.cantidad * detalle.costounitario ).toFixed(2);
+                    detalle.fkidsucursal = notaIngreso.fkidsucursal;
+                    detalle.sucursal = notaIngreso.sucursal;
+
+                    detalle.fkidalmacen = notaIngreso.fkidalmacen;
+                    detalle.almacen = notaIngreso.almacen;
+
+                    detalle.stockactualanterior = data.stockactual;
+                    detalle.cantidad = 0;
+                    detalle.nrocajas = 0;
+
+                    detalle.descuento = 0;
+                    detalle.montodescuento = 0;
+
+                    detalle.costobase = parseFloat(data.costounitario).toFixed(2);
+                    detalle.costounitario = parseFloat(data.costounitario).toFixed(2);
+                    detalle.costosubtotal = "0.00";
+                    detalle.costopromedio = 0;
 
                     detalle.peso = parseFloat(data.peso).toFixed(2);
+                    detalle.pesosubtotal = "0.00";
+
                     detalle.volumen = parseFloat(data.volumen).toFixed(2);
+                    detalle.volumensubtotal = "0.00";
 
-                    detalle.pesosubtotal = parseFloat( data.peso * detalle.cantidad ).toFixed(2);
-                    detalle.volumensubtotal = parseFloat( data.volumen * detalle.cantidad ).toFixed(2);
+                    detalle.fechavencimiento = null;
+                    detalle.fvencimiento = null;
+                    detalle.nota = null;
 
-                    updateTotales();
+                    detalle.nrolote = "0.00";
+                    detalle.nrofabrica = "0.00";
+
+                    detalle.fkidnotaingreso = null;
+                    detalle.idnotaingresodetalle = null;
+                    detalle.fkidalmacenproductodetalle = null;
+
+                    detalle.visible_producto = false;
+                    detalle.visible_sucursal = false;
+                    detalle.visible_almacen = false;
+                    detalle.errorcantidad = false;
+                    detalle.errorcostounitario = false;
+        
                     onChange(notaIngreso);
                     setRowDetalle(null);
                 } }
-                data={row_detalle.array_unidadmedidaproducto}
             />
         );
-    };
-
-    function updateTotales() {
-        let cantidadtotal = 0;
-        let montototal = 0;
-        let nrocajastotal = 0;
-        let pesototal = 0;
-        let volumentotal = 0;
-        notaIngreso.arrayNotaIngresoDetalle.map( (item) => {
-            if ( item.fkidproducto !== null ) {
-                cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costosubtotal);
-                nrocajastotal += parseFloat(item.nrocajas);
-                pesototal += parseFloat(item.pesosubtotal);
-                volumentotal += parseFloat(item.volumensubtotal);
-            }
-        } );
-        notaIngreso.cantidadtotal = parseInt(cantidadtotal);
-        notaIngreso.montototal = parseFloat(montototal).toFixed(2);
-        notaIngreso.nrocajastotal = parseFloat(nrocajastotal).toFixed(2);
-        notaIngreso.pesototal = parseFloat(pesototal).toFixed(2);
-        notaIngreso.volumentotal = parseFloat(volumentotal).toFixed(2);
     };
 
     return (
@@ -258,7 +228,6 @@ function C_Form( props ) {
             { componentAlmacen() }
             { componentConceptoInventario() }
             { componentProducto() }
-            { componentUnidadMedidaProducto() }
 
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
@@ -273,33 +242,6 @@ function C_Form( props ) {
                         focus={ focusInput }
                     />
                 </Col>
-                <Col sm={{ span: 8, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <C_Input 
-                        label={"Moneda"}
-                        value={ notaIngreso.moneda }
-                        disabled={ true }
-                    />
-                </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <C_Input 
-                        label={"Tipo Cambio"}
-                        value={ notaIngreso.tipocambio }
-                        onChange={ onChangeTipoCambio }
-                        disabled={ disabled.data }
-                    />
-                </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
-                    <C_Date 
-                        label={"Fecha"}
-                        value={ notaIngreso.fechanotaingreso }
-                        onChange={ onChangeFecha }
-                        disabled={ disabled.data }
-                        allowClear={false}
-                    />
-                </Col>
-            </Row>
-            <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input
                         label={ "Código"}
@@ -320,19 +262,28 @@ function C_Form( props ) {
                         disabled={ disabled.data }
                     />
                 </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
-                    <C_Input
-                        label={ "Analitico"}
-                        placeholder={ "INGRESAR ANALITICO..." }
-                        value={ "Por definir" }
-                        disabled
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Date 
+                        label={"Fecha"}
+                        value={ notaIngreso.fechanotaingreso }
+                        onChange={ onChangeFecha }
+                        disabled={ disabled.data }
+                        allowClear={false}
                     />
                 </Col>
-                <Col xs={{ span: 24, }} sm={{ span: 4, }} className="d-flex justify-content-end align-items-center">
-                    <C_Checkbox disabled={disabled.data}
-                        titleText={ "INGRESADO" } 
-                        checked={ (notaIngreso.esingresado === "A") }
-                        onChange={ onChangeEsIngresado }
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Input 
+                        label={"Moneda"}
+                        value={ notaIngreso.moneda }
+                        disabled={ true }
+                    />
+                </Col>
+                <Col xs={{ span: 24, }} sm={{ span: 4, }}>
+                    <C_Input 
+                        label={"Tipo Cambio"}
+                        value={ notaIngreso.tipocambio }
+                        onChange={ onChangeTipoCambio }
+                        disabled={ disabled.data }
                     />
                 </Col>
             </Row>
@@ -374,48 +325,61 @@ function C_Form( props ) {
                     />
                 </Col>
             </Row>
-            <div className="main-card card mb-3 mt-3 pl-1 pr-1 pb-1">
+            <div className="main-card card mb-1 mt-3 pl-1 pr-1 pb-1">
                 <Table 
                     pagination={false} bordered size={"small"}
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
-                    columns={ columns( onVisibleProducto, onVisibleUnidadMedidaProducto, onChange, notaIngreso, disabled ) } 
+                    columns={ columns( notaIngreso, disabled, onVisibleProducto, onChange ) } 
                     dataSource={notaIngreso.arrayNotaIngresoDetalle}
-                    scroll={{ x: 2000, y: notaIngreso.arrayNotaIngresoDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2400, y: notaIngreso.arrayNotaIngresoDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                    <C_Input
-                        label={ "Nota"}
-                        placeholder={ "INGRESAR NOTA..." }
-                        value={ notaIngreso.nota }
-                        onChange={ onChangeNota }
-                        disabled={ disabled.data }
-                        multiline minRows={2} maxRows={3}
-                    />
+                    <Row gutter={ [12, 8] }>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                            <C_Input
+                                label={ "Analitico"}
+                                placeholder={ "INGRESAR ANALITICO..." }
+                                value={ "Por definir" }
+                                disabled
+                            />
+                        </Col>
+                        <Col xs={{ span: 24, }} sm={{ span: 6, }} className="d-flex justify-content-start align-items-center mt-1">
+                            <C_Checkbox disabled={disabled.data}
+                                titleText={ (notaIngreso.estado === "A") ? "Activo" : "Inactivo" }
+                                checked={ (notaIngreso.estado === "A") }
+                                onChange={ () => {
+                                    notaIngreso.estado = (notaIngreso.estado === "A") ? "N" : "A";
+                                    onChange( notaIngreso );
+                                } }
+                            />
+                        </Col>
+                        <Col xs={{ span: 24, }} sm={{ span: 6, }} className="d-flex justify-content-start align-items-center mt-1">
+                            <C_Checkbox disabled={disabled.data}
+                                titleText={ "INGRESADO" } 
+                                checked={ (notaIngreso.esingresado === "A") }
+                                onChange={ onChangeEsIngresado }
+                            />
+                        </Col>
+                    </Row>
+                    <Row gutter={ [12, 8] }>
+                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                            <C_Input
+                                label={ "Nota"}
+                                placeholder={ "INGRESAR NOTA..." }
+                                value={ notaIngreso.nota }
+                                onChange={ onChangeNota }
+                                disabled={ disabled.data }
+                                multiline minRows={3} maxRows={3}
+                            />
+                        </Col>
+                    </Row>
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <Row gutter={ [12, 8] }>
                         <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                            <Row gutter={ [12, 8] }>
-                                <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                                    <C_Input
-                                        label={ "Cant. Total"}
-                                        value={ notaIngreso.cantidadtotal }
-                                        readOnly
-                                    />
-                                </Col>
-                                <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                                    <C_Input
-                                        label={ "Mto. Total"}
-                                        value={ notaIngreso.montototal }
-                                        readOnly
-                                    />
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
-                            <Row gutter={ [12, 8] }>
+                            <div className='form-row'>
                                 <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                                     <C_Input
                                         label={ "Nro. Cajas Total"}
@@ -437,7 +401,25 @@ function C_Form( props ) {
                                         readOnly
                                     />
                                 </Col>
-                            </Row>
+                            </div>
+                        </Col>
+                        <Col xs={{ span: 24, }} sm={{ span: 12, }}>
+                            <div className='form-row'>
+                                <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                    <C_Input
+                                        label={ "Cant. Total"}
+                                        value={ notaIngreso.cantidadtotal }
+                                        readOnly
+                                    />
+                                </Col>
+                                <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                                    <C_Input
+                                        label={ "Mto. Total"}
+                                        value={ notaIngreso.montototal }
+                                        readOnly
+                                    />
+                                </Col>
+                            </div>
                         </Col>
                     </Row>
                 </Col>

@@ -24,6 +24,8 @@ class Producto extends Model
         'stockactual' => 0, 'nivel' => 0, 'isventa' => 'A',
         'valorequivalente' => 0, 'peso' => 0, 'volumen' => 0, 'costocif' => 0, 'costofob' => 0,
         'costobase' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0, 'costounitario' => 0,
+        'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'solicitudcompra' => 0, 'ordencompra' => 0, 'notacompra' => 0,
+        'devolucioncompra' => 0, 'notaventa' => 0, 'devolucionventa' => 0,
         'imagen' => null, 'extension' => null, 'abreviatura' => null,
     ];
 
@@ -31,6 +33,8 @@ class Producto extends Model
         'fkidciudadorigen', 'fkidcategoria', 'fkidproductomarca', 'fkidproductotipo', 'fkidproductogrupo', 'fkidproductosubgrupo', 'fkidunidadmedida',
         'codigo', 'nombre', 'descripcion', 'stockactual', 'nivel', 'abreviatura', 'costocif', 'costofob',
         'valorequivalente', 'peso', 'volumen', 'costobase', 'costodescuento', 'costomontodescuento', 'costounitario',
+        'ingresos', 'salidas', 'traspasos', 'solicitudcompra', 'ordencompra', 'notacompra', 'devolucioncompra',
+        'notaventa', 'devolucionventa',
         'imagen', 'extension', 'isventa', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 

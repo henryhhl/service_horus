@@ -316,7 +316,8 @@ class OrdenCompraController extends Controller
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
-                $fkidsolicitudcompra = $request->input("fkidsolicitudcompra", null);
+                $ordencompra = $obj->find( $request->idordencompra );
+                $fkidsolicitudcompra = $ordencompra->fkidsolicitudcompra;
 
                 if ( !is_null( $fkidsolicitudcompra ) ) {
                     $solicomp = new SolicitudCompra();
@@ -344,6 +345,20 @@ class OrdenCompraController extends Controller
                     $ordencompradetalle = $ordcompdet->find( $idordencompradetalle );
                     if ( !is_null( $ordencompradetalle ) ) {
                         $ordencompradetalle->delete();
+                    }
+                }
+
+                $ordcompdet = new OrdenCompraDetalle();
+                $arrayOrdenCompraDetalle = $ordcompdet->getOrdenCompraDetalle( $ordcompdet, $ordencompra->idordencompra );
+
+                foreach ( $arrayOrdenCompraDetalle as $detalle ) {
+                    $ordencompradetalle = $ordcompdet->find($detalle->idordencompradetalle);
+                    if ( !is_null( $ordencompradetalle ) ) {
+                        if ( $ordencompradetalle->fkidsolicitudcompra != $ordencompra->fkidsolicitudcompra ) {
+                            if ( !is_null( $ordencompradetalle->fkidsolicitudcompra ) ) {
+                                $ordencompradetalle->delete();
+                            }
+                        }
                     }
                 }
 
@@ -458,8 +473,7 @@ class OrdenCompraController extends Controller
                 $tpotrans = new TipoTransaccion();
                 $tipotransaccion = $tpotrans->find( $ordencompra->fkidtipotransaccion );
                 if ( !is_null( $tipotransaccion ) ) {
-                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) - 1;
-                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
                     $tipotransaccion->update();
                 }
 

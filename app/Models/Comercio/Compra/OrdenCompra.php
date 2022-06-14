@@ -48,8 +48,14 @@ class OrdenCompra extends Model
         $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
         $column  = 'ordencompra.idordencompra';
 
-        if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
+        $iscompra = isset($request->iscompra) ? $request->iscompra : null;
+        if ( strtoupper( $iscompra ) != 'A' && strtoupper( $iscompra ) != 'N' ) {
+            $iscompra = null;
+        } else {
+            $iscompra = strtoupper( $iscompra );
+        }
 
+        if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
         $islike =  Functions::isLikeAndIlike();
 
         $ordencompra = $query
@@ -85,6 +91,7 @@ class OrdenCompra extends Model
                 }
                 return;
             } )
+            ->where( !is_null( $iscompra ) ? [ ['ordencompra.iscompra', '=', $iscompra] ] : [] )
             ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
                     ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
@@ -130,6 +137,13 @@ class OrdenCompra extends Model
         $paginate = isset($request->paginate) ? $request->paginate : 20;
         $column   = 'ordencompra.idordencompra';
 
+        $iscompra = isset($request->iscompra) ? $request->iscompra : null;
+        if ( strtoupper( $iscompra ) != 'A' && strtoupper( $iscompra ) != 'N' ) {
+            $iscompra = null;
+        } else {
+            $iscompra = strtoupper( $iscompra );
+        }
+
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
 
         if ( !is_numeric( $paginate ) ) $paginate = 20;
@@ -169,6 +183,7 @@ class OrdenCompra extends Model
                 }
                 return;
             } )
+            ->where( !is_null( $iscompra ) ? [ ['ordencompra.iscompra', '=', $iscompra] ] : [] )
             ->with( [ 'arrayordencompradetalle' => function( $query ) {
                 $query
                     ->leftJoin('sucursal as suc', 'ordencompradetalle.fkidsucursal', '=', 'suc.idsucursal')
@@ -244,6 +259,9 @@ class OrdenCompra extends Model
         $internacion = isset( $request->internacion ) ? $request->internacion : null;
         $otrosgastos = isset( $request->otrosgastos ) ? $request->otrosgastos : null;
 
+        $iscompra = isset( $request->iscompra ) ? $request->iscompra : "N";
+        $issolicitudcompra = isset( $request->issolicitudcompra ) ? $request->issolicitudcompra : "N";
+
         $nota            = isset( $request->nota ) ? $request->nota : null;
         $tiposolicitud   = isset( $request->tiposolicitud ) ? $request->tiposolicitud : null;
 
@@ -263,6 +281,9 @@ class OrdenCompra extends Model
             'nrofactura' => $nrofactura,
             'codigo'     => $codigo,
             'tipocambio' => $tipocambio,
+
+            'iscompra' => $iscompra,
+            'issolicitudcompra' => $issolicitudcompra,
 
             'diasplazo'       => $diasplazo,
             'fechasolicitada' => $fechasolicitada,
@@ -314,6 +335,9 @@ class OrdenCompra extends Model
         $internacion = isset( $request->internacion ) ? $request->internacion : null;
         $otrosgastos = isset( $request->otrosgastos ) ? $request->otrosgastos : null;
 
+        $iscompra = isset( $request->iscompra ) ? $request->iscompra : "N";
+        $issolicitudcompra = isset( $request->issolicitudcompra ) ? $request->issolicitudcompra : "N";
+
         $nota            = isset( $request->nota ) ? $request->nota : null;
         $tiposolicitud   = isset( $request->tiposolicitud ) ? $request->tiposolicitud : null;
 
@@ -330,6 +354,9 @@ class OrdenCompra extends Model
                 'nrofactura' => $nrofactura,
                 'codigo'     => $codigo,
                 'tipocambio' => $tipocambio,
+
+                'iscompra' => $iscompra,
+                'issolicitudcompra' => $issolicitudcompra,
 
                 'diasplazo'       => $diasplazo,
                 'fechasolicitada' => $fechasolicitada,

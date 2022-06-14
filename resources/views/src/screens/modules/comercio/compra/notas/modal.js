@@ -37,7 +37,7 @@ function ModalCompraNota( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="ORDEN COMPRA"
-                        width={"98%"} style={{ top: 20, }}
+                        width={"98%"} style={{ top: 5, }}
                     >
                         <IndexOrdenCompra
                             onClose={ onClose }
@@ -51,7 +51,7 @@ function ModalCompraNota( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="NOTA COMPRA"
-                        width={"98%"} style={{ top: 20, }}
+                        width={"98%"} style={{ top: 5, }}
                     >
                         <IndexNotaCompra
                             onClose={ onClose }

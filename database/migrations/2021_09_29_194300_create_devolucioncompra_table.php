@@ -22,6 +22,7 @@ class CreateDevolucioncompraTable extends Migration
             $table->integer('fkidconceptocompra')->unsigned();
             $table->integer('fkidproveedor')->unsigned();
             $table->integer('fkidmoneda')->unsigned();
+            $table->integer('fkidtipotransaccion')->unsigned();
 
             $table->string('codigo', 150)->nullable();
             $table->text('nrofactura')->nullable();
