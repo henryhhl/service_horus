@@ -19,7 +19,8 @@ class CreateNotatraspasoproductodetalleTable extends Migration
             $table->integer('fkidusers')->unsigned()->nullable();
 
             $table->integer('fkidnotatraspasoproducto')->unsigned();
-            $table->integer('fkidalmacenproductodetalle')->unsigned();
+            $table->integer('fkidalmacenproductodetalleingreso')->unsigned();
+            $table->integer('fkidalmacenproductodetallesalida')->unsigned();
             $table->integer('fkidproducto')->unsigned();
             $table->integer('fkidsucursalingreso')->unsigned();
             $table->integer('fkidsucursalsalida')->unsigned();

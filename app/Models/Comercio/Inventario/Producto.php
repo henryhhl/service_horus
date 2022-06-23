@@ -26,6 +26,10 @@ class Producto extends Model
         'costobase' => 0, 'costodescuento' => 0, 'costomontodescuento' => 0, 'costounitario' => 0,
         'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'solicitudcompra' => 0, 'ordencompra' => 0, 'notacompra' => 0,
         'devolucioncompra' => 0, 'notaventa' => 0, 'devolucionventa' => 0,
+        'ingresocancelado' => 0, 'salidacancelado' => 0, 'traspasocancelado' => 0, 'solicitudcompracancelado' => 0, 'ordencompracancelado' => 0, 
+        'notacompracancelado' => 0, 'devolucioncompracancelado' => 0, 'notaventacancelado' => 0, 'devolucionventacancelado' => 0,
+        'totalingresos' => 0, 'totalsalidas' => 0, 'totaltraspasos' => 0, 'totalsolicitudcompra' => 0, 'totalordencompra' => 0, 'totalnotacompra' => 0,
+        'totaldevolucioncompra' => 0, 'totalnotaventa' => 0, 'totaldevolucionventa' => 0,
         'imagen' => null, 'extension' => null, 'abreviatura' => null,
     ];
 
@@ -33,8 +37,11 @@ class Producto extends Model
         'fkidciudadorigen', 'fkidcategoria', 'fkidproductomarca', 'fkidproductotipo', 'fkidproductogrupo', 'fkidproductosubgrupo', 'fkidunidadmedida',
         'codigo', 'nombre', 'descripcion', 'stockactual', 'nivel', 'abreviatura', 'costocif', 'costofob',
         'valorequivalente', 'peso', 'volumen', 'costobase', 'costodescuento', 'costomontodescuento', 'costounitario',
-        'ingresos', 'salidas', 'traspasos', 'solicitudcompra', 'ordencompra', 'notacompra', 'devolucioncompra',
-        'notaventa', 'devolucionventa',
+        'ingresos', 'salidas', 'traspasos', 'solicitudcompra', 'ordencompra', 'notacompra', 'devolucioncompra', 'notaventa', 'devolucionventa',
+        'ingresocancelado', 'salidacancelado', 'traspasocancelado', 'solicitudcompracancelado', 'ordencompracancelado', 
+        'notacompracancelado', 'devolucioncompracancelado', 'notaventacancelado', 'devolucionventacancelado',
+        'totalingresos', 'totalsalidas', 'totaltraspasos', 'totalsolicitudcompra', 'totalordencompra', 'totalnotacompra',
+        'totaldevolucioncompra', 'totalnotaventa', 'totaldevolucionventa',
         'imagen', 'extension', 'isventa', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 
@@ -75,11 +82,15 @@ class Producto extends Model
         $search  = isset($request->search)  ? $request->search  : null;
         $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
         $isventa = isset($request->isventa) ? $request->isventa : 'T';
-        $column  = 'producto.idproducto';
+        $fkidalmacen = isset($request->fkidalmacen) ? $request->fkidalmacen : null;
+        $column  = isset($request->column) ? $request->column : 'idproducto';
+
+        $column = 'producto.' . $column;
 
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
-        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) $isventa = 'T';
-        else $isventa = strtoupper( $isventa );
+        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) { $isventa = 'T'; 
+        } else { $isventa = strtoupper( $isventa ); }
+        if ( !is_numeric( $fkidalmacen ) ) $fkidalmacen = null;
 
         $islike =  Functions::isLikeAndIlike();
 

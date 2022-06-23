@@ -37,15 +37,41 @@ class CreateProductoTable extends Migration
             $table->integer('stockactual')->default(0);
             $table->integer('nivel')->default(0);
 
+            $table->integer('totalingresos')->default(0);
             $table->integer('ingresos')->default(0);
+            $table->integer('ingresocancelado')->default(0);
+
+            $table->integer('totalsalidas')->default(0);
             $table->integer('salidas')->default(0);
+            $table->integer('salidacancelado')->default(0);
+
+            $table->integer('totaltraspasos')->default(0);
             $table->integer('traspasos')->default(0);
+            $table->integer('traspasocancelado')->default(0);
+            
+            $table->integer('totalsolicitudcompra')->default(0);
             $table->integer('solicitudcompra')->default(0);
+            $table->integer('solicitudcompracancelado')->default(0);
+
+            $table->integer('totalordencompra')->default(0);
             $table->integer('ordencompra')->default(0);
+            $table->integer('ordencompracancelado')->default(0);
+
+            $table->integer('totalnotacompra')->default(0);
             $table->integer('notacompra')->default(0);
+            $table->integer('notacompracancelado')->default(0);
+
+            $table->integer('totaldevolucioncompra')->default(0);
             $table->integer('devolucioncompra')->default(0);
+            $table->integer('devolucioncompracancelado')->default(0);
+
+            $table->integer('totalnotaventa')->default(0);
             $table->integer('notaventa')->default(0);
+            $table->integer('notaventacancelado')->default(0);
+
+            $table->integer('totaldevolucionventa')->default(0);
             $table->integer('devolucionventa')->default(0);
+            $table->integer('devolucionventacancelado')->default(0);
 
             $table->decimal('costobase', 24, 8)->default(0);
             $table->integer('costodescuento')->default(0);

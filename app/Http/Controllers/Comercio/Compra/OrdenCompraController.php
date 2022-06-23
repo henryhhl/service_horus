@@ -9,7 +9,9 @@ use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\OrdenCompraDetalle;
+use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\SolicitudCompra;
+use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Inventario\SeccionInventario;
 use App\Models\Comercio\Venta\Sucursal;
 use App\Models\Comercio\Venta\TipoTransaccion;
@@ -133,34 +135,64 @@ class OrdenCompraController extends Controller
             $obj = new OrdenCompra();
             $ordencompra = $obj->store( $obj, $request );
 
-            if ( !is_null( $ordencompra->fkidsolicitudcompra ) ) {
-                $solicomp = new SolicitudCompra();
-                $solicitudcompra = $solicomp->find( $ordencompra->fkidsolicitudcompra );
-                $solicitudcompra->isordencompra = "A";
-                $solicitudcompra->update();
-            }
-
-            $arrayOrdenCompraDetalle = json_decode($request->input('arrayOrdenCompraDetalle', '[]'));
-            foreach ( $arrayOrdenCompraDetalle as $detalle ) {
-                if ( !is_null( $detalle->fkidproducto ) ) {
-                    $detalle->fkidordencompra = $ordencompra->idordencompra;
-                    $ordencompradetalle = new OrdenCompraDetalle();
-                    $ordencompradetalle->store($ordencompradetalle, $request, $detalle);
+            if ( $ordencompra ) {
+                if ( !is_null( $ordencompra->fkidsolicitudcompra ) ) {
+                    $solicomp = new SolicitudCompra();
+                    $solicitudcompra = $solicomp->find( $ordencompra->fkidsolicitudcompra );
+                    $solicitudcompra->isordencompra = "A";
+                    $solicitudcompra->update();
                 }
-            }
 
-            $tpotrans = new TipoTransaccion();
-            $tipotransaccion = $tpotrans->find( $ordencompra->fkidtipotransaccion );
-            if ( !is_null( $tipotransaccion ) ) {
-                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
-                $tipotransaccion->update();
+                $provdor = new Proveedor();
+                $proveedor = $provdor->find( $ordencompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->cantidadtotalordencomprarealizada = $proveedor->cantidadtotalordencomprarealizada + 1;
+                    $proveedor->cantidadordencomprarealizada = $proveedor->cantidadordencomprarealizada + 1;
+                    $proveedor->update();
+                }
+    
+                $arrayOrdenCompraDetalle = json_decode($request->input('arrayOrdenCompraDetalle', '[]'));
+                foreach ( $arrayOrdenCompraDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $detalle->fkidordencompra = $ordencompra->idordencompra;
+                        $ordcompdet = new OrdenCompraDetalle();
+                        $ordencompradetalle = $ordcompdet->store($ordcompdet, $request, $detalle);
+                        if ( $ordencompradetalle ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($ordencompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalordencompra = $producto->totalordencompra + intval($detalle->cantidad);
+                                $producto->ordencompra = $producto->ordencompra + intval($detalle->cantidad);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada + intval($detalle->cantidad);
+                                $proveedor->cantidadproductoordencomprarealizada = $proveedor->cantidadproductoordencomprarealizada + intval($detalle->cantidad);
+                                $proveedor->update();
+                            }
+                        }
+                    }
+                }
+    
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $ordencompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                    $tipotransaccion->update();
+                }
+    
+                DB::commit();
+                return response( )->json( [
+                    'response' => 1,
+                    'ordencompra' => $ordencompra,
+                    'message'  => 'Orden Compra registrado éxitosamente.',
+                ] );
             }
-
-            DB::commit();
+            DB::rollBack();
             return response( )->json( [
-                'response' => 1,
+                'response' => -1,
                 'ordencompra' => $ordencompra,
-                'message'  => 'Orden Compra registrado éxitosamente.',
+                'message'  => 'Orden Compra no registrado, intentar nuevamente.',
             ] );
 
         } catch ( \Exception $th ) {
@@ -313,11 +345,33 @@ class OrdenCompraController extends Controller
                 $solicitudcompra->update();
             }
 
+            $provdor = new Proveedor();
+            $updateproveedor = false;
+            $proveedordelete = null;
+            if ( $ordencompra->fkidproveedor != $request->fkidproveedor ) {
+                $proveedordelete = $provdor->find( $ordencompra->fkidproveedor );
+                if ( !is_null( $proveedordelete ) ) {
+                    $proveedordelete->cantidadtotalordencomprarealizada = $proveedordelete->cantidadtotalordencomprarealizada - 1;
+                    $proveedordelete->cantidadordencompracancelada = $proveedordelete->cantidadordencompracancelada + 1;
+                    $proveedordelete->update();
+                    $updateproveedor = true;
+                }
+            }
+
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
                 $ordencompra = $obj->find( $request->idordencompra );
                 $fkidsolicitudcompra = $ordencompra->fkidsolicitudcompra;
+
+                $proveedor = $provdor->find( $request->fkidproveedor );
+                if ( $updateproveedor == true ) {
+                    if ( !is_null( $proveedor ) ) {
+                        $proveedor->cantidadtotalordencomprarealizada = $proveedor->cantidadtotalordencomprarealizada + 1;
+                        $proveedor->cantidadordencomprarealizada = $proveedor->cantidadordencomprarealizada + 1;
+                        $proveedor->update();
+                    }
+                }
 
                 if ( !is_null( $fkidsolicitudcompra ) ) {
                     $solicomp = new SolicitudCompra();
@@ -332,9 +386,43 @@ class OrdenCompraController extends Controller
                         $ordcompdet = new OrdenCompraDetalle();
                         $detalle->fkidordencompra = $ordencompra->idordencompra;
                         if ( is_null( $detalle->idordencompradetalle ) ) {
-                            $ordcompdet->store( $ordcompdet, $request, $detalle );
+                            $ordencompradetalle = $ordcompdet->store( $ordcompdet, $request, $detalle );
+                            if ( $ordencompradetalle ) {
+                                $prod = new Producto();
+                                $producto = $prod->find($ordencompradetalle->fkidproducto);
+                                if ( !is_null( $producto ) ) {
+                                    $producto->totalordencompra = $producto->totalordencompra + intval($detalle->cantidad);
+                                    $producto->ordencompra = $producto->ordencompra + intval($detalle->cantidad);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $proveedor ) ) {
+                                    $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada + intval($detalle->cantidad);
+                                    $proveedor->cantidadproductoordencomprarealizada = $proveedor->cantidadproductoordencomprarealizada + intval($detalle->cantidad);
+                                    $proveedor->update();
+                                }
+                            }
                         } else {
-                            $ordencompradetalle = $ordcompdet->upgrade( $ordcompdet, $detalle );
+                            $ordencompradetalle = $ordcompdet->find( $detalle->idordencompradetalle );
+                            $ordencompradetalleupdate = $ordcompdet->upgrade( $ordcompdet, $detalle );
+                            if ( $ordencompradetalleupdate ) {
+                                $prod = new Producto();
+                                $producto = $prod->find($detalle->fkidproducto);
+                                if ( !is_null( $producto ) ) {
+                                    $producto->totalordencompra = $producto->totalordencompra - intval($ordencompradetalle->cantidad) + intval($detalle->cantidad);
+                                    $producto->ordencompra = $producto->ordencompra - intval($ordencompradetalle->cantidad) + intval($detalle->cantidad);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $proveedor ) ) {
+                                    $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad) + intval($detalle->cantidad);
+                                    $proveedor->cantidadproductoordencomprarealizada = $proveedor->cantidadproductoordencomprarealizada - intval($ordencompradetalle->cantidad) + intval($detalle->cantidad);
+                                    $proveedor->update();
+                                }
+                                if ( $updateproveedor == true ) {
+                                    $proveedordelete->cantidadtotalproductoordencomprarealizada = $proveedordelete->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                    $proveedordelete->cantidadproductoordencompracancelada = $proveedordelete->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                    $proveedordelete->update();
+                                }
+                            }
                         }
                     }
                 }
@@ -344,7 +432,26 @@ class OrdenCompraController extends Controller
                     $ordcompdet = new OrdenCompraDetalle();
                     $ordencompradetalle = $ordcompdet->find( $idordencompradetalle );
                     if ( !is_null( $ordencompradetalle ) ) {
-                        $ordencompradetalle->delete();
+                        $ordencompradetalledelete = $ordencompradetalle->delete();
+                        if ( $ordencompradetalledelete ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($ordencompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalordencompra = $producto->totalordencompra - intval($ordencompradetalle->cantidad);
+                                $producto->ordencompracancelado = $producto->ordencompracancelado + intval($ordencompradetalle->cantidad);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                $proveedor->cantidadproductoordencompracancelada = $proveedor->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                $proveedor->update();
+                            }
+                            if ( $updateproveedor == true ) {
+                                $proveedordelete->cantidadtotalproductoordencomprarealizada = $proveedordelete->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                $proveedordelete->cantidadproductoordencompracancelada = $proveedordelete->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                $proveedordelete->update();
+                            }
+                        }
                     }
                 }
 
@@ -356,7 +463,26 @@ class OrdenCompraController extends Controller
                     if ( !is_null( $ordencompradetalle ) ) {
                         if ( $ordencompradetalle->fkidsolicitudcompra != $ordencompra->fkidsolicitudcompra ) {
                             if ( !is_null( $ordencompradetalle->fkidsolicitudcompra ) ) {
-                                $ordencompradetalle->delete();
+                                $ordencompradetalledelete = $ordencompradetalle->delete();
+                                if ( $ordencompradetalledelete ) {
+                                    $prod = new Producto();
+                                    $producto = $prod->find($ordencompradetalle->fkidproducto);
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->totalordencompra = $producto->totalordencompra - intval($ordencompradetalle->cantidad);
+                                        $producto->ordencompracancelado = $producto->ordencompracancelado + intval($ordencompradetalle->cantidad);
+                                        $producto->update();
+                                    }
+                                    if ( !is_null( $proveedor ) ) {
+                                        $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                        $proveedor->cantidadproductoordencompracancelada = $proveedor->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                        $proveedor->update();
+                                    }
+                                    if ( $updateproveedor == true ) {
+                                        $proveedordelete->cantidadtotalproductoordencomprarealizada = $proveedordelete->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                        $proveedordelete->cantidadproductoordencompracancelada = $proveedordelete->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                        $proveedordelete->update();
+                                    }
+                                }
                             }
                         }
                     }
@@ -436,6 +562,13 @@ class OrdenCompraController extends Controller
 
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
 
+            if ( $ordencompra->iscompra == "A" ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'Funcionalidad no permitido. Ya que se encuentra en COMPRA registrado.',
+                ] );
+            }
+
             $ntacomp = new NotaCompra();
             if ( $ntacomp->existsOrdenCompra( $ntacomp, $request->idordencompra ) ) {
                 return response()->json( [
@@ -448,6 +581,15 @@ class OrdenCompraController extends Controller
 
             /* fin de restriccion */
 
+            $provdor = new Proveedor();
+            $proveedor = $provdor->find( $ordencompra->fkidproveedor );
+
+            if ( !is_null( $proveedor ) ) {
+                $proveedor->cantidadtotalordencomprarealizada = $proveedor->cantidadtotalordencomprarealizada - 1;
+                $proveedor->cantidadordencompracancelada = $proveedor->cantidadordencompracancelada + 1;
+                $proveedor->update();
+            }
+
             $ordencompradelete = $obj->remove( $obj, $request );
 
             if ( $ordencompradelete ) {
@@ -457,7 +599,21 @@ class OrdenCompraController extends Controller
                 foreach ( $arrayOrdenCompraDetalle as $detalle ) {
                     $ordencompradetalle = $ordcompdet->find($detalle->idordencompradetalle);
                     if ( !is_null( $ordencompradetalle ) ) {
-                        $ordencompradetalle->delete();
+                        $ordencompradetalledelete = $ordencompradetalle->delete();
+                        if ( $ordencompradetalledelete ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($ordencompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalordencompra = $producto->totalordencompra - intval($ordencompradetalle->cantidad);
+                                $producto->ordencompracancelado = $producto->ordencompracancelado + intval($ordencompradetalle->cantidad);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductoordencomprarealizada = $proveedor->cantidadtotalproductoordencomprarealizada - intval($ordencompradetalle->cantidad);
+                                $proveedor->cantidadproductoordencompracancelada = $proveedor->cantidadproductoordencompracancelada + intval($ordencompradetalle->cantidad);
+                                $proveedor->update();
+                            }
+                        }
                     }
                 }
 

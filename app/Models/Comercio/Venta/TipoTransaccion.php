@@ -26,4 +26,25 @@ class TipoTransaccion extends Model
         'codigo', 'descripcion', 'abreviatura', 'cantidadrealizada', 'cantidadcancelada', 'imagen', 'extension',
         'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
+
+    public function get_data( $query, $request )
+    {
+        $orderBy = isset($request->orderBy) ? $request->orderBy : 'ASC';
+        $column  = 'tipotransaccion.idtipotransaccion';
+
+        if ( strtoupper( $orderBy ) != 'DESC' ) $orderBy = 'ASC';
+
+        $tipotransaccion = $query
+            ->select( [
+                'tipotransaccion.idtipotransaccion', 'tipotransaccion.abreviatura', 'tipotransaccion.descripcion',
+                'tipotransaccion.cantidadrealizada', 'tipotransaccion.cantidadcancelada', 'tipotransaccion.imagen',
+                'tipotransaccion.estado', 'tipotransaccion.isdelete', 'tipotransaccion.fecha', 'tipotransaccion.hora'
+            ] )
+            ->whereNull( 'tipotransaccion.deleted_at' )
+            ->orderBy( $column , $orderBy)
+            ->get();
+
+        return $tipotransaccion;
+    }
+
 }

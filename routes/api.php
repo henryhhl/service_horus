@@ -27,6 +27,8 @@ $modulecontabilidad = '/contabilidad';
 
 $moduleconfiguracion = '/configuracion';
 
+Route::post('/inicio', 'InicioController@inicio');
+
 Route::get($moduleconfiguracion  . '/moneda/index', 'Configuracion\MonedaController@index');
 Route::get($moduleconfiguracion  . '/moneda/create', 'Configuracion\MonedaController@create');
 Route::get($moduleconfiguracion  . '/moneda/editar/{idmoneda}', 'Configuracion\MonedaController@edit');
@@ -181,6 +183,16 @@ Route::get($submodulocomercioinventario  . '/notasalida/show/{idnotasalida}', 'C
 Route::post($submodulocomercioinventario . '/notasalida/delete', 'Comercio\Inventario\NotaSalidaController@delete');
 Route::get($submodulocomercioinventario  . '/notasalida/searchByID', 'Comercio\Inventario\NotaSalidaController@searchByID');
 Route::post($submodulocomercioinventario . '/notasalida/reporte', 'Comercio\Inventario\NotaSalidaController@reporte');
+
+Route::get($submodulocomercioinventario  . '/notatraspasoproducto/index', 'Comercio\Inventario\NotaTraspasoProductoController@index');
+Route::get($submodulocomercioinventario  . '/notatraspasoproducto/create', 'Comercio\Inventario\NotaTraspasoProductoController@create');
+Route::get($submodulocomercioinventario  . '/notatraspasoproducto/editar/{idnotatraspasoproducto}', 'Comercio\Inventario\NotaTraspasoProductoController@edit');
+Route::post($submodulocomercioinventario . '/notatraspasoproducto/store', 'Comercio\Inventario\NotaTraspasoProductoController@store');
+Route::post($submodulocomercioinventario . '/notatraspasoproducto/update', 'Comercio\Inventario\NotaTraspasoProductoController@update');
+Route::get($submodulocomercioinventario  . '/notatraspasoproducto/show/{idnotatraspasoproducto}', 'Comercio\Inventario\NotaTraspasoProductoController@show');
+Route::post($submodulocomercioinventario . '/notatraspasoproducto/delete', 'Comercio\Inventario\NotaTraspasoProductoController@delete');
+Route::get($submodulocomercioinventario  . '/notatraspasoproducto/searchByID', 'Comercio\Inventario\NotaTraspasoProductoController@searchByID');
+Route::post($submodulocomercioinventario . '/notatraspasoproducto/reporte', 'Comercio\Inventario\NotaTraspasoProductoController@reporte');
 
 
 

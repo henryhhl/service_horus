@@ -15,6 +15,8 @@ let module = {
 
 const webservices = {
 
+    wsinicio: '/api/inicio',
+
     wsconfiguracionmoneda_index:      module.configuracion + '/moneda/index',
     wsconfiguracionmoneda_create:     module.configuracion + '/moneda/create',
     wsconfiguracionmoneda_store:      module.configuracion + '/moneda/store',
@@ -155,6 +157,16 @@ const webservices = {
     wscomercioinventarionotasalida_delete:     module.comercio.inventario + '/notasalida/delete',
     wscomercioinventarionotasalida_reporte:    module.comercio.inventario + '/notasalida/reporte',
     wscomercioinventarionotasalida_searchByID: module.comercio.inventario + '/notasalida/searchByID',
+
+    wscomercioinventarionotatraspasoproducto_index:      module.comercio.inventario + '/notatraspasoproducto/index',
+    wscomercioinventarionotatraspasoproducto_create:     module.comercio.inventario + '/notatraspasoproducto/create',
+    wscomercioinventarionotatraspasoproducto_store:      module.comercio.inventario + '/notatraspasoproducto/store',
+    wscomercioinventarionotatraspasoproducto_editar:     module.comercio.inventario + '/notatraspasoproducto/editar',
+    wscomercioinventarionotatraspasoproducto_update:     module.comercio.inventario + '/notatraspasoproducto/update',
+    wscomercioinventarionotatraspasoproducto_show:       module.comercio.inventario + '/notatraspasoproducto/show',
+    wscomercioinventarionotatraspasoproducto_delete:     module.comercio.inventario + '/notatraspasoproducto/delete',
+    wscomercioinventarionotatraspasoproducto_reporte:    module.comercio.inventario + '/notatraspasoproducto/reporte',
+    wscomercioinventarionotatraspasoproducto_searchByID: module.comercio.inventario + '/notatraspasoproducto/searchByID',
 
 
 

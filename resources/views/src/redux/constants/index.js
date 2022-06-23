@@ -124,6 +124,17 @@ const moduleInventario = {
     notasalida_onFocus:      '[Nota Salida] On Focus',
     notasalida_offFocus:     '[Nota Salida] Off Focus',
 
+    notatraspasoproducto_setLimpiar:   '[Nota Traspaso Producto] Set Limpiar',
+    notatraspasoproducto_setLoad:      '[Nota Traspaso Producto] Set Load',
+    notatraspasoproducto_onChange:     '[Nota Traspaso Producto] On Change',
+    notatraspasoproducto_setImprimir:  '[Nota Traspaso Producto] Set Imprimir',
+    notatraspasoproducto_setState:     '[Nota Traspaso Producto] Set Nota Traspaso Producto',
+    notatraspasoproducto_onCreate:     '[Nota Traspaso Producto] on Create',
+    notatraspasoproducto_onEditar:     '[Nota Traspaso Producto] on Editar',
+    notatraspasoproducto_onShow:       '[Nota Traspaso Producto] on Show',
+    notatraspasoproducto_onFocus:      '[Nota Traspaso Producto] On Focus',
+    notatraspasoproducto_offFocus:     '[Nota Traspaso Producto] Off Focus',
+
     ciudad_setArray: '[Ciudad] Set Array',
 };
 

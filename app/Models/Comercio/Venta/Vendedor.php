@@ -22,14 +22,20 @@ class Vendedor extends Model
     protected $attributes = [
         'codigo' => null, 'direccion' => null, 'fax' => null, 'telefono' => null,
         'celular' => null, 'email' => null, 'fechanacimiento' => null, 'genero' => 'N', 'estadocivil' => null,
-        'imagen' => null, 'extension' => null,
-        'x_idusuario' => null, 'estado' => 'A',  'isdelete' => 'A',
+        'cantidadventarealizada' => 0, 'cantidadventacancelada' => 0, 'cantidadproductoventarealizada' => 0, 'cantidadproductoventacancelada' => 0,
+        'cantidadproductodevolucionventarealizada' => 0, 'cantidadproductodevolucionventacancelada' => 0,
+        'cantidaddevolucionventarealizada' => 0, 'cantidaddevolucionventacancelada' => 0, 'cantidadtotalproductodevolucionventarealizada' => 0,
+        'cantidadtotalventarealizada' => 0, 'cantidadtotalproductoventarealizada' => 0, 'cantidadtotaldevolucionventarealizada' => 0,
+        'imagen' => null, 'extension' => null, 'x_idusuario' => null, 'estado' => 'A',  'isdelete' => 'A',
     ];
 
     protected $fillable = [
         'fkidciudadpais', 'fkidciudad', 'fkidcomisionventa',
         'codigo', 'ci', 'nombre', 'apellido', 'direccion', 'fax', 'telefono',
         'celular', 'email', 'fechanacimiento', 'genero', 'estadocivil',
+        'cantidadventarealizada', 'cantidadventacancelada', 'cantidadproductoventarealizada', 'cantidadproductoventacancelada',
+        'cantidadproductodevolucionventarealizada', 'cantidadproductodevolucionventacancelada', 'cantidaddevolucionventarealizada', 'cantidaddevolucionventacancelada',
+        'cantidadtotalventarealizada', 'cantidadtotalproductoventarealizada', 'cantidadtotaldevolucionventarealizada', 'cantidadtotalproductodevolucionventarealizada',
         'imagen', 'extension', 'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 

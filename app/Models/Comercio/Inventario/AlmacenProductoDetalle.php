@@ -19,15 +19,20 @@ class AlmacenProductoDetalle extends Model
     ];
 
     protected $attributes = [
-        'estado' => 'A',  'isdelete' => 'A',
         'stockactual' => 0, 'stockminimo' => 0, 'stockmaximo' => 0,
-        'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'ventas' => 0, 'compras' => 0,
-        'devolucionventas' => 0, 'devolucioncompras' => 0,
+        'ingresos' => 0, 'salidas' => 0, 'traspasos' => 0, 'ventas' => 0, 'compras' => 0, 'devolucionventas' => 0, 'devolucioncompras' => 0,
+        'ingresocancelado' => 0, 'salidacancelada' => 0, 'traspasocancelada' => 0, 'ventacancelada' => 0, 'devolucionventacancelada' => 0,
+        'compracancelada' => 0, 'devolucioncompracancelada' => 0, 'totalingresos' => 0, 'totalsalidas' => 0, 'totaltraspasos' => 0,
+        'totalventas' => 0, 'totaldevolucionventas' => 0, 'totalcompras' => 0, 'totaldevolucioncompras' => 0,
+        'estado' => 'A',  'isdelete' => 'A',
     ];
 
     protected $fillable = [
         'fkidproducto', 'fkidalmacen', 'stockactual', 'stockminimo', 'stockmaximo',
         'ingresos', 'salidas', 'traspasos', 'ventas', 'compras', 'devolucionventas', 'devolucioncompras',
+        'ingresocancelado', 'salidacancelada', 'traspasocancelada', 'ventacancelada', 'devolucionventacancelada',
+        'compracancelada', 'devolucioncompracancelada', 'totalingresos', 'totalsalidas', 'totaltraspasos',
+        'totalventas', 'totaldevolucionventas', 'totalcompras', 'totaldevolucioncompras',
         'isdelete', 'estado', 'fecha', 'hora',
     ];
 

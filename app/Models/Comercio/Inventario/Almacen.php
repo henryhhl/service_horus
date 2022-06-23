@@ -20,13 +20,40 @@ class Almacen extends Model
     ];
 
     protected $attributes = [ 
-        'estado' => 'A',  'isdelete' => 'A', 
         'codigo' => null, 'abreviatura' => null,
-        'imagen' => null, 'extension' => null,
+        'cantidadtotalingresorealizada' => 0, 'cantidadingresorealizada' => 0, 'cantidadingresocancelado' => 0,
+        'cantidadtotalproductoingresorealizada' => 0, 'cantidadproductoingresorealizada' => 0, 'cantidadproductoingresocancelado' => 0,
+        'cantidadtotalsalidarealizada' => 0, 'cantidadsalidarealizada' => 0, 'cantidadsalidacancelado' => 0,
+        'cantidadtotalproductosalidarealizada' => 0, 'cantidadproductosalidarealizada' => 0, 'cantidadproductosalidacancelado' => 0,
+        'cantidadtotaltraspasorealizada' => 0, 'cantidadtraspasorealizada' => 0, 'cantidadtraspasocancelado' => 0,
+        'cantidadtotalproductotraspasorealizada' => 0, 'cantidadproductotraspasorealizada' => 0, 'cantidadproductotraspasocancelado' => 0,
+        'cantidadtotalventarealizada' => 0, 'cantidadventarealizada' => 0, 'cantidadventacancelado' => 0,
+        'cantidadtotalproductoventarealizada' => 0, 'cantidadproductoventarealizada' => 0, 'cantidadproductoventacancelado' => 0,
+        'cantidadtotaldevolucionventarealizada' => 0, 'cantidaddevolucionventarealizada' => 0, 'cantidaddevolucionventacancelado' => 0,
+        'cantidadtotalproductodevolucionventarealizada' => 0, 'cantidadproductodevolucionventarealizada' => 0, 'cantidadproductodevolucionventacancelado' => 0,
+        'cantidadtotalcomprarealizada' => 0, 'cantidadcomprarealizada' => 0, 'cantidadcompracancelado' => 0,
+        'cantidadtotalproductocomprarealizada' => 0, 'cantidadproductocomprarealizada' => 0, 'cantidadproductocompracancelado' => 0,
+        'cantidadtotaldevolucioncomprarealizada' => 0, 'cantidaddevolucioncomprarealizada' => 0, 'cantidaddevolucioncompracancelado' => 0,
+        'cantidadtotalproductodevolucioncomprarealizada' => 0, 'cantidadproductodevolucioncomprarealizada' => 0, 'cantidadproductodevolucioncompracancelado' => 0,
+        'estado' => 'A',  'isdelete' => 'A',  'imagen' => null, 'extension' => null,
     ];
 
     protected $fillable = [ 
         'codigo', 'descripcion', 'abreviatura', 'direccion', 'fkidsucursal',
+        'cantidadtotalingresorealizada', 'cantidadingresorealizada', 'cantidadingresocancelado',
+        'cantidadtotalproductoingresorealizada', 'cantidadproductoingresorealizada', 'cantidadproductoingresocancelado',
+        'cantidadtotalsalidarealizada', 'cantidadsalidarealizada', 'cantidadsalidacancelado',
+        'cantidadtotalproductosalidarealizada', 'cantidadproductosalidarealizada', 'cantidadproductosalidacancelado',
+        'cantidadtotaltraspasorealizada', 'cantidadtraspasorealizada', 'cantidadtraspasocancelado',
+        'cantidadtotalproductotraspasorealizada', 'cantidadproductotraspasorealizada', 'cantidadproductotraspasocancelado',
+        'cantidadtotalventarealizada', 'cantidadventarealizada', 'cantidadventacancelado',
+        'cantidadtotalproductoventarealizada', 'cantidadproductoventarealizada', 'cantidadproductoventacancelado',
+        'cantidadtotaldevolucionventarealizada', 'cantidaddevolucionventarealizada', 'cantidaddevolucionventacancelado',
+        'cantidadtotalproductodevolucionventarealizada', 'cantidadproductodevolucionventarealizada', 'cantidadproductodevolucionventacancelado',
+        'cantidadtotalcomprarealizada', 'cantidadcomprarealizada', 'cantidadcompracancelado',
+        'cantidadtotalproductocomprarealizada', 'cantidadproductocomprarealizada', 'cantidadproductocompracancelado',
+        'cantidadtotaldevolucioncomprarealizada', 'cantidaddevolucioncomprarealizada', 'cantidaddevolucioncompracancelado',
+        'cantidadtotalproductodevolucioncomprarealizada', 'cantidadproductodevolucioncomprarealizada', 'cantidadproductodevolucioncompracancelado',
         'imagen', 'extension', 'isdelete', 'estado', 'fecha', 'hora',
     ];
 

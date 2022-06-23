@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Venta\ClienteRequest;
 use App\Models\Comercio\Venta\Cliente;
+use App\Models\Comercio\Venta\NotaVenta;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
@@ -317,6 +318,14 @@ class ClienteController extends Controller
             }
 
             /* restriccion en eliminar, cuando otras tablas lleva su fk */
+
+            $ntavta = new NotaVenta();
+            if ( $ntavta->existCliente( $ntavta, $cliente->idcliente ) ) {
+                return response()->json( [
+                    'response'  => -1,
+                    'message'   => 'No se puede eliminar, ya que tiene transacción realizado.',
+                ] );
+            }
 
             /* fin de restriccion */
 

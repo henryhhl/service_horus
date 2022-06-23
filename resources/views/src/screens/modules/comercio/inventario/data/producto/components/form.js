@@ -278,6 +278,8 @@ function C_Form( props ) {
             if ( Functions.esDecimal( value, 2 ) ) {
                 let valorequivalente = Functions.onChangeNumberDecimal(value);
                 producto.valorequivalente = valorequivalente;
+                producto.message.valorequivalente = "";
+                producto.error.valorequivalente = false;
                 onChange( producto );
             }
         };
@@ -534,7 +536,7 @@ function C_Form( props ) {
                 </Col> */}
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input
-                        label={"Tipo"}
+                        label={"Tipo*"}
                         placeholder={ "SELECCIONAR TIPO..." }
                         value={ producto.productotipo }
                         onClick={onShowTipo}
@@ -546,7 +548,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input
-                        label={"Origen"}
+                        label={"Origen*"}
                         placeholder={ "SELECCIONAR ORIGEN..." }
                         value={ producto.ciudadorigen }
                         onClick={onShowOrigen}
@@ -593,7 +595,7 @@ function C_Form( props ) {
                         <Row gutter={ [12, 8] }>
                             <Col xs={{ span: 24, }} sm={{ span: 16, }}>
                                 <C_Input
-                                    label={"Nombre"}
+                                    label={"Nombre*"}
                                     placeholder={ "INGRESAR NOMBRE..." }
                                     value={ producto.nombre }
                                     onChange={ onChangeNombre }
@@ -604,7 +606,7 @@ function C_Form( props ) {
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                                 <C_Input
-                                    label={"Categoría"}
+                                    label={"Categoría*"}
                                     placeholder={ "SELECCIONAR CATEGORÍA..." }
                                     value={ producto.categoria }
                                     onClick={onShowCategoria}
@@ -630,7 +632,7 @@ function C_Form( props ) {
                         <Row gutter={ [12, 8] } className="mb-2">
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                                 <C_Input
-                                    label={"Marca"}
+                                    label={"Marca*"}
                                     placeholder={ "SELECCIONAR MARCA..." }
                                     value={ producto.productomarca }
                                     onClick={onShowMarca}
@@ -642,7 +644,7 @@ function C_Form( props ) {
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                                 <C_Input
-                                    label={"Grupo"}
+                                    label={"Grupo*"}
                                     placeholder={ "SELECCIONAR GRUPO..." }
                                     value={ producto.productogrupo }
                                     onClick={onShowGrupo}
@@ -654,7 +656,7 @@ function C_Form( props ) {
                             </Col>
                             <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                                 <C_Input
-                                    label={"Sub Grupo"}
+                                    label={"Sub Grupo*"}
                                     placeholder={ "SELECCIONAR SUB GRUPO..." }
                                     value={ producto.productosubgrupo }
                                     onClick={onShowSubGrupo}
@@ -752,7 +754,7 @@ function C_Form( props ) {
                                     <Row gutter={ [12, 8] }>
                                         <Col xs={{ span: 24, }} sm={{ span: 12, }}>
                                             <C_Input
-                                                label={"Und. Med."}
+                                                label={"Und. Med.*"}
                                                 placeholder={ "SELECCIONAR UND MEDIDA..." }
                                                 value={ producto.unidadmedida }
                                                 onClick={ () => {
@@ -779,20 +781,22 @@ function C_Form( props ) {
                                         </Col>
                                         <Col xs={{ span: 24, }} md={{ span: 12, }}>
                                             <C_Input
-                                                label={"V. Equiv."}
+                                                label={"V. Equiv.*"}
                                                 placeholder={ "INGRESAR VALOR EQUIVALENTE..." }
                                                 value={ producto.valorequivalente }
                                                 onChange={ (value) => {
                                                     onChangeValorEquivalente( value);
                                                 } }
                                                 disabled={ (disabled.data || ( typeof producto.fkidunidadmedida != "number" ) ) ? true : false }
+                                                message={producto.message.valorequivalente}
+                                                error={producto.error.valorequivalente}
                                             />
                                         </Col>
                                     </Row>
                                     <Row gutter={ [12, 8] }>
                                         <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                                             <C_Input
-                                                label={"Código"}
+                                                label={"Código*"}
                                                 placeholder={ "INGRESAR CÓDIGO..." }
                                                 value={ producto.codigo }
                                                 onChange={ (value) => {

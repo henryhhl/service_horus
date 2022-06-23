@@ -142,37 +142,43 @@ class NotaIngresoController extends Controller
             foreach ( $arrayNotaIngresoDetalle as $detalle ) {
                 if ( !is_null( $detalle->fkidproducto ) ) {
 
-                    $almproddet = new AlmacenProductoDetalle();
-                    $firstalmunidmedprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
-                    
-                    if ( is_null( $firstalmunidmedprod ) ) {
-                        $almacenproductodetalle = new AlmacenProductoDetalle();
-                        $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
-                        $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
-                        $almacenproductodetalle->stockactual = $detalle->cantidad;
-                        $almacenproductodetalle->ingresos = 1;
-                        $almacenproductodetalle->fecha       = $request->x_fecha;
-                        $almacenproductodetalle->hora        = $request->x_hora;
-                        $almacenproductodetalle->save();
-
-                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
-                    } else {
-                        $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
-                        $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) + intval($detalle->cantidad);
-                        $almacenproductodetalle->ingresos = intval($almacenproductodetalle->ingresos) + 1;
-                        $almacenproductodetalle->update();
-                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
-                    }
-
-                    $detalle->fkidnotaingreso = $notaingreso->idnotaingreso;
-
-                    $prod = new Producto();
-                    $producto = $prod->find( $detalle->fkidproducto );
-                    $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
-                    $producto->update();
-
                     $ntaingdet = new NotaIngresoDetalle();
                     $notaingresodetalle = $ntaingdet->store($ntaingdet, $request, $detalle);
+
+                    if ( $notaingresodetalle ) {
+                        $almproddet = new AlmacenProductoDetalle();
+                        $firstalmunidmedprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                        
+                        if ( is_null( $firstalmunidmedprod ) ) {
+                            $almacenproductodetalle = new AlmacenProductoDetalle();
+                            $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
+                            $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
+                            $almacenproductodetalle->stockactual = $detalle->cantidad;
+                            $almacenproductodetalle->totalingresos = $detalle->cantidad;
+                            $almacenproductodetalle->ingresos = $detalle->cantidad;
+                            $almacenproductodetalle->fecha  = $request->x_fecha;
+                            $almacenproductodetalle->hora   = $request->x_hora;
+                            $almacenproductodetalle->save();
+
+                            $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
+                        } else {
+                            $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
+                            $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) + intval($detalle->cantidad);
+                            $almacenproductodetalle->totalingresos = intval($almacenproductodetalle->totalingresos) + intval($detalle->cantidad);
+                            $almacenproductodetalle->ingresos = intval($almacenproductodetalle->ingresos) + intval($detalle->cantidad);
+                            $almacenproductodetalle->update();
+                            $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
+                        }
+
+                        $detalle->fkidnotaingreso = $notaingreso->idnotaingreso;
+
+                        $prod = new Producto();
+                        $producto = $prod->find( $detalle->fkidproducto );
+                        $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
+                        $producto->totalingresos = intval($producto->totalingresos) + intval($detalle->cantidad);
+                        $producto->ingresos = intval($producto->ingresos) + intval($detalle->cantidad);
+                        $producto->update();
+                    }
                 }
             }
 
@@ -336,16 +342,18 @@ class NotaIngresoController extends Controller
                                 $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
                                 $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
                                 $almacenproductodetalle->stockactual = $detalle->cantidad;
-                                $almacenproductodetalle->ingresos = 1;
-                                $almacenproductodetalle->fecha       = $request->x_fecha;
-                                $almacenproductodetalle->hora        = $request->x_hora;
+                                $almacenproductodetalle->totalingresos = $detalle->cantidad;
+                                $almacenproductodetalle->ingresos = $detalle->cantidad;
+                                $almacenproductodetalle->fecha  = $request->x_fecha;
+                                $almacenproductodetalle->hora   = $request->x_hora;
                                 $almacenproductodetalle->save();
 
                                 $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                             } else {
                                 $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
                                 $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) + intval($detalle->cantidad);
-                                $almacenproductodetalle->ingresos = intval($almacenproductodetalle->ingresos) + 1;
+                                $almacenproductodetalle->totalingresos = intval($almacenproductodetalle->totalingresos) + intval($detalle->cantidad);
+                                $almacenproductodetalle->ingresos = intval($almacenproductodetalle->ingresos) + intval($detalle->cantidad);
                                 $almacenproductodetalle->update();
                                 $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                             }
@@ -355,6 +363,8 @@ class NotaIngresoController extends Controller
                             $prod = new Producto();
                             $producto = $prod->find( $detalle->fkidproducto );
                             $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
+                            $producto->totalingresos = intval($producto->totalingresos) + intval($detalle->cantidad);
+                            $producto->ingresos = intval($producto->ingresos) + intval($detalle->cantidad);
                             $producto->update();
 
                             $ntaingdet = new NotaIngresoDetalle();
@@ -368,12 +378,17 @@ class NotaIngresoController extends Controller
                                 $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
                                 if ( !is_null( $almacenproductodetalle ) ) {
                                     $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
+                                    $almacenproductodetalle->totalingresos = intval( $almacenproductodetalle->totalingresos ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
+                                    $almacenproductodetalle->ingresos = intval( $almacenproductodetalle->ingresos ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
+                                    $almacenproductodetalle->ingresocancelado = intval( $almacenproductodetalle->ingresocancelado ) + intval($notaingresodetalle->cantidad);
                                     $almacenproductodetalle->update();
 
                                     $prod = new Producto();
                                     $producto = $prod->find($almacenproductodetalle->fkidproducto);
                                     if ( !is_null( $producto ) ) {
                                         $producto->stockactual = intval( $producto->stockactual ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
+                                        $producto->totalingresos = intval( $producto->totalingresos ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
+                                        $producto->ingresos = intval( $producto->ingresos ) + intval( $detalle->cantidad ) - intval($notaingresodetalle->cantidad);
                                         $producto->update();
                                     }
                                 }
@@ -392,12 +407,16 @@ class NotaIngresoController extends Controller
                         $almacenproductodetalle = $almproddet->find($notaingresodetalle->fkidalmacenproductodetalle);
                         if ( !is_null( $almacenproductodetalle ) ) {
                             $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $notaingresodetalle->cantidad );
+                            $almacenproductodetalle->totalingresos = intval( $almacenproductodetalle->totalingresos ) - intval( $notaingresodetalle->cantidad );
+                            $almacenproductodetalle->ingresocancelado = intval( $almacenproductodetalle->ingresocancelado ) + intval($notaingresodetalle->cantidad);
                             $almacenproductodetalle->update();
     
                             $prod = new Producto();
                             $producto = $prod->find($almacenproductodetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) - intval( $notaingresodetalle->cantidad );
+                                $producto->totalingresos = intval( $producto->totalingresos ) - intval($notaingresodetalle->cantidad);
+                                $producto->ingresocancelado = intval( $producto->ingresocancelado ) + intval($notaingresodetalle->cantidad);
                                 $producto->update();
                             }
                         }
@@ -498,12 +517,16 @@ class NotaIngresoController extends Controller
                         $almacenproductodetalle = $almproddet->find($notaingresodetalle->fkidalmacenproductodetalle);
                         if ( !is_null( $almacenproductodetalle ) ) {
                             $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $notaingresodetalle->cantidad );
+                            $almacenproductodetalle->totalingresos = intval( $almacenproductodetalle->totalingresos ) - intval( $notaingresodetalle->cantidad );
+                            $almacenproductodetalle->ingresocancelado = intval( $almacenproductodetalle->ingresocancelado ) + intval( $notaingresodetalle->cantidad );
                             $almacenproductodetalle->update();
     
                             $prod = new Producto();
                             $producto = $prod->find($almacenproductodetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) - intval( $notaingresodetalle->cantidad );
+                                $producto->totalingresos = intval( $producto->totalingresos ) - intval( $notaingresodetalle->cantidad );
+                                $producto->ingresocancelado = intval( $producto->ingresocancelado ) + intval( $notaingresodetalle->cantidad );
                                 $producto->update();
                             }
                         }

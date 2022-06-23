@@ -147,16 +147,18 @@ class NotaSalidaController extends Controller
                         $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
                         $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
                         $almacenproductodetalle->stockactual = $detalle->cantidad;
-                        $almacenproductodetalle->salidas = 1;
-                        $almacenproductodetalle->fecha       = $request->x_fecha;
-                        $almacenproductodetalle->hora        = $request->x_hora;
+                        $almacenproductodetalle->totalsalidas = $detalle->cantidad;
+                        $almacenproductodetalle->salidas = $detalle->cantidad;
+                        $almacenproductodetalle->fecha = $request->x_fecha;
+                        $almacenproductodetalle->hora  = $request->x_hora;
                         $almacenproductodetalle->save();
 
                         $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                     } else {
                         $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
                         $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) - intval($detalle->cantidad);
-                        $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + 1;
+                        $almacenproductodetalle->totalsalidas = intval($almacenproductodetalle->totalsalidas) + intval($detalle->cantidad);
+                        $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + intval($detalle->cantidad);
                         $almacenproductodetalle->update();
                         $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                     }
@@ -166,6 +168,8 @@ class NotaSalidaController extends Controller
                     $prod = new Producto();
                     $producto = $prod->find( $detalle->fkidproducto );
                     $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
+                    $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
+                    $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
                     $producto->update();
 
                     $ntasaldet = new NotaSalidaDetalle();
@@ -332,16 +336,18 @@ class NotaSalidaController extends Controller
                                 $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
                                 $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
                                 $almacenproductodetalle->stockactual = $detalle->cantidad;
-                                $almacenproductodetalle->salidas = 1;
-                                $almacenproductodetalle->fecha       = $request->x_fecha;
-                                $almacenproductodetalle->hora        = $request->x_hora;
+                                $almacenproductodetalle->totalsalidas = $detalle->cantidad;
+                                $almacenproductodetalle->salidas = $detalle->cantidad;
+                                $almacenproductodetalle->fecha  = $request->x_fecha;
+                                $almacenproductodetalle->hora   = $request->x_hora;
                                 $almacenproductodetalle->save();
 
                                 $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                             } else {
                                 $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
                                 $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) - intval($detalle->cantidad);
-                                $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + 1;
+                                $almacenproductodetalle->totalsalidas = intval($almacenproductodetalle->totalsalidas) + intval($detalle->cantidad);
+                                $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + intval($detalle->cantidad);
                                 $almacenproductodetalle->update();
                                 $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                             }
@@ -351,6 +357,8 @@ class NotaSalidaController extends Controller
                             $prod = new Producto();
                             $producto = $prod->find( $detalle->fkidproducto );
                             $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
+                            $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
+                            $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
                             $producto->update();
 
                             $ntasaldet = new NotaSalidaDetalle();
@@ -364,12 +372,16 @@ class NotaSalidaController extends Controller
                                 $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
                                 if ( !is_null( $almacenproductodetalle ) ) {
                                     $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad ) + intval($notasalidadetalle->cantidad);
+                                    $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                    $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval($notasalidadetalle->cantidad);
                                     $almacenproductodetalle->update();
 
                                     $prod = new Producto();
                                     $producto = $prod->find($almacenproductodetalle->fkidproducto);
                                     if ( !is_null( $producto ) ) {
                                         $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad ) + intval($notasalidadetalle->cantidad);
+                                        $producto->totalsalidas = intval( $producto->totalsalidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                        $producto->salidas = intval( $producto->salidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
                                         $producto->update();
                                     }
                                 }
@@ -388,12 +400,16 @@ class NotaSalidaController extends Controller
                         $almacenproductodetalle = $almproddet->find($notasalidadetalle->fkidalmacenproductodetalle);
                         if ( !is_null( $almacenproductodetalle ) ) {
                             $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) + intval( $notasalidadetalle->cantidad );
+                            $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                            $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->update();
     
                             $prod = new Producto();
                             $producto = $prod->find($almacenproductodetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
+                                $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                                $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
                                 $producto->update();
                             }
                         }
@@ -494,12 +510,16 @@ class NotaSalidaController extends Controller
                         $almacenproductodetalle = $almproddet->find($notasalidadetalle->fkidalmacenproductodetalle);
                         if ( !is_null( $almacenproductodetalle ) ) {
                             $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) + intval( $notasalidadetalle->cantidad );
+                            $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                            $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->update();
     
                             $prod = new Producto();
                             $producto = $prod->find($almacenproductodetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
+                                $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                                $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
                                 $producto->update();
                             }
                         }

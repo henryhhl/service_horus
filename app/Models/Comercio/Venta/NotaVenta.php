@@ -634,4 +634,15 @@ class NotaVenta extends Model
 
         return $notaventa;
     }
+
+    public function existCliente( $query, $fkidcliente ) {
+
+        $notaventa = $query
+            ->where( 'notaventa.fkidcliente', '=', $fkidcliente )
+            ->whereNull('notaventa.deleted_at')
+            ->get();
+
+        return ( sizeof( $notaventa ) > 0 );
+    }
+
 }

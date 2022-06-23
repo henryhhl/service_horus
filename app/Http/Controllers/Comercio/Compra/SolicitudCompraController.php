@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Compra\SolicitudCompraRequest;
 use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\OrdenCompra;
+use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\SolicitudCompra;
 use App\Models\Comercio\Compra\SolicitudCompraDetalle;
+use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Inventario\SeccionInventario;
 use App\Models\Comercio\Venta\Sucursal;
 use App\Models\Comercio\Venta\TipoTransaccion;
@@ -133,27 +135,57 @@ class SolicitudCompraController extends Controller
             $obj = new SolicitudCompra();
             $solicitudcompra = $obj->store( $obj, $request );
 
-            $arraySolicitudCompraDetalle = json_decode($request->input('arraySolicitudCompraDetalle', '[]'));
-            foreach ( $arraySolicitudCompraDetalle as $detalle ) {
-                if ( !is_null( $detalle->fkidproducto ) ) {
-                    $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
-                    $solicitudcompradetalle = new SolicitudCompraDetalle();
-                    $solicitudcompradetalle->store($solicitudcompradetalle, $request, $detalle);
+            if ( $solicitudcompra ) {
+                $provdor = new Proveedor();
+                $proveedor = $provdor->find( $solicitudcompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->cantidadtotalsolicitudcomprarealizada = $proveedor->cantidadtotalsolicitudcomprarealizada + 1;
+                    $proveedor->cantidadsolicitudcomprarealizada = $proveedor->cantidadsolicitudcomprarealizada + 1;
+                    $proveedor->update();
                 }
-            }
 
-            $tpotrans = new TipoTransaccion();
-            $tipotransaccion = $tpotrans->find( $solicitudcompra->fkidtipotransaccion );
-            if ( !is_null( $tipotransaccion ) ) {
-                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
-                $tipotransaccion->update();
-            }
+                $arraySolicitudCompraDetalle = json_decode($request->input('arraySolicitudCompraDetalle', '[]'));
+                foreach ( $arraySolicitudCompraDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
+                        $solicompdet = new SolicitudCompraDetalle();
+                        $solicitudcompradetalle = $solicompdet->store($solicompdet, $request, $detalle);
+                        if ( $solicitudcompradetalle ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($solicitudcompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalsolicitudcompra = $producto->totalsolicitudcompra + intval($detalle->cantidadsolicitada);
+                                $producto->solicitudcompra = $producto->solicitudcompra + intval($detalle->cantidadsolicitada);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductosolicitudcomprarealizada = $proveedor->cantidadtotalproductosolicitudcomprarealizada + intval($detalle->cantidadsolicitada);
+                                $proveedor->cantidadproductosolicitudcomprarealizada = $proveedor->cantidadproductosolicitudcomprarealizada + intval($detalle->cantidadsolicitada);
+                                $proveedor->update();
+                            }
+                        }
+                    }
+                }
 
-            DB::commit();
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $solicitudcompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                DB::commit();
+                return response( )->json( [
+                    'response' => 1,
+                    'solicitudcompra' => $solicitudcompra,
+                    'message'  => 'Solicitud Compra registrado éxitosamente.',
+                ] );
+            }
+            DB::rollBack();
             return response( )->json( [
-                'response' => 1,
+                'response' => -1,
                 'solicitudcompra' => $solicitudcompra,
-                'message'  => 'Solicitud Compra registrado éxitosamente.',
+                'message'  => 'Solicitud Compra no registrado, intentar nuevamente.',
             ] );
 
         } catch ( \Exception $th ) {
@@ -299,9 +331,31 @@ class SolicitudCompraController extends Controller
                 ] );
             }
 
+            $provdor = new Proveedor();
+            $updateproveedor = false;
+            $proveedordelete = null;
+            if ( $solicitudcompra->fkidproveedor != $request->fkidproveedor ) {
+                $proveedordelete = $provdor->find( $solicitudcompra->fkidproveedor );
+                if ( !is_null( $proveedordelete ) ) {
+                    $proveedordelete->cantidadtotalsolicitudcomprarealizada = $proveedordelete->cantidadtotalsolicitudcomprarealizada - 1;
+                    $proveedordelete->cantidadsolicitudcompracancelada = $proveedordelete->cantidadsolicitudcompracancelada + 1;
+                    $proveedordelete->update();
+                    $updateproveedor = true;
+                }
+            }
+
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
+                $proveedor = $provdor->find( $request->fkidproveedor );
+                if ( $updateproveedor == true ) {
+                    if ( !is_null( $proveedor ) ) {
+                        $proveedor->cantidadtotalsolicitudcomprarealizada = $proveedor->cantidadtotalsolicitudcomprarealizada + 1;
+                        $proveedor->cantidadsolicitudcomprarealizada = $proveedor->cantidadsolicitudcomprarealizada + 1;
+                        $proveedor->update();
+                        $updateproveedor = true;
+                    }
+                }
 
                 $arraySolicitudCompraDetalle = json_decode( isset( $request->arraySolicitudCompraDetalle ) ? $request->arraySolicitudCompraDetalle : '[]' );
                 foreach ( $arraySolicitudCompraDetalle as $detalle ) {
@@ -309,9 +363,43 @@ class SolicitudCompraController extends Controller
                         $solicompdet = new SolicitudCompraDetalle();
                         $detalle->fkidsolicitudcompra = $solicitudcompra->idsolicitudcompra;
                         if ( is_null( $detalle->idsolicitudcompradetalle ) ) {
-                            $solicompdet->store( $solicompdet, $request, $detalle );
+                            $solicitudcompradetalle = $solicompdet->store( $solicompdet, $request, $detalle );
+                            if ( $solicitudcompradetalle ) {
+                                $prod = new Producto();
+                                $producto = $prod->find($solicitudcompradetalle->fkidproducto);
+                                if ( !is_null( $producto ) ) {
+                                    $producto->totalsolicitudcompra = $producto->totalsolicitudcompra + intval($detalle->cantidadsolicitada);
+                                    $producto->solicitudcompra = $producto->solicitudcompra + intval($detalle->cantidadsolicitada);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $proveedor ) ) {
+                                    $proveedor->cantidadtotalproductosolicitudcomprarealizada = $proveedor->cantidadtotalproductosolicitudcomprarealizada + intval($detalle->cantidadsolicitada);
+                                    $proveedor->cantidadproductosolicitudcomprarealizada = $proveedor->cantidadproductosolicitudcomprarealizada + intval($detalle->cantidadsolicitada);
+                                    $proveedor->update();
+                                }
+                            }
                         } else {
-                            $solicitudcompradetalle = $solicompdet->upgrade( $solicompdet, $detalle );
+                            $solicitudcompradetalle = $solicompdet->find( $detalle->idsolicitudcompradetalle );
+                            $solicitudcompradetalleupdate = $solicompdet->upgrade( $solicompdet, $detalle );
+                            if ( $solicitudcompradetalleupdate ) {
+                                $prod = new Producto();
+                                $producto = $prod->find($detalle->fkidproducto);
+                                if ( !is_null( $producto ) ) {
+                                    $producto->totalsolicitudcompra = $producto->totalsolicitudcompra - intval($solicitudcompradetalle->cantidadsolicitada) + intval($detalle->cantidadsolicitada);
+                                    $producto->solicitudcompra = $producto->solicitudcompra - intval($solicitudcompradetalle->cantidadsolicitada) + intval($detalle->cantidadsolicitada);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $proveedor ) ) {
+                                    $proveedor->cantidadtotalproductosolicitudcomprarealizada = $proveedor->cantidadtotalproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada) + intval($detalle->cantidadsolicitada);
+                                    $proveedor->cantidadproductosolicitudcomprarealizada = $proveedor->cantidadproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada) + intval($detalle->cantidadsolicitada);
+                                    $proveedor->update();
+                                }
+                                if ( $updateproveedor == true ) {
+                                    $proveedordelete->cantidadtotalproductosolicitudcomprarealizada = $proveedordelete->cantidadtotalproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada);
+                                    $proveedordelete->cantidadproductosolicitudcompracancelada = $proveedordelete->cantidadproductosolicitudcompracancelada + intval($solicitudcompradetalle->cantidadsolicitada);
+                                    $proveedordelete->update();
+                                }
+                            }
                         }
                     }
                 }
@@ -321,7 +409,26 @@ class SolicitudCompraController extends Controller
                     $solicompdet = new SolicitudCompraDetalle();
                     $solicitudcompradetalle = $solicompdet->find( $idsolicitudcompradetalle );
                     if ( !is_null( $solicitudcompradetalle ) ) {
-                        $solicitudcompradetalle->delete();
+                        $solicitudcompradetalledelete = $solicitudcompradetalle->delete();
+                        if ( $solicitudcompradetalledelete ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($solicitudcompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalsolicitudcompra = $producto->totalsolicitudcompra - intval($solicitudcompradetalle->cantidadsolicitada);
+                                $producto->solicitudcompracancelado = $producto->solicitudcompracancelado + intval($solicitudcompradetalle->cantidadsolicitada);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductosolicitudcomprarealizada = $proveedor->cantidadtotalproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedor->cantidadproductosolicitudcompracancelada = $proveedor->cantidadproductosolicitudcompracancelada + intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedor->update();
+                            }
+                            if ( $updateproveedor == true ) {
+                                $proveedordelete->cantidadtotalproductosolicitudcomprarealizada = $proveedordelete->cantidadtotalproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedordelete->cantidadproductosolicitudcompracancelada = $proveedordelete->cantidadproductosolicitudcompracancelada + intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedordelete->update();
+                            }
+                        }
                     }
                 }
 
@@ -420,6 +527,15 @@ class SolicitudCompraController extends Controller
 
             /* fin de restriccion */
 
+            $provdor = new Proveedor();
+            $proveedor = $provdor->find( $solicitudcompra->fkidproveedor );
+
+            if ( !is_null( $proveedor ) ) {
+                $proveedor->cantidadtotalsolicitudcomprarealizada = $proveedor->cantidadtotalsolicitudcomprarealizada - 1;
+                $proveedor->cantidadsolicitudcompracancelada = $proveedor->cantidadsolicitudcompracancelada + 1;
+                $proveedor->update();
+            }
+
             $solicitudcompradelete = $obj->remove( $obj, $request );
 
             if ( $solicitudcompradelete ) {
@@ -429,7 +545,21 @@ class SolicitudCompraController extends Controller
                 foreach ( $arraySolicitudCompraDetalle as $detalle ) {
                     $solicitudcompradetalle = $solcompdet->find($detalle->idsolicitudcompradetalle);
                     if ( !is_null( $solicitudcompradetalle ) ) {
-                        $solicitudcompradetalle->delete();
+                        $solicitudcompradetalledelete = $solicitudcompradetalle->delete();
+                        if ( $solicitudcompradetalledelete ) {
+                            $prod = new Producto();
+                            $producto = $prod->find($solicitudcompradetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->totalsolicitudcompra = $producto->totalsolicitudcompra - intval($solicitudcompradetalle->cantidadsolicitada);
+                                $producto->solicitudcompracancelado = $producto->solicitudcompracancelado + intval($solicitudcompradetalle->cantidadsolicitada);
+                                $producto->update();
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductosolicitudcomprarealizada = $proveedor->cantidadtotalproductosolicitudcomprarealizada - intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedor->cantidadproductosolicitudcompracancelada = $proveedor->cantidadproductosolicitudcompracancelada + intval($solicitudcompradetalle->cantidadsolicitada);
+                                $proveedor->update();
+                            }
+                        }
                     }
                 }
 

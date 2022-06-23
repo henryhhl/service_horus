@@ -27,16 +27,21 @@ class Cliente extends Model
         'descuentoinicial' => 0, 'descuentofinal' => 0,
         'montototaladeudado' => 0, 'fechaultimopago' => null, 'montototaladeudadoultimopago' => 0, 'fechaultimaventa' => null, 'montototalultimaventa' => 0,
         'imagen' => null, 'extension' => null, 'tipopersoneria' => 'S',
+        'cantidadventarealizada' => 0, 'cantidadventacancelada' => 0, 'cantidadproductoventarealizada' => 0, 'cantidadproductovendidocancelada' => 0,
+        'cantidaddevolucionventarealizada' => 0, 'cantidaddevolucionventacancelada' => 0, 'cantidadproductodevolucionventarealizada' => 0, 'cantidadproductodevolucionventacancelada' => 0,
+        'cantidadtotalventarealizada' => 0, 'cantidadtotalproductoventarealizada' => 0, 'cantidadtotaldevolucionventarealizada' => 0, 'cantidadtotalproductodevolucionventarealizada' => 0,
         'estado' => 'A',  'isdelete' => 'A', 'x_idusuario' => null,
     ];
 
     protected $fillable = [
         'fkidciudadpais', 'fkidciudad', 'fkidclientetipo', 'fkidlistaprecio', 'fkidconceptoventa', 'fkidsucursal',
         'codigo', 'nombre', 'apellido', 'razonsocial', 'nit', 'email', 'casilla', 'fax', 'telefono', 'celular',
-        'contacto', 'direccion', 'diascredito', 'limitecredito',
         'descuento', 'cantidaditems', 'descuentoxcantidaditems', 'descuentoinicial', 'descuentofinal',
         'montototaladeudado', 'fechaultimopago', 'montototaladeudadoultimopago', 'fechaultimaventa', 'montototalultimaventa',
-        'imagen', 'extension', 'tipopersoneria',
+        'contacto', 'direccion', 'diascredito', 'limitecredito', 'imagen', 'extension', 'tipopersoneria',
+        'cantidadventarealizada', 'cantidadventacancelada', 'cantidadproductoventarealizada', 'cantidadproductovendidocancelada',
+        'cantidaddevolucionventarealizada', 'cantidaddevolucionventacancelada', 'cantidadproductodevolucionventarealizada', 'cantidadproductodevolucionventacancelada',
+        'cantidadtotalventarealizada', 'cantidadtotalproductoventarealizada', 'cantidadtotaldevolucionventarealizada', 'cantidadtotalproductodevolucionventarealizada',
         'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
 

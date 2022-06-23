@@ -263,7 +263,7 @@ function C_Form( props ) {
     function onChangeFKIDProducto( data ) {
         console.log(data)
         informeCompra.fkidproducto  = data.idproducto;
-        informeCompra.producto      = `${parseFloat(data.peso).toFixed(2)}${data.abreviatura} ${data.producto}`;
+        informeCompra.producto      = `${parseFloat(data.peso).toFixed(2)}${data.abreviatura} ${data.nombre}`;
         onChange( informeCompra );
         setVisibleProducto(false);
     };
@@ -271,7 +271,7 @@ function C_Form( props ) {
     function componentProducto() {
         if ( !visible_producto ) return null;
         return (
-            <M_ListadoUnidadMedidaProducto
+            <M_ListadoProducto
                 visible={visible_producto}
                 onClose={ () =>  setVisibleProducto(false) }
                 value={informeCompra.fkidproducto}

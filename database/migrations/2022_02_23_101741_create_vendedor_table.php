@@ -33,6 +33,22 @@ class CreateVendedorTable extends Migration
             $table->text('email')->nullable();
             $table->date('fechanacimiento')->nullable();
 
+            $table->integer('cantidadtotalventarealizada')->default(0);
+            $table->integer('cantidadventarealizada')->default(0);
+            $table->integer('cantidadventacancelada')->default(0);
+
+            $table->integer('cantidadtotalproductoventarealizada')->default(0);
+            $table->integer('cantidadproductoventarealizada')->default(0);
+            $table->integer('cantidadproductoventacancelada')->default(0);
+
+            $table->integer('cantidadtotaldevolucionventarealizada')->default(0);
+            $table->integer('cantidaddevolucionventarealizada')->default(0);
+            $table->integer('cantidaddevolucionventacancelada')->default(0);
+
+            $table->integer('cantidadtotalproductodevolucionventarealizada')->default(0);
+            $table->integer('cantidadproductodevolucionventarealizada')->default(0);
+            $table->integer('cantidadproductodevolucionventacancelada')->default(0);
+
             $table->enum('genero', ['M', 'F', 'N'])->default('N');
             $table->enum('estadocivil', ['S', 'C', 'D', 'V', 'N'])->default('N');
 

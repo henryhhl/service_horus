@@ -155,6 +155,8 @@ class NotaCompraController extends Controller
             $proveedor = $prov->find( $notacompra->fkidproveedor );
             if ( !is_null( $proveedor ) ) {
                 $proveedor->nroorden = intval( $proveedor->nroorden ) + 1;
+                $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada + 1;
+                $proveedor->cantidadcomprarealizada = $proveedor->cantidadcomprarealizada + 1;
                 $proveedor->update();
             }
 
@@ -174,7 +176,8 @@ class NotaCompraController extends Controller
                         $almproddet->fkidproducto = $detalle->fkidproducto;
                         $almproddet->fkidalmacen = $detalle->fkidalmacen;
                         $almproddet->stockactual = $detalle->cantidad;
-                        $almproddet->compras = 1;
+                        $almproddet->totalcompras = $detalle->cantidad;
+                        $almproddet->compras = $detalle->cantidad;
                         $almproddet->fecha = $request->x_fecha;
                         $almproddet->hora = $request->x_hora;
                         $almproddet->save();
@@ -183,18 +186,18 @@ class NotaCompraController extends Controller
                         $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
                         $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenproductodetalle );
                         $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->stockactual);
-                        $almacenproductodetalle->compras = intval($almacenproductodetalle->compras) + 1;
+                        $almacenproductodetalle->totalcompras = intval($almacenproductodetalle->totalcompras) + intval($almacenproductodetalle->stockactual);
+                        $almacenproductodetalle->compras = intval($almacenproductodetalle->compras) + intval($almacenproductodetalle->stockactual);
                         $almacenproductodetalle->update();
 
                         $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                     }
 
-                    $notacompradetalle = new NotaCompraDetalle();
-                    $notacompradetalle->store($notacompradetalle, $request, $detalle);
-
                     $prod = new Producto();
                     $producto = $prod->find( $detalle->fkidproducto );
                     $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
+                    $producto->totalnotacompra = intval($producto->totalnotacompra) + intval($detalle->cantidad);
+                    $producto->notacompra = intval($producto->notacompra) + intval($detalle->cantidad);
                     $producto->update();
 
                     $provprod = new ProveedorProducto();
@@ -205,6 +208,17 @@ class NotaCompraController extends Controller
                             $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
                             $proveedorproducto->update();
                         }
+                    }
+                    if ( !is_null( $proveedor ) ) {
+                        $proveedor->cantidadtotalproductocomprarealizada = $proveedor->cantidadtotalproductocomprarealizada + intval($detalle->cantidad);
+                        $proveedor->cantidadproductocomprarealizada = $proveedor->cantidadproductocomprarealizada + intval($detalle->cantidad);
+                        $proveedor->update();
+                    }
+
+                    $ntacompdet = new NotaCompraDetalle();
+                    $notacompradetalle = $ntacompdet->store($ntacompdet, $request, $detalle);
+                    if ( $notacompradetalle ) {
+                        // Verifiaciones
                     }
 
                 }
@@ -393,6 +407,16 @@ class NotaCompraController extends Controller
 
             /* fin de restriccion */
 
+            $provdor = new Proveedor();
+            $proveedor = $provdor->find( $notacompra->fkidproveedor );
+
+            if ( !is_null( $proveedor ) ) {
+                $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
+                $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada - 1;
+                $proveedor->cantidadcompracancelada = $proveedor->cantidadcompracancelada + 1;
+                $proveedor->update();
+            }
+
             $notacompradelete = $obj->remove( $obj, $request );
 
             if ( $notacompradelete ) {
@@ -402,37 +426,41 @@ class NotaCompraController extends Controller
                 foreach ( $arrayNotaCompraDetalle as $detalle ) {
                     $notacompradetalle = $ntacompdet->find( $detalle->idnotacompradetalle );
                     if ( !is_null( $notacompradetalle ) ) {
-                        $almproddet = new AlmacenProductoDetalle();
-                        $almacenproductodetalle = $almproddet->find($notacompradetalle->fkidalmacenproductodetalle);
-                        if ( !is_null( $almacenproductodetalle ) ) {
-                            $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $notacompradetalle->cantidad );
-                            $almacenproductodetalle->update();
-                        }
-                        $prod = new Producto();
-                        $producto = $prod->find($almacenproductodetalle->fkidproducto);
-                        if ( !is_null( $producto ) ) {
-                            $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
-                            $producto->update();
-                        }
+                        $notacompradetalledelete = $notacompradetalle->delete();
+                        if ( $notacompradetalledelete ) {
+                            $almproddet = new AlmacenProductoDetalle();
+                            $almacenproductodetalle = $almproddet->find($notacompradetalle->fkidalmacenproductodetalle);
+                            if ( !is_null( $almacenproductodetalle ) ) {
+                                $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $notacompradetalle->cantidad );
+                                $almacenproductodetalle->totalcompras = intval( $almacenproductodetalle->totalcompras ) - intval( $notacompradetalle->cantidad );
+                                $almacenproductodetalle->compracancelada = intval( $almacenproductodetalle->compracancelada ) + intval( $notacompradetalle->cantidad );
+                                $almacenproductodetalle->update();
+                            }
+                            $prod = new Producto();
+                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
+                                $producto->totalnotacompra = intval( $producto->totalnotacompra ) - intval( $notacompradetalle->cantidad );
+                                $producto->notacompracancelado = intval( $producto->notacompracancelado ) + intval( $notacompradetalle->cantidad );
+                                $producto->update();
+                            }
 
-                        $provprod = new ProveedorProducto();
-                        if ( $provprod->existProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor ) ) {
-                            $firstProvProd = $provprod->firstProvProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor );
-                            $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
-                            if ( !is_null( $proveedorproducto ) ) {
-                                $proveedorproducto->stock = intval($proveedorproducto->stock) - intval($detalle->cantidad);
-                                $proveedorproducto->update();
+                            $provprod = new ProveedorProducto();
+                            if ( $provprod->existProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor ) ) {
+                                $firstProvProd = $provprod->firstProvProd( $provprod, $notacompradetalle->fkidproducto, $notacompradetalle->fkidproveedor );
+                                $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
+                                if ( !is_null( $proveedorproducto ) ) {
+                                    $proveedorproducto->stock = intval($proveedorproducto->stock) - intval($detalle->cantidad);
+                                    $proveedorproducto->update();
+                                }
+                            }
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductocomprarealizada = $proveedor->cantidadtotalproductocomprarealizada - intval($notacompradetalle->cantidad);
+                                $proveedor->cantidadproductocompracancelada = $proveedor->cantidadproductocompracancelada + intval($notacompradetalle->cantidad);
+                                $proveedor->update();
                             }
                         }
-                        $notacompradetalle->delete();
                     }
-                }
-
-                $prov = new Proveedor();
-                $proveedor = $prov->find( $notacompra->fkidproveedor );
-                if ( !is_null( $proveedor ) ) {
-                    $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
-                    $proveedor->update();
                 }
 
                 if ( !is_null( $notacompra->fkidordencompra ) ) {

@@ -5,8 +5,13 @@ namespace App\Http\Controllers\Comercio\Venta;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Venta\DevolucionNotaVentaRequest;
+use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
+use App\Models\Comercio\Inventario\Producto;
+use App\Models\Comercio\Venta\Cliente;
 use App\Models\Comercio\Venta\DevolucionNotaVenta;
 use App\Models\Comercio\Venta\DevolucionNotaVentaDetalle;
+use App\Models\Comercio\Venta\TipoTransaccion;
+use App\Models\Comercio\Venta\Vendedor;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -112,6 +117,28 @@ class DevolucionNotaVentaController extends Controller
 
             if ( $devolucionnotaventa ) {
 
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $devolucionnotaventa->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                $clte = new Cliente();
+                $cliente = $clte->find( $devolucionnotaventa->fkidcliente );
+                if ( !is_null( $cliente ) ) {
+                    $cliente->cantidadtotaldevolucionventarealizada = $cliente->cantidadtotaldevolucionventarealizada + 1;
+                    $cliente->cantidaddevolucionventarealizada = $cliente->cantidaddevolucionventarealizada + 1;
+                    $cliente->update();
+                }
+                $vdor = new Vendedor();
+                $vendedor = $vdor->find( $devolucionnotaventa->fkidvendedor );
+                if ( !is_null( $vendedor ) ) {
+                    $vendedor->cantidadtotaldevolucionventarealizada = $vendedor->cantidadtotaldevolucionventarealizada + 1;
+                    $vendedor->cantidaddevolucionventarealizada = $vendedor->cantidaddevolucionventarealizada + 1;
+                    $vendedor->update();
+                }
+
                 $arraydevolucionnotaventadetalle = json_decode( $request->input( 'arraydevolucionnotaventadetalle', '[]' ) );
 
                 foreach ( $arraydevolucionnotaventadetalle as $detalle ) {
@@ -119,7 +146,35 @@ class DevolucionNotaVentaController extends Controller
                         $devntavtadet = new DevolucionNotaVentaDetalle();
                         $detalle->fkiddevolucionnotaventa = $devolucionnotaventa->iddevolucionnotaventa;
                         $detalle->fkidvendedor = $devolucionnotaventa->fkidvendedor;
-                        $devntavtadet->store( $devntavtadet, $request, $detalle );
+                        $devolucionnotaventadetalle = $devntavtadet->store( $devntavtadet, $request, $detalle );
+                        if ( !is_null( $devolucionnotaventadetalle ) ) {
+                            $almproddet = new AlmacenProductoDetalle();
+                            $almacenproductodetalle = $almproddet->find($devolucionnotaventadetalle->fkidalmacenproductodetalle);
+                            if ( !is_null( $almacenproductodetalle ) ) {
+                                $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual + $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->totaldevolucionventas = $almacenproductodetalle->totaldevolucionventas + $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->devolucionventas = $almacenproductodetalle->devolucionventas + $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->update();
+                            }
+                            $prod = new Producto();
+                            $producto = $prod->find($devolucionnotaventadetalle->fkidproducto);
+                            if ( !is_null( $producto ) ) {
+                                $producto->stockactual = intval($producto->stockactual) + intval($devolucionnotaventadetalle->cantidad);
+                                $producto->totaldevolucionventa = intval($producto->totaldevolucionventa) + intval($devolucionnotaventadetalle->cantidad);
+                                $producto->devolucionventa = intval($producto->devolucionventa) + intval($devolucionnotaventadetalle->cantidad);
+                                $producto->update();
+                            }
+                            if ( !is_null( $cliente ) ) {
+                                $cliente->cantidadtotalproductodevolucionventarealizada = $cliente->cantidadtotalproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                $cliente->cantidadproductodevolucionventarealizada = $cliente->cantidadproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                $cliente->update();
+                            }
+                            if ( !is_null( $vendedor ) ) {
+                                $vendedor->cantidadtotalproductodevolucionventarealizada = $vendedor->cantidadtotalproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                $vendedor->cantidadproductodevolucionventarealizada = $vendedor->cantidadproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                $vendedor->update();
+                            }
+                        }
                     }
                 }
 
@@ -276,16 +331,78 @@ class DevolucionNotaVentaController extends Controller
 
             if ( $result ) {
 
+                $clte = new Cliente();
+                $cliente = $clte->find( $devolucionnotaventa->fkidcliente );
+
+                $vdor = new Vendedor();
+                $vendedor = $vdor->find( $devolucionnotaventa->fkidvendedor );
+
                 $arraydevolucionnotaventadetalle = json_decode( isset( $request->arraydevolucionnotaventadetalle ) ? $request->arraydevolucionnotaventadetalle : '[]' );
                 foreach ( $arraydevolucionnotaventadetalle as $detalle ) {
                     if ( !is_null( $detalle->fkidalmacenproductodetalle ) ) {
                         $devntavtadet = new DevolucionNotaVentaDetalle();
+
+                        $almproddet = new AlmacenProductoDetalle();
+                        $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+
+                        $prod = new Producto();
+                        $producto = $prod->find( $detalle->fkidproducto );
+
                         if ( is_null( $detalle->iddevolucionnotaventadetalle ) ) {
                             $detalle->fkiddevolucionnotaventa = $devolucionnotaventa->iddevolucionnotaventa;
                             $detalle->fkidvendedor = $devolucionnotaventa->fkidvendedor;
-                            $devntavtadet->store( $devntavtadet, $request, $detalle );
+                            $devolucionnotaventadetalle = $devntavtadet->store( $devntavtadet, $request, $detalle );
+                            if ( !is_null( $devolucionnotaventadetalle ) ) {
+                                if ( !is_null( $almacenproductodetalle ) ) {
+                                    $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual + $devolucionnotaventadetalle->cantidad;
+                                    $almacenproductodetalle->totaldevolucionventas = $almacenproductodetalle->totaldevolucionventas + $devolucionnotaventadetalle->cantidad;
+                                    $almacenproductodetalle->devolucionventas = $almacenproductodetalle->devolucionventas + $devolucionnotaventadetalle->cantidad;
+                                    $almacenproductodetalle->update();
+                                }
+                                if ( !is_null( $producto ) ) {
+                                    $producto->stockactual = intval($producto->stockactual) + intval($devolucionnotaventadetalle->cantidad);
+                                    $producto->totaldevolucionventa = intval($producto->totaldevolucionventa) + intval($devolucionnotaventadetalle->cantidad);
+                                    $producto->devolucionventa = intval($producto->devolucionventa) + intval($devolucionnotaventadetalle->cantidad);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $cliente ) ) {
+                                    $cliente->cantidadtotalproductodevolucionventarealizada = $cliente->cantidadtotalproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                    $cliente->cantidadproductodevolucionventarealizada = $cliente->cantidadproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                    $cliente->update();
+                                }
+                                if ( !is_null( $vendedor ) ) {
+                                    $vendedor->cantidadtotalproductodevolucionventarealizada = $vendedor->cantidadtotalproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                    $vendedor->cantidadproductodevolucionventarealizada = $vendedor->cantidadproductodevolucionventarealizada + intval($devolucionnotaventadetalle->cantidad);
+                                    $vendedor->update();
+                                }
+                            }
                         } else {
-                            $devolucionnotaventadetalle = $devntavtadet->upgrade( $devntavtadet, $detalle );
+                            $devolucionnotaventadetalle = $devntavtadet->find( $detalle->iddevolucionnotaventadetalle );
+                            $devolucionnotaventadetalleupdate = $devntavtadet->upgrade( $devntavtadet, $detalle );
+                            if ( $devolucionnotaventadetalleupdate ) {
+                                if ( !is_null( $almacenproductodetalle ) ) {
+                                    $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $almacenproductodetalle->totaldevolucionventas = $almacenproductodetalle->totaldevolucionventas - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $almacenproductodetalle->devolucionventas = $almacenproductodetalle->devolucionventas - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $almacenproductodetalle->update();
+                                }
+                                if ( !is_null( $producto ) ) {
+                                    $producto->stockactual = intval($producto->stockactual) - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $producto->totaldevolucionventa = intval($producto->totaldevolucionventa) - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $producto->devolucionventa = intval($producto->devolucionventa) - $devolucionnotaventadetalle->cantidad + intval($detalle->cantidad);
+                                    $producto->update();
+                                }
+                                if ( !is_null( $cliente ) ) {
+                                    $cliente->cantidadtotalproductodevolucionventarealizada = $cliente->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad) + intval($detalle->cantidad);
+                                    $cliente->cantidadproductodevolucionventarealizada = $cliente->cantidadproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad) + intval($detalle->cantidad);
+                                    $cliente->update();
+                                }
+                                if ( !is_null( $vendedor ) ) {
+                                    $vendedor->cantidadtotalproductodevolucionventarealizada = $vendedor->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad) + intval($detalle->cantidad);
+                                    $vendedor->cantidadproductodevolucionventarealizada = $vendedor->cantidadproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad) + intval($detalle->cantidad);
+                                    $vendedor->update();
+                                }
+                            }
                         }
                     }
                 }
@@ -295,7 +412,35 @@ class DevolucionNotaVentaController extends Controller
                     $devntavtadet = new DevolucionNotaVentaDetalle();
                     $devolucionnotaventadetalle = $devntavtadet->find( $iddevolucionnotaventadetalle );
                     if ( !is_null( $devolucionnotaventadetalle ) ) {
-                        $devolucionnotaventadetalle->delete();
+                        $devolucionnotaventadetalledelete = $devolucionnotaventadetalle->delete();
+                        if ( $devolucionnotaventadetalledelete ) {
+                            $almproddet = new AlmacenProductoDetalle();
+                            $almacenproductodetalle = $almproddet->find($devolucionnotaventadetalle->fkidalmacenproductodetalle);
+                            if ( !is_null( $almacenproductodetalle ) ) {
+                                $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->totaldevolucionventas = $almacenproductodetalle->totaldevolucionventas - $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->devolucionventacancelada = $almacenproductodetalle->devolucionventacancelada + $devolucionnotaventadetalle->cantidad;
+                                $almacenproductodetalle->update();
+                            }
+                            $prod = new Producto();
+                            $producto = $prod->find( $devolucionnotaventadetalle->fkidproducto );
+                            if ( !is_null( $producto ) ) {
+                                $producto->stockactual = intval($producto->stockactual) - intval($devolucionnotaventadetalle->cantidad);
+                                $producto->totaldevolucionventa = intval($producto->totaldevolucionventa) - intval($devolucionnotaventadetalle->cantidad);
+                                $producto->devolucionventacancelado = intval($producto->devolucionventacancelado) + intval($devolucionnotaventadetalle->cantidad);
+                                $producto->update();
+                            }
+                            if ( !is_null( $cliente ) ) {
+                                $cliente->cantidadtotalproductodevolucionventarealizada = $cliente->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad);
+                                $cliente->cantidadproductodevolucionventacancelada = $cliente->cantidadproductodevolucionventacancelada + intval($devolucionnotaventadetalle->cantidad);
+                                $cliente->update();
+                            }
+                            if ( !is_null( $vendedor ) ) {
+                                $vendedor->cantidadtotalproductodevolucionventarealizada = $vendedor->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad);
+                                $vendedor->cantidadproductodevolucionventacancelada = $vendedor->cantidadproductodevolucionventacancelada + intval($devolucionnotaventadetalle->cantidad);
+                                $vendedor->update();
+                            }
+                        }
                     }
                 }
 
@@ -377,13 +522,47 @@ class DevolucionNotaVentaController extends Controller
 
             /* fin de restriccion */
 
+            $clte = new Cliente();
+            $cliente = $clte->find( $devolucionnotaventa->fkidcliente );
+
+            $vdor = new Vendedor();
+            $vendedor = $vdor->find( $devolucionnotaventa->fkidvendedor );
+
             $devntavtadet = new DevolucionNotaVentaDetalle();
             $arraydevolucionnotaventadetalle = $devntavtadet->getDevolucionNotaVentaDetalle( $devntavtadet, $request->iddevolucionnotaventa );
 
             foreach ( $arraydevolucionnotaventadetalle as $detalle ) {
                 $devolucionnotaventadetalle = $devntavtadet->find( $detalle->iddevolucionnotaventadetalle );
                 if ( !is_null( $devolucionnotaventadetalle ) ) {
-                    $devolucionnotaventadetalle->delete();
+                    $devolucionnotaventadetalledelete =  $devolucionnotaventadetalle->delete();
+                    if ( $devolucionnotaventadetalledelete ) {
+                        $almproddet = new AlmacenProductoDetalle();
+                        $almacenproductodetalle = $almproddet->find($devolucionnotaventadetalle->fkidalmacenproductodetalle);
+                        if ( !is_null( $almacenproductodetalle ) ) {
+                            $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - $devolucionnotaventadetalle->cantidad;
+                            $almacenproductodetalle->totaldevolucionventas = $almacenproductodetalle->totaldevolucionventas - $devolucionnotaventadetalle->cantidad;
+                            $almacenproductodetalle->devolucionventacancelada = $almacenproductodetalle->devolucionventacancelada + $devolucionnotaventadetalle->cantidad;
+                            $almacenproductodetalle->update();
+                        }
+                        $prod = new Producto();
+                        $producto = $prod->find( $devolucionnotaventadetalle->fkidproducto );
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval($producto->stockactual) - intval($devolucionnotaventadetalle->cantidad);
+                            $producto->totaldevolucionventa = intval($producto->totaldevolucionventa) - intval($devolucionnotaventadetalle->cantidad);
+                            $producto->devolucionventacancelado = intval($producto->devolucionventacancelado) + intval($devolucionnotaventadetalle->cantidad);
+                            $producto->update();
+                        }
+                        if ( !is_null( $cliente ) ) {
+                            $cliente->cantidadtotalproductodevolucionventarealizada = $cliente->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad);
+                            $cliente->cantidadproductodevolucionventacancelada = $cliente->cantidadproductodevolucionventacancelada + intval($devolucionnotaventadetalle->cantidad);
+                            $cliente->update();
+                        }
+                        if ( !is_null( $vendedor ) ) {
+                            $vendedor->cantidadtotalproductodevolucionventarealizada = $vendedor->cantidadtotalproductodevolucionventarealizada - intval($devolucionnotaventadetalle->cantidad);
+                            $vendedor->cantidadproductodevolucionventacancelada = $vendedor->cantidadproductodevolucionventacancelada + intval($devolucionnotaventadetalle->cantidad);
+                            $vendedor->update();
+                        }
+                    }
                 }
             }
 

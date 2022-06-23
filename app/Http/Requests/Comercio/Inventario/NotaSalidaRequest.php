@@ -113,7 +113,7 @@ class NotaSalidaRequest extends FormRequest
             'fkidtipotransaccion'    => 'ID',
 
             'codigo'           => 'código',
-            'fechanotasalida' => 'fecha Nota Ingreso',
+            'fechanotasalida' => 'fecha Nota',
 
             'tipocambio'    => 'Tipo Cambio',
             'cantidadtotal' => 'Cantidad Total',

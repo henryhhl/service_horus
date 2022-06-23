@@ -398,7 +398,7 @@ class SolicitudCompra extends Model
     public function remove( $query, $request )
     {
         $idsolicitudcompra = $request->idsolicitudcompra;
-        $query->where('idsolicitudcompra', '=', $idsolicitudcompra)->delete();
+        return $query->where('idsolicitudcompra', '=', $idsolicitudcompra)->delete();
     }
 
     public function searchByID( $query, $idsolicitudcompra ) {

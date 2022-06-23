@@ -294,6 +294,16 @@ function onValidate( producto ) {
         producto.message.codigo = "Se permite máximo 50 caracteres";
         bandera = false;
     }
+    if ( typeof parseFloat(producto.valorequivalente) != "number" ) {
+        producto.error.valorequivalente   = true;
+        producto.message.valorequivalente = "Campo requerido";
+        bandera = false;
+    }
+    if ( parseInt(producto.valorequivalente) <= 0 ) {
+        producto.error.valorequivalente   = true;
+        producto.message.valorequivalente = "Campo requerido";
+        bandera = false;
+    }
     if ( typeof producto.fkidciudadorigen !== "number" ) {
         producto.error.fkidciudadorigen   = true;
         producto.message.fkidciudadorigen = "Campo requerido";
