@@ -29,6 +29,8 @@ class CreateNotaventadetalleTable extends Migration
             $table->integer('fkidlistaprecio')->unsigned();
 
             $table->integer('fkidvendedor')->unsigned();
+            $table->integer('fkidcliente')->unsigned();
+            $table->integer('fkidsucursal')->unsigned();
 
             $table->integer('cantidad')->default(0);
             $table->integer('cantidadsolicitada')->default(0);

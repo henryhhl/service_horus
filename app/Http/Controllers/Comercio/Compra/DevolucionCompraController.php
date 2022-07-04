@@ -10,6 +10,7 @@ use App\Models\Comercio\Compra\DevolucionCompra;
 use App\Models\Comercio\Compra\DevolucionCompraDetalle;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\Proveedor;
+use App\Models\Comercio\Inventario\Almacen;
 use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Venta\TipoTransaccion;
@@ -129,8 +130,18 @@ class DevolucionCompraController extends Controller
                 if ( !is_null( $devolucioncompra->fkidnotacompra ) ) {
                     $notcomp = new NotaCompra();
                     $notacompra = $notcomp->find( $devolucioncompra->fkidnotacompra );
-                    $notacompra->isdevolucioncompra = "A";
-                    $notacompra->update();
+                    if ( !is_null( $notacompra ) ) {
+                        $notacompra->isdevolucioncompra = "A";
+                        $notacompra->update();
+                    }
+                }
+
+                $alm = new Almacen();
+                $almacen = $alm->find( $devolucioncompra->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotaldevolucioncomprarealizada = $almacen->cantidadtotaldevolucioncomprarealizada + 1;
+                    $almacen->cantidaddevolucioncomprarealizada = $almacen->cantidaddevolucioncomprarealizada + 1;
+                    $almacen->update();
                 }
     
                 $tpotrans = new TipoTransaccion();
@@ -155,22 +166,30 @@ class DevolucionCompraController extends Controller
                         $devcompdet = new DevolucionCompraDetalle();
                         $devolucioncompradetalle = $devcompdet->store($devcompdet, $request, $detalle);
 
-                        if ( !is_null( $proveedor ) ) {
-                            $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval($detalle->cantidad);
-                            $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad);
-                            $proveedor->update();
-                        }
-    
-                        $almproddet = new AlmacenProductoDetalle();
-                        $almacenproductodetalle = $almproddet->find($devolucioncompradetalle->fkidalmacenproductodetalle);
-                        if ( !is_null( $almacenproductodetalle ) ) {
-                            $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $devolucioncompradetalle->cantidad );
-                            $almacenproductodetalle->totaldevolucioncompras = intval($almproddet->totaldevolucioncompras) + intval( $devolucioncompradetalle->cantidad );
-                            $almacenproductodetalle->devolucioncompras = intval($almproddet->devolucioncompras) + intval( $devolucioncompradetalle->cantidad );
-                            $almacenproductodetalle->update();
-    
+                        if ( !is_null( $devolucioncompradetalle ) ) {
+                            $proveedor = $provdor->find( $devolucioncompradetalle->fkidproveedor );
+                            if ( !is_null( $proveedor ) ) {
+                                $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval($devolucioncompra->cantidad);
+                                $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($devolucioncompra->cantidad);
+                                $proveedor->update();
+                            }
+        
+                            $almproddet = new AlmacenProductoDetalle();
+                            $almacenproductodetalle = $almproddet->find($devolucioncompradetalle->fkidalmacenproductodetalle);
+                            if ( !is_null( $almacenproductodetalle ) ) {
+                                $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $devolucioncompradetalle->cantidad );
+                                $almacenproductodetalle->totaldevolucioncompras = intval($almproddet->totaldevolucioncompras) + intval( $devolucioncompradetalle->cantidad );
+                                $almacenproductodetalle->devolucioncompras = intval($almproddet->devolucioncompras) + intval( $devolucioncompradetalle->cantidad );
+                                $almacenproductodetalle->update();
+                            }
+                            $almacen = $alm->find( $devolucioncompradetalle->fkidalmacen );
+                            if ( !is_null( $almacen ) ) {
+                                $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada + intval($devolucioncompra->cantidad);
+                                $almacen->cantidadproductodevolucioncomprarealizada = $almacen->cantidadproductodevolucioncomprarealizada + intval($devolucioncompra->cantidad);
+                                $almacen->update();
+                            }
                             $prod = new Producto();
-                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                            $producto = $prod->find($devolucioncompradetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) - intval( $devolucioncompradetalle->cantidad );
                                 $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $devolucioncompradetalle->cantidad );
@@ -181,7 +200,6 @@ class DevolucionCompraController extends Controller
     
                     }
                 }
-    
                 DB::commit();
                 return response( )->json( [
                     'response' => 1,
@@ -190,9 +208,8 @@ class DevolucionCompraController extends Controller
                 ] );
             }
 
-            DB::rollBack();
             return response( )->json( [
-                'response' => 1,
+                'response' => -1,
                 'devolucioncompra' => $devolucioncompra,
                 'message'  => 'Devolución Compra no registrado, intentar nuevamente.',
             ] );
@@ -333,25 +350,19 @@ class DevolucionCompraController extends Controller
                 ] );
             }
 
-            $provdor = new Proveedor();
-            $updateproveedor = false;
-            $proveedordelete = null;
-            if ( $devolucioncompra->fkidproveedor != $request->fkidproveedor ) {
-                $proveedordelete = $provdor->find( $devolucioncompra->fkidproveedor );
-                if ( !is_null( $proveedordelete ) ) {
-                    $proveedordelete->cantidadtotaldevolucioncomprarealizada = $proveedordelete->cantidadtotaldevolucioncomprarealizada - 1;
-                    $proveedordelete->cantidaddevolucioncompracancelada = $proveedordelete->cantidaddevolucioncompracancelada + 1;
-                    $proveedordelete->update();
-                    $updateproveedor = true;
-                }
-            }
-
             $result = $obj->upgrade( $obj, $request );
 
             if ( $result ) {
 
-                $proveedor = $provdor->find( $request->fkidproveedor );
-                if ( $updateproveedor == true ) {
+                $provdor = new Proveedor();
+                if ( $devolucioncompra->fkidproveedor != $request->fkidproveedor ) {
+                    $proveedor = $provdor->find( $devolucioncompra->fkidproveedor );
+                    if ( !is_null( $proveedor ) ) {
+                        $proveedor->cantidadtotaldevolucioncomprarealizada = $proveedor->cantidadtotaldevolucioncomprarealizada - 1;
+                        $proveedor->cantidaddevolucioncompracancelada = $proveedor->cantidaddevolucioncompracancelada + 1;
+                        $proveedor->update();
+                    }
+                    $proveedor = $provdor->find( $request->fkidproveedor );
                     if ( !is_null( $proveedor ) ) {
                         $proveedor->cantidadtotaldevolucioncomprarealizada = $proveedor->cantidadtotaldevolucioncomprarealizada + 1;
                         $proveedor->cantidaddevolucioncomprarealizada = $proveedor->cantidaddevolucioncomprarealizada + 1;
@@ -359,87 +370,176 @@ class DevolucionCompraController extends Controller
                     }
                 }
 
-                if ( !is_null( $devolucioncompra->fkidnotacompra ) ) {
-                    $ntacomp = new NotaCompra();
-                    $notacompra = $ntacomp->find( $devolucioncompra->fkidnotacompra );
-                    $notacompra->isdevolucioncompra = "N";
-                    $notacompra->update();
+                $alm = new Almacen();
+                if ( $devolucioncompra->fkidalmacen != $request->fkidalmacen ) {
+                    $almacen = $alm->find( $devolucioncompra->fkidalmacen );
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotaldevolucioncomprarealizada = $almacen->cantidadtotaldevolucioncomprarealizada - 1;
+                        $almacen->cantidaddevolucioncompracancelado = $almacen->cantidaddevolucioncompracancelado + 1;
+                        $almacen->update();
+                    }
+                    $almacen = $alm->find($request->fkidalmacen);
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotaldevolucioncomprarealizada = $almacen->cantidadtotaldevolucioncomprarealizada + 1;
+                        $almacen->cantidaddevolucioncomprarealizada = $almacen->cantidaddevolucioncomprarealizada + 1;
+                        $almacen->update();
+                    }
                 }
-                $devolucioncompra = $obj->find( $request->iddevolucioncompra );
+
                 if ( !is_null( $devolucioncompra->fkidnotacompra ) ) {
                     $ntacomp = new NotaCompra();
                     $notacompra = $ntacomp->find( $devolucioncompra->fkidnotacompra );
-                    $notacompra->isdevolucioncompra = "A";
-                    $notacompra->update();
+                    if ( !is_null( $notacompra ) ) {
+                        $notacompra->isdevolucioncompra = "N";
+                        $notacompra->update();
+                    }
+                }
+                if ( !is_null( $request->fkidnotacompra ) ) {
+                    $ntacomp = new NotaCompra();
+                    $notacompra = $ntacomp->find( $devolucioncompra->fkidnotacompra );
+                    if ( !is_null( $notacompra ) ) {
+                        $notacompra->isdevolucioncompra = "A";
+                        $notacompra->update();
+                    }
                 }
 
                 $arrayDevolucionCompraDetalle = json_decode( isset( $request->arrayDevolucionCompraDetalle ) ? $request->arrayDevolucionCompraDetalle : '[]' );
                 foreach ( $arrayDevolucionCompraDetalle as $detalle ) {
-
                     if ( !is_null( $detalle->fkidproducto ) ) {
                         $detalle->fkiddevolucioncompra = $devolucioncompra->iddevolucioncompra;
                         $devcompdet = new DevolucionCompraDetalle();
-
                         if ( is_null( $detalle->iddevolucioncompradetalle ) ) {
                             $devolucioncompradetalle = $devcompdet->store($devcompdet, $request, $detalle);
                             if ( $devolucioncompradetalle ) {
                                 $almproddet = new AlmacenProductoDetalle();
-                                $almacenproductodetalle = $almproddet->find($devolucioncompradetalle->fkidalmacenproductodetalle);
+                                $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
                                 if ( !is_null( $almacenproductodetalle ) ) {
-                                    $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $devolucioncompradetalle->cantidad );
-                                    $almacenproductodetalle->totaldevolucioncompras = intval($almproddet->totaldevolucioncompras) + intval( $devolucioncompradetalle->cantidad );
-                                    $almacenproductodetalle->devolucioncompras = intval($almproddet->devolucioncompras) + intval( $devolucioncompradetalle->cantidad );
+                                    $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad );
+                                    $almacenproductodetalle->totaldevolucioncompras = intval($almproddet->totaldevolucioncompras) + intval( $detalle->cantidad );
+                                    $almacenproductodetalle->devolucioncompras = intval($almproddet->devolucioncompras) + intval( $detalle->cantidad );
                                     $almacenproductodetalle->update();
-            
-                                    $prod = new Producto();
-                                    $producto = $prod->find($almacenproductodetalle->fkidproducto);
-                                    if ( !is_null( $producto ) ) {
-                                        $producto->stockactual = intval( $producto->stockactual ) - intval( $devolucioncompradetalle->cantidad );
-                                        $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $devolucioncompradetalle->cantidad );
-                                        $producto->devolucioncompra = intval( $producto->devolucioncompra ) + intval( $devolucioncompradetalle->cantidad );
-                                        $producto->update();
-                                    }
+                                }
+                                $almacen = $alm->find( $detalle->fkidalmacen );
+                                if ( !is_null( $almacen ) ) {
+                                    $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada + intval($detalle->cantidad);
+                                    $almacen->cantidadproductodevolucioncomprarealizada = $almacen->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad);
+                                    $almacen->update();
                                 }
 
+                                $prod = new Producto();
+                                $producto = $prod->find($detalle->fkidproducto);
+                                if ( !is_null( $producto ) ) {
+                                    $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad );
+                                    $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $detalle->cantidad );
+                                    $producto->devolucioncompra = intval( $producto->devolucioncompra ) + intval( $detalle->cantidad );
+                                    $producto->update();
+                                }
+
+                                $proveedor = $provdor->find( $detalle->fkidproveedor );
                                 if ( !is_null( $proveedor ) ) {
-                                    $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval($devolucioncompradetalle->cantidad);
-                                    $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($devolucioncompradetalle->cantidad);
+                                    $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval($detalle->cantidad);
+                                    $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad);
                                     $proveedor->update();
                                 }
                             }
                         } else {
                             $devolucioncompradetalle = $devcompdet->find( $detalle->iddevolucioncompradetalle );
-                            $cantidadrealizada = $devolucioncompradetalle->cantidad;
                             if ( $devcompdet->upgrade( $devcompdet, $detalle ) ) {
-                                $devolucioncompradetalle = $devcompdet->find( $detalle->iddevolucioncompradetalle );
 
                                 $almproddet = new AlmacenProductoDetalle();
-                                $almacenproductodetalle = $almproddet->find($devolucioncompradetalle->fkidalmacenproductodetalle);
-                                if ( !is_null( $almacenproductodetalle ) ) {
-                                    $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $devolucioncompradetalle->cantidad ) + intval($cantidadrealizada);
-                                    $almacenproductodetalle->totaldevolucioncompras = intval( $almacenproductodetalle->totaldevolucioncompras ) + intval( $devolucioncompradetalle->cantidad ) - intval($cantidadrealizada);
-                                    $almacenproductodetalle->devolucioncompracancelada = intval( $almacenproductodetalle->devolucioncompracancelada ) + intval( $devolucioncompradetalle->cantidad );
-                                    $almacenproductodetalle->update();
-            
-                                    $prod = new Producto();
-                                    $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                                if ( $devolucioncompradetalle->fkidalmacenproductodetalle != $detalle->fkidalmacenproductodetalle ) {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad );
+                                        $almacenproductodetalle->totaldevolucioncompras = intval( $almacenproductodetalle->totaldevolucioncompras ) + intval( $detalle->cantidad );
+                                        $almacenproductodetalle->devolucioncompras = intval( $almacenproductodetalle->devolucioncompras ) + intval( $detalle->cantidad );
+                                        $almacenproductodetalle->update();
+                                    }
+                                    $almacenproductodetalle = $almproddet->find($devolucioncompradetalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) + intval( $devolucioncompradetalle->cantidad );
+                                        $almacenproductodetalle->totaldevolucioncompras = intval( $almacenproductodetalle->totaldevolucioncompras ) - intval( $devolucioncompradetalle->cantidad );
+                                        $almacenproductodetalle->devolucioncompracancelada = intval( $almacenproductodetalle->devolucioncompracancelada ) + intval( $detalle->cantidad );
+                                        $almacenproductodetalle->update();
+                                    }
+                                } else {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad ) + intval( $devolucioncompradetalle->cantidad );
+                                        $almacenproductodetalle->totaldevolucioncompras = intval( $almacenproductodetalle->totaldevolucioncompras ) + intval( $detalle->cantidad ) - intval( $devolucioncompradetalle->cantidad );
+                                        $almacenproductodetalle->devolucioncompras = intval( $almacenproductodetalle->devolucioncompras ) + intval( $detalle->cantidad ) - intval( $devolucioncompradetalle->cantidad );
+                                        $almacenproductodetalle->update();
+                                    }
+                                }
+                                
+                                $prod = new Producto();
+                                if ( $devolucioncompradetalle->fkidproducto != $detalle->fkidproducto ) {
+                                    $producto = $prod->find($detalle->fkidproducto);
                                     if ( !is_null( $producto ) ) {
-                                        $producto->stockactual = intval( $producto->stockactual ) - intval( $devolucioncompradetalle->cantidad ) + intval($cantidadrealizada);
-                                        $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $devolucioncompradetalle->cantidad ) - intval($cantidadrealizada);
+                                        $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad );
+                                        $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $detalle->cantidad );
+                                        $producto->devolucioncompra = intval( $producto->devolucioncompra ) + intval( $detalle->cantidad );
+                                        $producto->update();
+                                    }
+                                    $producto = $prod->find($devolucioncompradetalle->fkidproducto);
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval( $producto->stockactual ) + intval( $devolucioncompradetalle->cantidad );
+                                        $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) - intval( $devolucioncompradetalle->cantidad );
                                         $producto->devolucioncompracancelado = intval( $producto->devolucioncompracancelado ) + intval( $devolucioncompradetalle->cantidad );
+                                        $producto->update();
+                                    }
+                                } else {
+                                    $producto = $prod->find($detalle->fkidproducto);
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad ) + intval( $devolucioncompradetalle->cantidad );
+                                        $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) + intval( $detalle->cantidad ) - intval( $devolucioncompradetalle->cantidad );
+                                        $producto->devolucioncompra = intval( $producto->devolucioncompra ) + intval( $detalle->cantidad ) - intval( $devolucioncompradetalle->cantidad );
                                         $producto->update();
                                     }
                                 }
 
-                                if ( !is_null( $proveedor ) ) {
-                                    $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval($devolucioncompradetalle->cantidad) - intval($cantidadrealizada);
-                                    $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($devolucioncompradetalle->cantidad) - intval($cantidadrealizada);
-                                    $proveedor->update();
+                                if ( $devolucioncompradetalle->fkidalmacen != $detalle->fkidalmacen ) {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada + intval($detalle->cantidad);
+                                        $almacen->cantidadproductodevolucioncomprarealizada = $almacen->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                    $almacen = $alm->find( $devolucioncompradetalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
+                                        $almacen->cantidadproductodevolucioncompracancelado = $almacen->cantidadproductodevolucioncompracancelado + intval($devolucioncompradetalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                } else {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada + intval($detalle->cantidad) - intval($devolucioncompradetalle->cantidad);
+                                        $almacen->cantidadproductodevolucioncomprarealizada = $almacen->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad) - intval($devolucioncompradetalle->cantidad);
+                                        $almacen->update();
+                                    }
                                 }
-                                if ( $updateproveedor == true ) {
-                                    $proveedordelete->cantidadtotalproductodevolucioncomprarealizada = $proveedordelete->cantidadtotalproductodevolucioncomprarealizada - intval($cantidadrealizada);
-                                    $proveedordelete->cantidadproductodevolucioncompracancelada = $proveedordelete->cantidadproductodevolucioncompracancelada + intval($cantidadrealizada);
-                                    $proveedordelete->update();
+
+                                if ( $devolucioncompradetalle->fkidproveedor != $detalle->fkidproveedor ) {
+                                    $proveedor = $provdor->find( $devolucioncompradetalle->fkidproveedor );
+                                    if ( !is_null( $proveedor ) ) {
+                                        $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada - intval( $devolucioncompradetalle->cantidad );
+                                        $proveedor->cantidadproductodevolucioncompracancelada = $proveedor->cantidadproductodevolucioncompracancelada + intval( $devolucioncompradetalle->cantidad );
+                                        $proveedor->update();
+                                    }
+                                    $proveedor = $provdor->find( $detalle->fkidproveedor );
+                                    if ( !is_null( $proveedor ) ) {
+                                        $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada + intval( $detalle->cantidad );
+                                        $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval( $detalle->cantidad );
+                                        $proveedor->update();
+                                    }
+                                } else {
+                                    $proveedor = $provdor->find( $detalle->fkidproveedor );
+                                    if ( !is_null( $proveedor ) ) {
+                                        $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad) + intval($detalle->cantidad);
+                                        $proveedor->cantidadproductodevolucioncomprarealizada = $proveedor->cantidadproductodevolucioncomprarealizada + intval($detalle->cantidad) - intval($devolucioncompradetalle->cantidad);
+                                        $proveedor->update();
+                                    }
                                 }
                             }
                         }
@@ -459,27 +559,32 @@ class DevolucionCompraController extends Controller
                             $almacenproductodetalle->totaldevolucioncompras = intval( $almacenproductodetalle->totaldevolucioncompras ) - intval( $devolucioncompradetalle->cantidad );
                             $almacenproductodetalle->devolucioncompracancelada = intval( $almacenproductodetalle->devolucioncompracancelada ) + intval( $devolucioncompradetalle->cantidad );
                             $almacenproductodetalle->update();
-    
-                            $prod = new Producto();
-                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
-                            if ( !is_null( $producto ) ) {
-                                $producto->stockactual = intval( $producto->stockactual ) + intval( $devolucioncompradetalle->cantidad );
-                                $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) - intval( $devolucioncompradetalle->cantidad );
-                                $producto->devolucioncompracancelado = intval( $producto->devolucioncompracancelado ) + intval( $devolucioncompradetalle->cantidad );
-                                $producto->update();
-                            }
+                        }
+
+                        $prod = new Producto();
+                        $producto = $prod->find($devolucioncompradetalle->fkidproducto);
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval( $producto->stockactual ) + intval( $devolucioncompradetalle->cantidad );
+                            $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) - intval( $devolucioncompradetalle->cantidad );
+                            $producto->devolucioncompracancelado = intval( $producto->devolucioncompracancelado ) + intval( $devolucioncompradetalle->cantidad );
+                            $producto->update();
+                        }
+
+                        $almacen = $alm->find( $devolucioncompradetalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
+                            $almacen->cantidadproductodevolucioncompracancelado = $almacen->cantidadproductodevolucioncompracancelado + intval($devolucioncompradetalle->cantidad);
+                            $almacen->update();
+                        }
+
+                        $proveedor = $provdor->find( $devolucioncompradetalle->fkidproveedor );
+                        if ( !is_null( $proveedor ) ) {
+                            $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada - intval( $devolucioncompradetalle->cantidad );
+                            $proveedor->cantidadproductodevolucioncompracancelada = $proveedor->cantidadproductodevolucioncompracancelada + intval( $devolucioncompradetalle->cantidad );
+                            $proveedor->update();
                         }
                         if ( $devolucioncompradetalle->delete() ) {
-                            if ( !is_null( $proveedor ) ) {
-                                $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
-                                $proveedor->cantidadproductodevolucioncompracancelada = $proveedor->cantidadproductodevolucioncompracancelada + intval($devolucioncompradetalle->cantidad);
-                                $proveedor->update();
-                            }
-                            if ( $updateproveedor == true ) {
-                                $proveedordelete->cantidadtotalproductodevolucioncomprarealizada = $proveedordelete->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
-                                $proveedordelete->cantidadproductodevolucioncompracancelada = $proveedordelete->cantidadproductodevolucioncompracancelada + intval($devolucioncompradetalle->cantidad);
-                                $proveedordelete->update();
-                            }
+                            // Accion    
                         }
                     }
                 }
@@ -490,8 +595,6 @@ class DevolucionCompraController extends Controller
                     'message'  => 'Devolución Compra actualizado éxitosamente.',
                 ] );
             }
-
-            DB::rollBack();
             return response()->json( [
                 'response' => -1,
                 'message'  => 'Hubo conflictos al actualizar Devolución de Compra.',
@@ -563,18 +666,41 @@ class DevolucionCompraController extends Controller
 
             /* fin de restriccion */
 
-            $provdor = new Proveedor();
-            $proveedor = $provdor->find( $devolucioncompra->fkidproveedor );
-
-            if ( !is_null( $proveedor ) ) {
-                $proveedor->cantidadtotaldevolucioncomprarealizada = $proveedor->cantidadtotaldevolucioncomprarealizada - 1;
-                $proveedor->cantidaddevolucioncompracancelada = $proveedor->cantidaddevolucioncompracancelada + 1;
-                $proveedor->update();
-            }
-
             $result = $obj->remove( $obj, $request );
 
             if ( $result ) {
+
+                if ( !is_null( $devolucioncompra->fkidnotacompra ) ) {
+                    $notcomp = new NotaCompra();
+                    $notacompra = $notcomp->find( $devolucioncompra->fkidnotacompra );
+                    if ( !is_null( $notacompra ) ) {
+                        $notacompra->isdevolucioncompra = "N";
+                        $notacompra->update();
+                    }
+                }
+
+                $provdor = new Proveedor();
+                $proveedor = $provdor->find( $devolucioncompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->cantidadtotaldevolucioncomprarealizada = $proveedor->cantidadtotaldevolucioncomprarealizada - 1;
+                    $proveedor->cantidaddevolucioncompracancelada = $proveedor->cantidaddevolucioncompracancelada + 1;
+                    $proveedor->update();
+                }
+
+                $alm = new Almacen();
+                $almacen = $alm->find($devolucioncompra->fkidalmacen);
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotaldevolucioncomprarealizada = $almacen->cantidadtotaldevolucioncomprarealizada - 1;
+                    $almacen->cantidaddevolucioncompracancelado = $almacen->cantidaddevolucioncompracancelado + 1;
+                    $almacen->update();
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
 
                 $devcompdet = new DevolucionCompraDetalle();
                 $arrayDevolucionCompraDetalle = $devcompdet->getDevolucionCompraDetalle( $devcompdet, $request->iddevolucioncompra );
@@ -590,14 +716,24 @@ class DevolucionCompraController extends Controller
                             $almacenproductodetalle->devolucioncompracancelada = intval( $almacenproductodetalle->devolucioncompracancelada ) + intval( $devolucioncompradetalle->cantidad );
                             $almacenproductodetalle->update();
                         }
+
                         $prod = new Producto();
-                        $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                        $producto = $prod->find($devolucioncompradetalle->fkidproducto);
                         if ( !is_null( $producto ) ) {
                             $producto->stockactual = intval( $producto->stockactual ) + intval( $devolucioncompradetalle->cantidad );
                             $producto->totaldevolucioncompra = intval( $producto->totaldevolucioncompra ) - intval( $devolucioncompradetalle->cantidad );
                             $producto->devolucioncompracancelado = intval( $producto->devolucioncompracancelado ) + intval( $devolucioncompradetalle->cantidad );
                             $producto->update();
                         }
+
+                        $almacen = $alm->find( $devolucioncompradetalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductodevolucioncomprarealizada = $almacen->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
+                            $almacen->cantidadproductodevolucioncompracancelado = $almacen->cantidadproductodevolucioncompracancelado + intval($devolucioncompradetalle->cantidad);
+                            $almacen->update();
+                        }
+
+                        $proveedor = $provdor->find($devolucioncompradetalle->fkidproveedor);
                         if ( !is_null( $proveedor ) ) {
                             $proveedor->cantidadtotalproductodevolucioncomprarealizada = $proveedor->cantidadtotalproductodevolucioncomprarealizada - intval($devolucioncompradetalle->cantidad);
                             $proveedor->cantidadproductodevolucioncompracancelada = $proveedor->cantidadproductodevolucioncompracancelada + intval($devolucioncompradetalle->cantidad);
@@ -605,22 +741,6 @@ class DevolucionCompraController extends Controller
                         }
                         $devolucioncompradetalle->delete();
                     }
-                }
-
-                if ( !is_null( $devolucioncompra->fkidnotacompra ) ) {
-                    $notcomp = new NotaCompra();
-                    $notacompra = $notcomp->find( $devolucioncompra->fkidnotacompra );
-                    if ( !is_null( $notacompra ) ) {
-                        $notacompra->isdevolucioncompra = "N";
-                        $notacompra->update();
-                    }
-                }
-
-                $tpotrans = new TipoTransaccion();
-                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
-                if ( !is_null( $tipotransaccion ) ) {
-                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
-                    $tipotransaccion->update();
                 }
 
                 DB::commit();

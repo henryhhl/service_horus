@@ -27,7 +27,7 @@ class NotaVentaDetalle extends Model
     protected $fillable = [
         'fkidnotaventa', 'fkidalmacenproductodetalle', 'fkidalmacen', 'fkidvendedor',
         'fkidproducto', 'fkidproductotipo', 'fkidproductomarca',
-        'fkidlistaprecio', 'fkidlistapreciodetalle',
+        'fkidlistaprecio', 'fkidlistapreciodetalle', 'fkidcliente', 'fkidsucursal',
         'cantidad', 'cantidadsolicitada', 'preciobase', 'preciounitario', 'preciosubtotal',
         'descuento', 'montodescuento', 'nota', 'estadoproceso', 'tipoentrega', 'isdevolucionventa',
         'nrolote', 'nrofabrica', 'fechavencimiento',
@@ -38,7 +38,7 @@ class NotaVentaDetalle extends Model
         $arraynotaventadetalle = $query
             ->select( [
                 'notaventadetalle.idnotaventadetalle', 'notaventadetalle.fkidnotaventa', 'notaventadetalle.fkidalmacenproductodetalle', 
-                'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidvendedor',
+                'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidvendedor', 'notaventadetalle.fkidcliente', 'notaventadetalle.fkidsucursal',
                 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo', 'notaventadetalle.fkidproductomarca', 
                 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidlistapreciodetalle',
                 'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 
@@ -68,6 +68,8 @@ class NotaVentaDetalle extends Model
         $fkidlistaprecio = $detalle->fkidlistaprecio;
         $fkidlistapreciodetalle = $detalle->fkidlistapreciodetalle;
         $fkidvendedor = $detalle->fkidvendedor;
+        $fkidcliente = $detalle->fkidcliente;
+        $fkidsucursal = $detalle->fkidsucursal;
 
         $cantidad = $detalle->cantidad;
         $cantidadsolicitada = $detalle->cantidadsolicitada;
@@ -103,6 +105,8 @@ class NotaVentaDetalle extends Model
             'fkidlistaprecio' => $fkidlistaprecio,
             'fkidlistapreciodetalle' => $fkidlistapreciodetalle,
             'fkidvendedor' => $fkidvendedor,
+            'fkidcliente' => $fkidcliente,
+            'fkidsucursal' => $fkidsucursal,
 
             'cantidad' => $cantidad,
             'cantidadsolicitada' => $cantidadsolicitada,
@@ -143,6 +147,8 @@ class NotaVentaDetalle extends Model
         $fkidlistaprecio = $detalle->fkidlistaprecio;
         $fkidlistapreciodetalle = $detalle->fkidlistapreciodetalle;
         $fkidvendedor = $detalle->fkidvendedor;
+        $fkidcliente = $detalle->fkidcliente;
+        $fkidsucursal = $detalle->fkidsucursal;
 
         $cantidad = $detalle->cantidad;
         $cantidadsolicitada = $detalle->cantidadsolicitada;
@@ -176,6 +182,8 @@ class NotaVentaDetalle extends Model
                 'fkidlistaprecio' => $fkidlistaprecio,
                 'fkidlistapreciodetalle' => $fkidlistapreciodetalle,
                 'fkidvendedor' => $fkidvendedor,
+                'fkidcliente' => $fkidcliente,
+                'fkidsucursal' => $fkidsucursal,
 
                 'cantidad' => $cantidad,
                 'cantidadsolicitada' => $cantidadsolicitada,

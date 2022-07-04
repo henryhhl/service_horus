@@ -102,6 +102,7 @@ class DevolucionNotaVenta extends Model
                         'devolucionnotaventadetalle.iddevolucionnotaventadetalle', 'devolucionnotaventadetalle.fkiddevolucionnotaventa', 'devolucionnotaventadetalle.fkidproducto', 
                         'devolucionnotaventadetalle.fkidproductotipo', 'devolucionnotaventadetalle.fkidproductomarca', 'devolucionnotaventadetalle.fkidvendedor',
                         'devolucionnotaventadetalle.fkidalmacenproductodetalle', 'devolucionnotaventadetalle.fkidalmacen',
+                        'devolucionnotaventadetalle.fkidcliente', 'devolucionnotaventadetalle.fkidsucursal',
                         'devolucionnotaventadetalle.fkidlistapreciodetalle', 'devolucionnotaventadetalle.fkidlistaprecio', 'devolucionnotaventadetalle.fkidnotaventadetalle',
 
                         'devolucionnotaventadetalle.cantidad', 'devolucionnotaventadetalle.cantidadvendida', 'devolucionnotaventadetalle.preciounitario', 
@@ -200,6 +201,7 @@ class DevolucionNotaVenta extends Model
                         'devolucionnotaventadetalle.iddevolucionnotaventadetalle', 'devolucionnotaventadetalle.fkiddevolucionnotaventa', 'devolucionnotaventadetalle.fkidproducto', 
                         'devolucionnotaventadetalle.fkidproductotipo', 'devolucionnotaventadetalle.fkidproductomarca', 'devolucionnotaventadetalle.fkidvendedor',
                         'devolucionnotaventadetalle.fkidalmacenproductodetalle', 'devolucionnotaventadetalle.fkidalmacen',
+                        'devolucionnotaventadetalle.fkidcliente', 'devolucionnotaventadetalle.fkidsucursal',
                         'devolucionnotaventadetalle.fkidlistapreciodetalle', 'devolucionnotaventadetalle.fkidlistaprecio', 'devolucionnotaventadetalle.fkidnotaventadetalle',
 
                         'devolucionnotaventadetalle.cantidad', 'devolucionnotaventadetalle.cantidadvendida', 'devolucionnotaventadetalle.preciounitario', 
@@ -428,6 +430,7 @@ class DevolucionNotaVenta extends Model
                         'devolucionnotaventadetalle.iddevolucionnotaventadetalle', 'devolucionnotaventadetalle.fkiddevolucionnotaventa', 'devolucionnotaventadetalle.fkidproducto', 
                         'devolucionnotaventadetalle.fkidproductotipo', 'devolucionnotaventadetalle.fkidproductomarca', 'devolucionnotaventadetalle.fkidvendedor',
                         'devolucionnotaventadetalle.fkidalmacenproductodetalle', 'devolucionnotaventadetalle.fkidalmacen',
+                        'devolucionnotaventadetalle.fkidcliente', 'devolucionnotaventadetalle.fkidsucursal',
                         'devolucionnotaventadetalle.fkidlistapreciodetalle', 'devolucionnotaventadetalle.fkidlistaprecio', 'devolucionnotaventadetalle.fkidnotaventadetalle',
 
                         'devolucionnotaventadetalle.cantidad', 'devolucionnotaventadetalle.cantidadvendida', 'devolucionnotaventadetalle.preciounitario', 
@@ -517,6 +520,7 @@ class DevolucionNotaVenta extends Model
                         'devolucionnotaventadetalle.iddevolucionnotaventadetalle', 'devolucionnotaventadetalle.fkiddevolucionnotaventa', 'devolucionnotaventadetalle.fkidproducto', 
                         'devolucionnotaventadetalle.fkidproductotipo', 'devolucionnotaventadetalle.fkidproductomarca', 'devolucionnotaventadetalle.fkidvendedor',
                         'devolucionnotaventadetalle.fkidalmacenproductodetalle', 'devolucionnotaventadetalle.fkidalmacen',
+                        'devolucionnotaventadetalle.fkidcliente', 'devolucionnotaventadetalle.fkidsucursal',
                         'devolucionnotaventadetalle.fkidlistapreciodetalle', 'devolucionnotaventadetalle.fkidlistaprecio', 'devolucionnotaventadetalle.fkidnotaventadetalle',
 
                         'devolucionnotaventadetalle.cantidad', 'devolucionnotaventadetalle.cantidadvendida', 'devolucionnotaventadetalle.preciounitario', 

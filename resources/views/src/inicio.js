@@ -445,7 +445,7 @@ const Inicio = (props) => {
                             <div className="card-hover-shadow-2x mb-3 card">
                                 <div className="card-header-tab card-header">
                                     <div className="card-header-title font-size-lg text-capitalize font-weight-normal">
-                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Lista Productos
+                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Productos
                                     </div>
                                     <div className="btn-actions-pane-right text-capitalize actions-icon-btn">
                                         <div className="btn-group dropdown">
@@ -786,7 +786,7 @@ const Inicio = (props) => {
                             <div className="card-hover-shadow-2x mb-3 card">
                                 <div className="card-header-tab card-header">
                                     <div className="card-header-title font-size-lg text-capitalize font-weight-normal">
-                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Tasks List
+                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Proveedores
                                     </div>
                                     <div className="btn-actions-pane-right text-capitalize actions-icon-btn">
                                         <div className="btn-group dropdown">
@@ -1127,7 +1127,7 @@ const Inicio = (props) => {
                             <div className="card-hover-shadow-2x mb-3 card">
                                 <div className="card-header-tab card-header">
                                     <div className="card-header-title font-size-lg text-capitalize font-weight-normal">
-                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Tasks List
+                                        <i className="header-icon lnr-database icon-gradient bg-malibu-beach"> </i>Clientes
                                     </div>
                                     <div className="btn-actions-pane-right text-capitalize actions-icon-btn">
                                         <div className="btn-group dropdown">

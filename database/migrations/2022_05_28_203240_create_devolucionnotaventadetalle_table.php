@@ -30,6 +30,8 @@ class CreateDevolucionnotaventadetalleTable extends Migration
             $table->integer('fkidlistapreciodetalle')->unsigned();
 
             $table->integer('fkidvendedor')->unsigned();
+            $table->integer('fkidcliente')->unsigned();
+            $table->integer('fkidsucursal')->unsigned();
 
             $table->integer('cantidadvendida')->default(0);
             $table->integer('cantidad')->default(0);

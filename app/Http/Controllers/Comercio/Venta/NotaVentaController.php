@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercio\Venta;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Venta\NotaVentaRequest;
+use App\Models\Comercio\Inventario\Almacen;
 use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Venta\Cliente;
@@ -152,6 +153,14 @@ class NotaVentaController extends Controller
                     $vendedor->update();
                 }
 
+                $alm = new Almacen();
+                $almacen = $alm->find( $notaventa->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotalventarealizada = $almacen->cantidadtotalventarealizada + 1;
+                    $almacen->cantidadventarealizada = $almacen->cantidadventarealizada + 1;
+                    $almacen->update();
+                }
+
                 $tpotrans = new TipoTransaccion();
                 $tipotransaccion = $tpotrans->find( $notaventa->fkidtipotransaccion );
                 if ( !is_null( $tipotransaccion ) ) {
@@ -160,36 +169,46 @@ class NotaVentaController extends Controller
                 }
 
                 $arraynotaventadetalle = json_decode( $request->input( 'arraynotaventadetalle', '[]' ) );
-
                 foreach ( $arraynotaventadetalle as $detalle ) {
                     if ( !is_null( $detalle->fkidalmacenproductodetalle ) ) {
                         $ntavtadet = new NotaVentaDetalle();
                         $detalle->fkidnotaventa = $notaventa->idnotaventa;
-                        $detalle->fkidvendedor = $notaventa->fkidvendedor;
                         $notaventadetalle = $ntavtadet->store( $ntavtadet, $request, $detalle );
 
                         if ( !is_null( $notaventadetalle ) ) {
                             $almproddet = new AlmacenProductoDetalle();
-                            $almacenproductodetalle = $almproddet->find($notaventadetalle->fkidalmacenproductodetalle);
+                            $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
                             if ( !is_null( $almacenproductodetalle ) ) {
                                 $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - intval($notaventadetalle->cantidad);
                                 $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas + $notaventadetalle->cantidad;
                                 $almacenproductodetalle->ventas = $almacenproductodetalle->ventas + $notaventadetalle->cantidad;
                                 $almacenproductodetalle->update();
                             }
+
                             $prod = new Producto();
-                            $producto = $prod->find($notaventadetalle->fkidproducto);
+                            $producto = $prod->find($detalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval($producto->stockactual) - intval($notaventadetalle->cantidad);
                                 $producto->totalnotaventa = intval($producto->totalnotaventa) + intval($notaventadetalle->cantidad);
                                 $producto->notaventa = intval($producto->notaventa) + intval($notaventadetalle->cantidad);
                                 $producto->update();
                             }
+
+                            $almacen = $alm->find($detalle->fkidalmacen);
+                            if ( !is_null( $almacen ) ) {
+                                $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) + intval($notaventadetalle->cantidad);
+                                $almacen->cantidadproductoventarealizada = intval($almacen->cantidadproductoventarealizada) + intval($notaventadetalle->cantidad);
+                                $almacen->update();
+                            }
+
+                            $cliente = $clte->find( $detalle->fkidcliente );
                             if ( !is_null( $cliente ) ) {
                                 $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
                                 $cliente->cantidadproductoventarealizada = $cliente->cantidadproductoventarealizada + intval($detalle->cantidad);
                                 $cliente->update();
                             }
+
+                            $vendedor = $vdor->find( $detalle->fkidvendedor );
                             if ( !is_null( $vendedor ) ) {
                                 $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
                                 $vendedor->cantidadproductoventarealizada = $vendedor->cantidadproductoventarealizada + intval($detalle->cantidad);
@@ -207,7 +226,6 @@ class NotaVentaController extends Controller
                 ] );
             }
 
-            DB::rollBack();
             return response( )->json( [
                 'response' => -1,
                 'notaventa' => $notaventa,
@@ -355,51 +373,54 @@ class NotaVentaController extends Controller
                 ] );
             }
 
-            $clte = new Cliente();
-            $updatecliente = false;
-            $clientedelete = null;
-            if ( $notaventa->fkidcliente != $request->fkidcliente ) {
-                $clientedelete = $clte->find( $notaventa->fkidcliente );
-                if ( !is_null( $clientedelete ) ) {
-                    $clientedelete->cantidadtotalventarealizada = $clientedelete->cantidadtotalventarealizada - 1;
-                    $clientedelete->cantidadventacancelada = $clientedelete->cantidadventacancelada + 1;
-                    $clientedelete->update();
-                    $updatecliente = true;
-                }
-            }
-
-            $vdor = new Vendedor();
-            $updatevendedor = false;
-            $vendedordelete = null;
-            if ( $notaventa->fkidvendedor != $request->fkidvendedor ) {
-                $vendedordelete = $vdor->find( $notaventa->fkidvendedor );
-                if ( !is_null( $vendedordelete ) ) {
-                    $vendedordelete->cantidadtotalventarealizada = $vendedordelete->cantidadtotalventarealizada - 1;
-                    $vendedordelete->cantidadventacancelada = $vendedordelete->cantidadventacancelada + 1;
-                    $vendedordelete->update();
-                    $updatevendedor = true;
-                }
-            }
-
-
             $result = $ntavta->upgrade( $ntavta, $request );
 
             if ( $result ) {
-
-                $cliente = $clte->find( $request->fkidcliente );
-                if ( $updatecliente == true ) {
+                $clte = new Cliente();
+                if ( $notaventa->fkidcliente != $request->fkidcliente ) {
+                    $cliente = $clte->find( $request->fkidcliente );
                     if ( !is_null( $cliente ) ) {
                         $cliente->cantidadtotalventarealizada = $cliente->cantidadtotalventarealizada + 1;
                         $cliente->cantidadventarealizada = $cliente->cantidadventarealizada + 1;
                         $cliente->update();
                     }
+                    $cliente = $clte->find( $notaventa->fkidcliente );
+                    if ( !is_null( $cliente ) ) {
+                        $cliente->cantidadtotalventarealizada = $cliente->cantidadtotalventarealizada - 1;
+                        $cliente->cantidadventacancelada = $cliente->cantidadventacancelada + 1;
+                        $cliente->update();
+                    }
                 }
-                $vendedor = $vdor->find( $request->fkidvendedor );
-                if ( $updatevendedor == true ) {
+
+                $vdor = new Vendedor();
+                if ( $notaventa->fkidvendedor != $request->fkidvendedor ) {
+                    $vendedor = $vdor->find( $request->fkidvendedor );
                     if ( !is_null( $vendedor ) ) {
                         $vendedor->cantidadtotalventarealizada = $vendedor->cantidadtotalventarealizada + 1;
                         $vendedor->cantidadventarealizada = $vendedor->cantidadventarealizada + 1;
                         $vendedor->update();
+                    }
+                    $vendedor = $vdor->find( $notaventa->fkidvendedor );
+                    if ( !is_null( $vendedor ) ) {
+                        $vendedor->cantidadtotalventarealizada = $vendedor->cantidadtotalventarealizada - 1;
+                        $vendedor->cantidadventacancelada = $vendedor->cantidadventacancelada + 1;
+                        $vendedor->update();
+                    }
+                }
+
+                $alm = new Almacen();
+                if ( $notaventa->fkidalmacen != $request->fkidalmacen ) {
+                    $almacen = $alm->find( $request->fkidalmacen );
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotalventarealizada = $almacen->cantidadtotalventarealizada + 1;
+                        $almacen->cantidadventarealizada = $almacen->cantidadventarealizada + 1;
+                        $almacen->update();
+                    }
+                    $almacen = $alm->find( $notaventa->fkidalmacen );
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotalventarealizada = $almacen->cantidadtotalventarealizada - 1;
+                        $almacen->cantidadventacancelado = $almacen->cantidadventacancelado + 1;
+                        $almacen->update();
                     }
                 }
 
@@ -407,32 +428,43 @@ class NotaVentaController extends Controller
                 foreach ( $arraynotaventadetalle as $detalle ) {
                     if ( !is_null( $detalle->fkidalmacenproductodetalle ) ) {
                         $ntavtadet = new NotaVentaDetalle();
-                        $almproddet = new AlmacenProductoDetalle();
-                        $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
-                        $prod = new Producto();
-                        $producto = $prod->find($detalle->fkidproducto);
                         if ( is_null( $detalle->idnotaventadetalle ) ) {
                             $detalle->fkidnotaventa = $notaventa->idnotaventa;
-                            $detalle->fkidvendedor = $notaventa->fkidvendedor;
                             $notaventadetalle = $ntavtadet->store( $ntavtadet, $request, $detalle );
                             if ( !is_null( $notaventadetalle ) ) {
+                                $almproddet = new AlmacenProductoDetalle();
+                                $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
                                 if ( !is_null( $almacenproductodetalle ) ) {
                                     $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - intval($notaventadetalle->cantidad);
                                     $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas + $notaventadetalle->cantidad;
                                     $almacenproductodetalle->ventas = $almacenproductodetalle->ventas + $notaventadetalle->cantidad;
                                     $almacenproductodetalle->update();
                                 }
+
+                                $prod = new Producto();
+                                $producto = $prod->find( $detalle->fkidproducto );
                                 if ( !is_null( $producto ) ) {
                                     $producto->stockactual = intval($producto->stockactual) - intval($notaventadetalle->cantidad);
                                     $producto->totalnotaventa = intval($producto->totalnotaventa) + intval($notaventadetalle->cantidad);
                                     $producto->notaventa = intval($producto->notaventa) + intval($notaventadetalle->cantidad);
                                     $producto->update();
                                 }
+
+                                $almacen = $alm->find( $detalle->fkidalmacen );
+                                if ( !is_null( $almacen ) ) {
+                                    $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) + intval($detalle->cantidad);
+                                    $almacen->cantidadproductoventarealizada = intval($almacen->cantidadproductoventarealizada) + intval($detalle->cantidad);
+                                    $almacen->update();
+                                }
+
+                                $cliente = $clte->find( $detalle->fkidcliente );
                                 if ( !is_null( $cliente ) ) {
                                     $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
                                     $cliente->cantidadproductoventarealizada = $cliente->cantidadproductoventarealizada + intval($detalle->cantidad);
                                     $cliente->update();
                                 }
+
+                                $vendedor = $vdor->find( $detalle->fkidvendedor );
                                 if ( !is_null( $vendedor ) ) {
                                     $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
                                     $vendedor->cantidadproductoventarealizada = $vendedor->cantidadproductoventarealizada + intval($detalle->cantidad);
@@ -441,40 +473,125 @@ class NotaVentaController extends Controller
                             }
                         } else {
                             $notaventadetalle = $ntavtadet->find( $detalle->idnotaventadetalle );
-                            $notaventadetalleupdate = $ntavtadet->upgrade( $ntavtadet, $detalle );
-                            if ( $notaventadetalleupdate ) {
-                                if ( !is_null( $almacenproductodetalle ) ) {
-                                    $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual + intval($notaventadetalle->cantidad) - intval($detalle->cantidad);
-                                    $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas - $notaventadetalle->cantidad + intval($detalle->cantidad);
-                                    $almacenproductodetalle->ventas = $almacenproductodetalle->ventas - $notaventadetalle->cantidad + intval($detalle->cantidad);
-                                    $almacenproductodetalle->update();
+                            if ( $ntavtadet->upgrade( $ntavtadet, $detalle ) ) {
+                                $almproddet = new AlmacenProductoDetalle();
+                                if ( $notaventadetalle->fkidalmacenproductodetalle != $detalle->fkidalmacenproductodetalle ) {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual - intval($detalle->cantidad);
+                                        $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas + intval($detalle->cantidad);
+                                        $almacenproductodetalle->ventas = $almacenproductodetalle->ventas + intval($detalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
+                                    $almacenproductodetalle = $almproddet->find($notaventadetalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual + intval($notaventadetalle->cantidad);
+                                        $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas - intval($notaventadetalle->cantidad);
+                                        $almacenproductodetalle->ventacancelada = $almacenproductodetalle->ventacancelada + intval($notaventadetalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
+                                } else {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = $almacenproductodetalle->stockactual + intval($notaventadetalle->cantidad) - intval($detalle->cantidad);
+                                        $almacenproductodetalle->totalventas = $almacenproductodetalle->totalventas - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $almacenproductodetalle->ventas = $almacenproductodetalle->ventas - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
                                 }
-                                if ( !is_null( $producto ) ) {
-                                    $producto->stockactual = intval($producto->stockactual) + intval($notaventadetalle->cantidad) - intval($detalle->cantidad);
-                                    $producto->totalnotaventa = intval($producto->totalnotaventa) - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $producto->notaventa = intval($producto->notaventa) - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $producto->update();
+
+                                $prod = new Producto();
+                                if ( $notaventadetalle->fkidproducto != $detalle->fkidproducto ) {
+                                    $producto = $prod->find( $detalle->fkidproducto );
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
+                                        $producto->totalnotaventa = intval($producto->totalnotaventa) + intval($detalle->cantidad);
+                                        $producto->notaventa = intval($producto->notaventa) + intval($detalle->cantidad);
+                                        $producto->update();
+                                    }
+                                    $producto = $prod->find( $notaventadetalle->fkidproducto );
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval($producto->stockactual) + intval($notaventadetalle->cantidad);
+                                        $producto->totalnotaventa = intval($producto->totalnotaventa) - intval($notaventadetalle->cantidad);
+                                        $producto->notaventacancelado = intval($producto->notaventacancelado) + intval($notaventadetalle->cantidad);
+                                        $producto->update();
+                                    }
+                                } else {
+                                    $producto = $prod->find( $detalle->fkidproducto );
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval($producto->stockactual) + intval($notaventadetalle->cantidad) - intval($detalle->cantidad);
+                                        $producto->totalnotaventa = intval($producto->totalnotaventa) - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $producto->notaventa = intval($producto->notaventa) - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $producto->update();
+                                    }
                                 }
-                                if ( !is_null( $cliente ) ) {
-                                    $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $cliente->cantidadproductoventarealizada = $cliente->cantidadproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $cliente->update();
+
+                                if ( $notaventadetalle->fkidalmacen != $detalle->fkidalmacen ) {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) + intval($detalle->cantidad);
+                                        $almacen->cantidadproductoventarealizada = intval($almacen->cantidadproductoventarealizada) + intval($detalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                    $almacen = $alm->find( $notaventadetalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) - intval($notaventadetalle->cantidad);
+                                        $almacen->cantidadproductoventacancelado = intval($almacen->cantidadproductoventacancelado) + intval($notaventadetalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                } else {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) + intval($detalle->cantidad) - intval($notaventadetalle->cantidad);
+                                        $almacen->cantidadproductoventarealizada = intval($almacen->cantidadproductoventarealizada) + intval($detalle->cantidad) - intval($notaventadetalle->cantidad);
+                                        $almacen->update();
+                                    }
                                 }
-                                if ( !is_null( $vendedor ) ) {
-                                    $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $vendedor->cantidadproductoventarealizada = $vendedor->cantidadproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
-                                    $vendedor->update();
+                                
+                                if ( $notaventadetalle->fkidcliente != $detalle->fkidcliente ) {
+                                    $cliente = $clte->find( $detalle->fkidcliente );
+                                    if ( !is_null( $cliente ) ) {
+                                        $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
+                                        $cliente->cantidadproductoventarealizada = $cliente->cantidadproductoventarealizada + intval($detalle->cantidad);
+                                        $cliente->update();
+                                    }
+                                    $cliente = $clte->find( $notaventadetalle->fkidcliente );
+                                    if ( !is_null( $cliente ) ) {
+                                        $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
+                                        $cliente->cantidadproductoventacancelada = $cliente->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
+                                        $cliente->update();
+                                    }
+                                } else {
+                                    $cliente = $clte->find( $detalle->fkidcliente );
+                                    if ( !is_null( $cliente ) ) {
+                                        $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $cliente->cantidadproductoventarealizada = $cliente->cantidadproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $cliente->update();
+                                    }
                                 }
-                                if ( $updatecliente == true ) {
-                                    $clientedelete->cantidadtotalproductoventarealizada = $clientedelete->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
-                                    $clientedelete->cantidadproductoventacancelada = $clientedelete->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
-                                    $clientedelete->update();
+
+                                if ( $notaventadetalle->fkidvendedor != $detalle->fkidvendedor ) {
+                                    $vendedor = $vdor->find( $detalle->fkidvendedor );
+                                    if ( !is_null( $vendedor ) ) {
+                                        $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada + intval($detalle->cantidad);
+                                        $vendedor->cantidadproductoventarealizada = $vendedor->cantidadproductoventarealizada + intval($detalle->cantidad);
+                                        $vendedor->update();
+                                    }
+                                    $vendedor = $vdor->find( $notaventadetalle->fkidvendedor );
+                                    if ( !is_null( $vendedor ) ) {
+                                        $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
+                                        $vendedor->cantidadproductoventacancelada = $vendedor->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
+                                        $vendedor->update();
+                                    }
+                                } else {
+                                    $vendedor = $vdor->find( $detalle->fkidvendedor );
+                                    if ( !is_null( $vendedor ) ) {
+                                        $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $vendedor->cantidadproductoventarealizada = $vendedor->cantidadproductoventarealizada - intval($notaventadetalle->cantidad) + intval($detalle->cantidad);
+                                        $vendedor->update();
+                                    }
                                 }
-                                if ( $updatevendedor == true ) {
-                                    $vendedordelete->cantidadtotalproductoventarealizada = $vendedordelete->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
-                                    $vendedordelete->cantidadproductoventacancelada = $vendedordelete->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
-                                    $vendedordelete->update();
-                                }
+                                
                             }
                         }
                     }
@@ -495,6 +612,7 @@ class NotaVentaController extends Controller
                                 $almacenproductodetalle->ventacancelada = $almacenproductodetalle->ventacancelada + $notaventadetalle->cantidad;
                                 $almacenproductodetalle->update();
                             }
+
                             $prod = new Producto();
                             $producto = $prod->find( $notaventadetalle->fkidproducto );
                             if ( !is_null( $producto ) ) {
@@ -503,25 +621,26 @@ class NotaVentaController extends Controller
                                 $producto->notaventacancelado = intval($producto->notaventacancelado) + intval($notaventadetalle->cantidad);
                                 $producto->update();
                             }
+
+                            $almacen = $alm->find( $notaventadetalle->fkidalmacen );
+                            if ( !is_null( $almacen ) ) {
+                                $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) - intval($notaventadetalle->cantidad);
+                                $almacen->cantidadproductoventacancelado = intval($almacen->cantidadproductoventacancelado) + intval($notaventadetalle->cantidad);
+                                $almacen->update();
+                            }
+
+                            $cliente = $clte->find( $notaventadetalle->fkidcliente );
                             if ( !is_null( $cliente ) ) {
                                 $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
                                 $cliente->cantidadproductoventacancelada = $cliente->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
                                 $cliente->update();
                             }
+
+                            $vendedor = $vdor->find( $notaventadetalle->fkidvendedor );
                             if ( !is_null( $vendedor ) ) {
                                 $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
                                 $vendedor->cantidadproductoventacancelada = $vendedor->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
                                 $vendedor->update();
-                            }
-                            if ( $updatecliente == true ) {
-                                $clientedelete->cantidadtotalproductoventarealizada = $clientedelete->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
-                                $clientedelete->cantidadproductoventacancelada = $clientedelete->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
-                                $clientedelete->update();
-                            }
-                            if ( $updatevendedor == true ) {
-                                $vendedordelete->cantidadtotalproductoventarealizada = $vendedordelete->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
-                                $vendedordelete->cantidadproductoventacancelada = $vendedordelete->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
-                                $vendedordelete->update();
                             }
                         }
                     }
@@ -619,7 +738,6 @@ class NotaVentaController extends Controller
 
             $clte = new Cliente();
             $cliente = $clte->find( $notaventa->fkidcliente );
-
             if ( !is_null( $cliente ) ) {
                 $cliente->cantidadtotalventarealizada = $cliente->cantidadtotalventarealizada - 1;
                 $cliente->cantidadventacancelada = $cliente->cantidadventacancelada + 1;
@@ -628,11 +746,18 @@ class NotaVentaController extends Controller
 
             $vdor = new Vendedor();
             $vendedor = $vdor->find( $notaventa->fkidvendedor );
-
             if ( !is_null( $vendedor ) ) {
                 $vendedor->cantidadtotalventarealizada = $vendedor->cantidadtotalventarealizada - 1;
                 $vendedor->cantidadventacancelada = $vendedor->cantidadventacancelada + 1;
                 $vendedor->update();
+            }
+
+            $alm = new Almacen();
+            $almacen = $alm->find( $notaventa->fkidalmacen );
+            if ( !is_null( $almacen ) ) {
+                $almacen->cantidadtotalventarealizada = $almacen->cantidadtotalventarealizada - 1;
+                $almacen->cantidadventacancelado = $almacen->cantidadventacancelado + 1;
+                $almacen->update();
             }
 
             $ntavtadet = new NotaVentaDetalle();
@@ -651,19 +776,31 @@ class NotaVentaController extends Controller
                             $almacenproductodetalle->ventacancelada = $almacenproductodetalle->ventacancelada + $notaventadetalle->cantidad;
                             $almacenproductodetalle->update();
                         }
+
                         $prod = new Producto();
-                            $producto = $prod->find( $notaventadetalle->fkidproducto );
-                            if ( !is_null( $producto ) ) {
-                                $producto->stockactual = intval($producto->stockactual) + intval($notaventadetalle->cantidad);
-                                $producto->totalnotaventa = intval($producto->totalnotaventa) - intval($notaventadetalle->cantidad);
-                                $producto->notaventacancelado = intval($producto->notaventacancelado) + intval($notaventadetalle->cantidad);
-                                $producto->update();
-                            }
+                        $producto = $prod->find( $notaventadetalle->fkidproducto );
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval($producto->stockactual) + intval($notaventadetalle->cantidad);
+                            $producto->totalnotaventa = intval($producto->totalnotaventa) - intval($notaventadetalle->cantidad);
+                            $producto->notaventacancelado = intval($producto->notaventacancelado) + intval($notaventadetalle->cantidad);
+                            $producto->update();
+                        }
+
+                        $almacen = $alm->find( $notaventadetalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductoventarealizada = intval($almacen->cantidadtotalproductoventarealizada) - intval($notaventadetalle->cantidad);
+                            $almacen->cantidadproductoventacancelado = intval($almacen->cantidadproductoventacancelado) + intval($notaventadetalle->cantidad);
+                            $almacen->update();
+                        }
+
+                        $cliente = $clte->find( $notaventadetalle->fkidcliente );
                         if ( !is_null( $cliente ) ) {
                             $cliente->cantidadtotalproductoventarealizada = $cliente->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
                             $cliente->cantidadproductoventacancelada = $cliente->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);
                             $cliente->update();
                         }
+
+                        $vendedor = $vdor->find( $notaventadetalle->fkidvendedor );
                         if ( !is_null( $vendedor ) ) {
                             $vendedor->cantidadtotalproductoventarealizada = $vendedor->cantidadtotalproductoventarealizada - intval($notaventadetalle->cantidad);
                             $vendedor->cantidadproductoventacancelada = $vendedor->cantidadproductoventacancelada + intval($notaventadetalle->cantidad);

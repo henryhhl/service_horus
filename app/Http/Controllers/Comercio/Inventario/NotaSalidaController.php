@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comercio\Inventario;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Comercio\Inventario\NotaSalidaRequest;
+use App\Models\Comercio\Inventario\Almacen;
 use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\ConceptoInventario;
 use App\Models\Comercio\Inventario\NotaSalida;
@@ -127,61 +128,85 @@ class NotaSalidaController extends Controller
             $obj = new NotaSalida();
             $notasalida = $obj->store( $obj, $request );
 
-            $tpotrans = new TipoTransaccion();
-            $tipotransaccion = $tpotrans->find( $notasalida->fkidtipotransaccion );
-            if ( !is_null( $tipotransaccion ) ) {
-                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
-                $tipotransaccion->update();
-            }
-
-            $arrayNotaSalidaDetalle = json_decode($request->input('arrayNotaSalidaDetalle', '[]'));
-
-            foreach ( $arrayNotaSalidaDetalle as $detalle ) {
-                if ( !is_null( $detalle->fkidproducto ) ) {
-
-                    $almproddet = new AlmacenProductoDetalle();
-                    $firstalmunidmedprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
-                    
-                    if ( is_null( $firstalmunidmedprod ) ) {
-                        $almacenproductodetalle = new AlmacenProductoDetalle();
-                        $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
-                        $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
-                        $almacenproductodetalle->stockactual = $detalle->cantidad;
-                        $almacenproductodetalle->totalsalidas = $detalle->cantidad;
-                        $almacenproductodetalle->salidas = $detalle->cantidad;
-                        $almacenproductodetalle->fecha = $request->x_fecha;
-                        $almacenproductodetalle->hora  = $request->x_hora;
-                        $almacenproductodetalle->save();
-
-                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
-                    } else {
-                        $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
-                        $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) - intval($detalle->cantidad);
-                        $almacenproductodetalle->totalsalidas = intval($almacenproductodetalle->totalsalidas) + intval($detalle->cantidad);
-                        $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + intval($detalle->cantidad);
-                        $almacenproductodetalle->update();
-                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
-                    }
-
-                    $detalle->fkidnotasalida = $notasalida->idnotasalida;
-
-                    $prod = new Producto();
-                    $producto = $prod->find( $detalle->fkidproducto );
-                    $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
-                    $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
-                    $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
-                    $producto->update();
-
-                    $ntasaldet = new NotaSalidaDetalle();
-                    $notasalidadetalle = $ntasaldet->store($ntasaldet, $request, $detalle);
+            if ( $notasalida ) {
+                $alm = new Almacen();
+                $almacen = $alm->find( $notasalida->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotalsalidarealizada = $almacen->cantidadtotalsalidarealizada + 1;
+                    $almacen->cantidadsalidarealizada = $almacen->cantidadsalidarealizada + 1;
+                    $almacen->update();
                 }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notasalida->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                $arrayNotaSalidaDetalle = json_decode($request->input('arrayNotaSalidaDetalle', '[]'));
+
+                foreach ( $arrayNotaSalidaDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $almproddet = new AlmacenProductoDetalle();
+                        $firstalmunidmedprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                        
+                        if ( is_null( $firstalmunidmedprod ) ) {
+                            $almacenproductodetalle = new AlmacenProductoDetalle();
+                            $almacenproductodetalle->fkidproducto = $detalle->fkidproducto;
+                            $almacenproductodetalle->fkidalmacen = $detalle->fkidalmacen;
+                            $almacenproductodetalle->stockactual = $detalle->cantidad;
+                            $almacenproductodetalle->totalsalidas = $detalle->cantidad;
+                            $almacenproductodetalle->salidas = $detalle->cantidad;
+                            $almacenproductodetalle->fecha = $request->x_fecha;
+                            $almacenproductodetalle->hora  = $request->x_hora;
+                            $almacenproductodetalle->save();
+
+                            $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
+                        } else {
+                            $almacenproductodetalle = $almproddet->find($firstalmunidmedprod->idalmacenproductodetalle);
+                            $almacenproductodetalle->stockactual = intval($almacenproductodetalle->stockactual) - intval($detalle->cantidad);
+                            $almacenproductodetalle->totalsalidas = intval($almacenproductodetalle->totalsalidas) + intval($detalle->cantidad);
+                            $almacenproductodetalle->salidas = intval($almacenproductodetalle->salidas) + intval($detalle->cantidad);
+                            $almacenproductodetalle->update();
+                            $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
+                        }
+
+                        $almacen = $alm->find( $detalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada + intval($detalle->cantidad);
+                            $almacen->cantidadproductosalidarealizada = $almacen->cantidadproductosalidarealizada + intval($detalle->cantidad);
+                            $almacen->update();
+                        }
+
+                        $prod = new Producto();
+                        $producto = $prod->find( $detalle->fkidproducto );
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
+                            $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
+                            $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
+                            $producto->update();
+                        }
+
+                        $detalle->fkidnotasalida = $notasalida->idnotasalida;
+                        $ntasaldet = new NotaSalidaDetalle();
+                        $notasalidadetalle = $ntasaldet->store($ntasaldet, $request, $detalle);
+                    }
+                }
+
+                DB::commit();
+                return response( )->json( [
+                    'response' => 1,
+                    'notasalida' => $notasalida,
+                    'message'  => 'Nota Salida registrado éxitosamente.',
+                ] );
             }
 
             DB::commit();
             return response( )->json( [
-                'response' => 1,
+                'response' => -1,
                 'notasalida' => $notasalida,
-                'message'  => 'Nota Salida registrado éxitosamente.',
+                'message'  => 'Nota Salida no registrado, intentar nuevamente.',
             ] );
             
         } catch ( \Exception $th ) {
@@ -322,12 +347,26 @@ class NotaSalidaController extends Controller
 
             if ( $result ) {
 
+                $alm = new Almacen();
+                if ( $notasalida->fkidalmacen != $request->fkidalmacen ) {
+                    $almacen = $alm->find( $notasalida->fkidalmacen );
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotalsalidarealizada = $almacen->cantidadtotalsalidarealizada - 1;
+                        $almacen->cantidadsalidacancelado = $almacen->cantidadsalidacancelado + 1;
+                        $almacen->update();
+                    }
+                    $almacen = $alm->find($request->fkidalmacen);
+                    if ( !is_null( $almacen ) ) {
+                        $almacen->cantidadtotalsalidarealizada = $almacen->cantidadtotalsalidarealizada + 1;
+                        $almacen->cantidadsalidarealizada = $almacen->cantidadsalidarealizada + 1;
+                        $almacen->update();
+                    }
+                }
+
                 $arrayNotaSalidaDetalle = json_decode( isset( $request->arrayNotaSalidaDetalle ) ? $request->arrayNotaSalidaDetalle : '[]' );
                 foreach ( $arrayNotaSalidaDetalle as $detalle ) {
                     if ( !is_null( $detalle->fkidproducto ) ) {
-
                         if ( is_null( $detalle->idnotasalidadetalle ) ) {
-
                             $almproddet = new AlmacenProductoDetalle();
                             $firstalmunidmedprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
                             
@@ -352,15 +391,23 @@ class NotaSalidaController extends Controller
                                 $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
                             }
 
-                            $detalle->fkidnotasalida = $notasalida->idnotasalida;
-
                             $prod = new Producto();
                             $producto = $prod->find( $detalle->fkidproducto );
-                            $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
-                            $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
-                            $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
-                            $producto->update();
+                            if ( !is_null( $producto ) ) {
+                                $producto->stockactual = intval($producto->stockactual) - intval($detalle->cantidad);
+                                $producto->totalsalidas = intval($producto->totalsalidas) + intval($detalle->cantidad);
+                                $producto->salidas = intval($producto->salidas) + intval($detalle->cantidad);
+                                $producto->update();
+                            }
 
+                            $almacen = $alm->find( $detalle->fkidalmacen );
+                            if ( !is_null( $almacen ) ) {
+                                $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada + intval($detalle->cantidad);
+                                $almacen->cantidadproductosalidarealizada = $almacen->cantidadproductosalidarealizada + intval($detalle->cantidad);
+                                $almacen->update();
+                            }
+                            
+                            $detalle->fkidnotasalida = $notasalida->idnotasalida;
                             $ntasaldet = new NotaSalidaDetalle();
                             $notasalidadetalle = $ntasaldet->store($ntasaldet, $request, $detalle);
                         } else {
@@ -368,16 +415,73 @@ class NotaSalidaController extends Controller
                             $notasalidadetalle = $ntasaldet->find( $detalle->idnotasalidadetalle );
 
                             if ( !is_null( $notasalidadetalle ) ) {
-                                $almproddet = new AlmacenProductoDetalle();
-                                $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
-                                if ( !is_null( $almacenproductodetalle ) ) {
-                                    $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad ) + intval($notasalidadetalle->cantidad);
-                                    $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
-                                    $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval($notasalidadetalle->cantidad);
-                                    $almacenproductodetalle->update();
 
-                                    $prod = new Producto();
-                                    $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                                if ( $notasalidadetalle->fkidalmacen != $detalle->fkidalmacen ) {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada + intval( $detalle->cantidad );
+                                        $almacen->cantidadproductosalidarealizada = $almacen->cantidadproductosalidarealizada + intval( $detalle->cantidad );
+                                        $almacen->update();
+                                    }
+                                    $almacen = $alm->find( $notasalidadetalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada - intval($notasalidadetalle->cantidad);
+                                        $almacen->cantidadproductosalidacancelado = $almacen->cantidadproductosalidacancelado + intval($notasalidadetalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                } else {
+                                    $almacen = $alm->find( $detalle->fkidalmacen );
+                                    if ( !is_null( $almacen ) ) {
+                                        $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                        $almacen->cantidadproductosalidarealizada = $almacen->cantidadproductosalidarealizada + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                        $almacen->update();
+                                    }
+                                }
+
+                                $almproddet = new AlmacenProductoDetalle();
+                                if ( $notasalidadetalle->fkidalmacenproductodetalle != $detalle->fkidalmacenproductodetalle ) {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad );
+                                        $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) + intval( $detalle->cantidad );
+                                        $almacenproductodetalle->salidas = intval( $almacenproductodetalle->salidas ) + intval($detalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
+                                    $almacenproductodetalle = $almproddet->find($notasalidadetalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) + intval( $notasalidadetalle->cantidad );
+                                        $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                                        $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval($notasalidadetalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
+                                } else {
+                                    $almacenproductodetalle = $almproddet->find($detalle->fkidalmacenproductodetalle);
+                                    if ( !is_null( $almacenproductodetalle ) ) {
+                                        $almacenproductodetalle->stockactual = intval( $almacenproductodetalle->stockactual ) - intval( $detalle->cantidad ) + intval($notasalidadetalle->cantidad);
+                                        $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                        $almacenproductodetalle->salidas = intval( $almacenproductodetalle->salidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
+                                        $almacenproductodetalle->update();
+                                    }
+                                }
+
+                                $prod = new Producto();
+                                if ( $notasalidadetalle->fkidproducto != $detalle->fkidproducto ) {
+                                    $producto = $prod->find($detalle->fkidproducto);
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad );
+                                        $producto->totalsalidas = intval( $producto->totalsalidas ) + intval( $detalle->cantidad );
+                                        $producto->salidas = intval( $producto->salidas ) + intval( $detalle->cantidad );
+                                        $producto->update();
+                                    }
+                                    $producto = $prod->find($notasalidadetalle->fkidproducto);
+                                    if ( !is_null( $producto ) ) {
+                                        $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
+                                        $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                                        $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
+                                        $producto->update();
+                                    }
+                                } else {
+                                    $producto = $prod->find($detalle->fkidproducto);
                                     if ( !is_null( $producto ) ) {
                                         $producto->stockactual = intval( $producto->stockactual ) - intval( $detalle->cantidad ) + intval($notasalidadetalle->cantidad);
                                         $producto->totalsalidas = intval( $producto->totalsalidas ) + intval( $detalle->cantidad ) - intval($notasalidadetalle->cantidad);
@@ -385,6 +489,7 @@ class NotaSalidaController extends Controller
                                         $producto->update();
                                     }
                                 }
+
                                 $ntasaldet->upgrade( $ntasaldet, $detalle );
                             }
                         }
@@ -403,16 +508,25 @@ class NotaSalidaController extends Controller
                             $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) - intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->update();
-    
-                            $prod = new Producto();
-                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
-                            if ( !is_null( $producto ) ) {
-                                $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
-                                $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
-                                $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
-                                $producto->update();
-                            }
                         }
+
+                        $prod = new Producto();
+                        $producto = $prod->find($notasalidadetalle->fkidproducto);
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
+                            $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                            $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
+                            $producto->update();
+                        }
+
+                        $alm = new Almacen();
+                        $almacen = $alm->find( $notasalidadetalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada - intval($notasalidadetalle->cantidad);
+                            $almacen->cantidadproductoingresocancelado = $almacen->cantidadproductoingresocancelado + intval($notasalidadetalle->cantidad);
+                            $almacen->update();
+                        }
+
                         $notasalidadetalle->delete();
                     }
                 }
@@ -500,6 +614,21 @@ class NotaSalidaController extends Controller
 
             if ( $result ) {
 
+                $alm = new Almacen();
+                $almacen = $alm->find( $notasalida->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotalsalidarealizada = $almacen->cantidadtotalsalidarealizada - 1;
+                    $almacen->cantidadsalidacancelado = $almacen->cantidadsalidacancelado + 1;
+                    $almacen->update();
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notasalida->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
+
                 $ntasaldet = new NotaSalidaDetalle();
                 $arrayNotaSalidaDetalle = $ntasaldet->getNotasalidaDetalle( $ntasaldet, $request->idnotasalida );
 
@@ -513,25 +642,26 @@ class NotaSalidaController extends Controller
                             $almacenproductodetalle->totalsalidas = intval( $almacenproductodetalle->totalsalidas ) - intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->salidacancelada = intval( $almacenproductodetalle->salidacancelada ) + intval( $notasalidadetalle->cantidad );
                             $almacenproductodetalle->update();
-    
-                            $prod = new Producto();
-                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
-                            if ( !is_null( $producto ) ) {
-                                $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
-                                $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
-                                $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
-                                $producto->update();
-                            }
+                        }
+
+                        $prod = new Producto();
+                        $producto = $prod->find($notasalidadetalle->fkidproducto);
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval( $producto->stockactual ) + intval( $notasalidadetalle->cantidad );
+                            $producto->totalsalidas = intval( $producto->totalsalidas ) - intval( $notasalidadetalle->cantidad );
+                            $producto->salidacancelado = intval( $producto->salidacancelado ) + intval( $notasalidadetalle->cantidad );
+                            $producto->update();
+                        }
+
+                        $alm = new Almacen();
+                        $almacen = $alm->find( $notasalidadetalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductosalidarealizada = $almacen->cantidadtotalproductosalidarealizada - intval($notasalidadetalle->cantidad);
+                            $almacen->cantidadproductoingresocancelado = $almacen->cantidadproductoingresocancelado + intval($notasalidadetalle->cantidad);
+                            $almacen->update();
                         }
                         $notasalidadetalle->delete();
                     }
-                }
-
-                $tpotrans = new TipoTransaccion();
-                $tipotransaccion = $tpotrans->find( $notasalida->fkidtipotransaccion );
-                if ( !is_null( $tipotransaccion ) ) {
-                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
-                    $tipotransaccion->update();
                 }
 
                 DB::commit();
@@ -541,7 +671,7 @@ class NotaSalidaController extends Controller
                 ] );
             }
 
-            DB::commit();
+            DB::rollBack();
             return response()->json( [
                 'response' => -1,
                 'message'  => 'Hubo conflictos al eliminar Nota Salida.',

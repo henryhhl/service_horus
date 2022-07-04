@@ -13,6 +13,7 @@ use App\Models\Comercio\Compra\NotaCompraDetalle;
 use App\Models\Comercio\Compra\OrdenCompra;
 use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Compra\ProveedorProducto;
+use App\Models\Comercio\Inventario\Almacen;
 use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\AlmacenUnidadMedidaProducto;
 use App\Models\Comercio\Inventario\Producto;
@@ -142,97 +143,122 @@ class NotaCompraController extends Controller
             $obj = new NotaCompra();
             $notacompra = $obj->store( $obj, $request );
 
-            $request->fkidnotacompra = $notacompra->idnotacompra;
-
-            if ( !is_null( $notacompra->fkidordencompra ) ) {
-                $ordcomp = new OrdenCompra();
-                $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
-                $ordencompra->iscompra = "A";
-                $ordencompra->update();
-            }
-
-            $prov = new Proveedor();
-            $proveedor = $prov->find( $notacompra->fkidproveedor );
-            if ( !is_null( $proveedor ) ) {
-                $proveedor->nroorden = intval( $proveedor->nroorden ) + 1;
-                $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada + 1;
-                $proveedor->cantidadcomprarealizada = $proveedor->cantidadcomprarealizada + 1;
-                $proveedor->update();
-            }
-
-            $tpotrans = new TipoTransaccion();
-            $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
-            if ( !is_null( $tipotransaccion ) ) {
-                $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
-                $tipotransaccion->update();
-            }
-
-            $arrayNotaCompraDetalle = json_decode($request->input('arrayNotaCompraDetalle', '[]'));
-            foreach ( $arrayNotaCompraDetalle as $detalle ) {
-                if ( !is_null( $detalle->fkidproducto ) ) {
-                    $detalle->fkidnotacompra = $notacompra->idnotacompra;
-                    $almproddet = new AlmacenProductoDetalle();
-                    if ( !$almproddet->existAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto ) ) {
-                        $almproddet->fkidproducto = $detalle->fkidproducto;
-                        $almproddet->fkidalmacen = $detalle->fkidalmacen;
-                        $almproddet->stockactual = $detalle->cantidad;
-                        $almproddet->totalcompras = $detalle->cantidad;
-                        $almproddet->compras = $detalle->cantidad;
-                        $almproddet->fecha = $request->x_fecha;
-                        $almproddet->hora = $request->x_hora;
-                        $almproddet->save();
-                        $detalle->fkidalmacenproductodetalle = $almproddet->idalmacenproductodetalle;
-                    } else {
-                        $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
-                        $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenproductodetalle );
-                        $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->stockactual);
-                        $almacenproductodetalle->totalcompras = intval($almacenproductodetalle->totalcompras) + intval($almacenproductodetalle->stockactual);
-                        $almacenproductodetalle->compras = intval($almacenproductodetalle->compras) + intval($almacenproductodetalle->stockactual);
-                        $almacenproductodetalle->update();
-
-                        $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
-                    }
-
-                    $prod = new Producto();
-                    $producto = $prod->find( $detalle->fkidproducto );
-                    $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
-                    $producto->totalnotacompra = intval($producto->totalnotacompra) + intval($detalle->cantidad);
-                    $producto->notacompra = intval($producto->notacompra) + intval($detalle->cantidad);
-                    $producto->update();
-
-                    $provprod = new ProveedorProducto();
-                    if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor ) ) {
-                        $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor );
-                        $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
-                        if ( !is_null( $proveedorproducto ) ) {
-                            $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
-                            $proveedorproducto->update();
-                        }
-                    }
-                    if ( !is_null( $proveedor ) ) {
-                        $proveedor->cantidadtotalproductocomprarealizada = $proveedor->cantidadtotalproductocomprarealizada + intval($detalle->cantidad);
-                        $proveedor->cantidadproductocomprarealizada = $proveedor->cantidadproductocomprarealizada + intval($detalle->cantidad);
-                        $proveedor->update();
-                    }
-
-                    $ntacompdet = new NotaCompraDetalle();
-                    $notacompradetalle = $ntacompdet->store($ntacompdet, $request, $detalle);
-                    if ( $notacompradetalle ) {
-                        // Verifiaciones
-                    }
-
+            if ( $notacompra ) {
+                $request->fkidnotacompra = $notacompra->idnotacompra;
+                if ( !is_null( $notacompra->fkidordencompra ) ) {
+                    $ordcomp = new OrdenCompra();
+                    $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
+                    $ordencompra->iscompra = "A";
+                    $ordencompra->update();
                 }
+
+                $alm = new Almacen();
+                $almacen = $alm->find( $notacompra->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotalcomprarealizada = $almacen->cantidadtotalcomprarealizada + 1;
+                    $almacen->cantidadcomprarealizada = $almacen->cantidadcomprarealizada + 1;
+                    $almacen->update();
+                }
+
+                $prov = new Proveedor();
+                $proveedor = $prov->find( $notacompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->nroorden = intval( $proveedor->nroorden ) + 1;
+                    $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada + 1;
+                    $proveedor->cantidadcomprarealizada = $proveedor->cantidadcomprarealizada + 1;
+                    $proveedor->update();
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadrealizada = intval( $tipotransaccion->cantidadrealizada ) + 1;
+                    $tipotransaccion->update();
+                }
+
+                $arrayNotaCompraDetalle = json_decode($request->input('arrayNotaCompraDetalle', '[]'));
+                foreach ( $arrayNotaCompraDetalle as $detalle ) {
+                    if ( !is_null( $detalle->fkidproducto ) ) {
+                        $almproddet = new AlmacenProductoDetalle();
+                        if ( !$almproddet->existAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto ) ) {
+                            $almproddet->fkidproducto = $detalle->fkidproducto;
+                            $almproddet->fkidalmacen = $detalle->fkidalmacen;
+                            $almproddet->stockactual = $detalle->cantidad;
+                            $almproddet->totalcompras = $detalle->cantidad;
+                            $almproddet->compras = $detalle->cantidad;
+                            $almproddet->fecha = $request->x_fecha;
+                            $almproddet->hora = $request->x_hora;
+                            $almproddet->save();
+                            $detalle->fkidalmacenproductodetalle = $almproddet->idalmacenproductodetalle;
+                        } else {
+                            $firstAlmProd = $almproddet->firstAlmacenProducto( $almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                            $almacenproductodetalle = $almproddet->find( $firstAlmProd->idalmacenproductodetalle );
+                            $almacenproductodetalle->stockactual = intval($detalle->cantidad) + intval($almacenproductodetalle->stockactual);
+                            $almacenproductodetalle->totalcompras = intval($almacenproductodetalle->totalcompras) + intval($detalle->cantidad);
+                            $almacenproductodetalle->compras = intval($almacenproductodetalle->compras) + intval($detalle->cantidad);
+                            $almacenproductodetalle->update();
+
+                            $detalle->fkidalmacenproductodetalle = $almacenproductodetalle->idalmacenproductodetalle;
+                        }
+
+                        $almacen = $alm->find( $detalle->fkidalmacen );
+                        if ( !is_null( $almacen ) ) {
+                            $almacen->cantidadtotalproductocomprarealizada = $almacen->cantidadtotalproductocomprarealizada + intval($detalle->cantidad);
+                            $almacen->cantidadproductocomprarealizada = $almacen->cantidadproductocomprarealizada + intval($detalle->cantidad);
+                            $almacen->update();
+                        }
+
+                        $prod = new Producto();
+                        $producto = $prod->find( $detalle->fkidproducto );
+                        if ( !is_null( $producto ) ) {
+                            $producto->stockactual = intval($producto->stockactual) + intval($detalle->cantidad);
+                            $producto->totalnotacompra = intval($producto->totalnotacompra) + intval($detalle->cantidad);
+                            $producto->notacompra = intval($producto->notacompra) + intval($detalle->cantidad);
+                            $producto->update();
+                        }
+
+                        $provprod = new ProveedorProducto();
+                        if ( $provprod->existProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor ) ) {
+                            $firstProvProd = $provprod->firstProvProd( $provprod, $detalle->fkidproducto, $detalle->fkidproveedor );
+                            $proveedorproducto = $provprod->find( $firstProvProd->idproveedorproducto );
+                            if ( !is_null( $proveedorproducto ) ) {
+                                $proveedorproducto->stock = intval($proveedorproducto->stock) + intval($detalle->cantidad);
+                                $proveedorproducto->update();
+                            }
+                        }
+
+                        $proveedor = $prov->find( $detalle->fkidproveedor );
+                        if ( !is_null( $proveedor ) ) {
+                            $proveedor->cantidadtotalproductocomprarealizada = $proveedor->cantidadtotalproductocomprarealizada + intval($detalle->cantidad);
+                            $proveedor->cantidadproductocomprarealizada = $proveedor->cantidadproductocomprarealizada + intval($detalle->cantidad);
+                            $proveedor->update();
+                        }
+
+                        $detalle->fkidnotacompra = $notacompra->idnotacompra;
+                        $ntacompdet = new NotaCompraDetalle();
+                        $notacompradetalle = $ntacompdet->store($ntacompdet, $request, $detalle);
+                        if ( $notacompradetalle ) {
+                            // Verifiaciones
+                        }
+
+                    }
+                }
+
+                $libcomp = new LibroCompra();
+                $librocompra = $libcomp->store($libcomp, $request);
+
+                DB::commit();
+                return response( )->json( [
+                    'response' => 1,
+                    'notacompra' => $notacompra,
+                    'librocompra' => $librocompra,
+                    'message'  => 'Nota Compra registrado éxitosamente.',
+                ] );
             }
-
-            $libcomp = new LibroCompra();
-            $librocompra = $libcomp->store($libcomp, $request);
-
-            DB::commit();
             return response( )->json( [
-                'response' => 1,
+                'response' => -1,
                 'notacompra' => $notacompra,
-                'librocompra' => $librocompra,
-                'message'  => 'Nota Compra registrado éxitosamente.',
+                'message'  => 'Nota Compra no registrado, intentar nuevamente.',
             ] );
 
         } catch ( \Exception $th ) {
@@ -407,19 +433,43 @@ class NotaCompraController extends Controller
 
             /* fin de restriccion */
 
-            $provdor = new Proveedor();
-            $proveedor = $provdor->find( $notacompra->fkidproveedor );
-
-            if ( !is_null( $proveedor ) ) {
-                $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
-                $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada - 1;
-                $proveedor->cantidadcompracancelada = $proveedor->cantidadcompracancelada + 1;
-                $proveedor->update();
-            }
-
             $notacompradelete = $obj->remove( $obj, $request );
 
             if ( $notacompradelete ) {
+
+                $alm = new Almacen();
+                $almacen = $alm->find( $notacompra->fkidalmacen );
+                if ( !is_null( $almacen ) ) {
+                    $almacen->cantidadtotalcomprarealizada = $almacen->cantidadtotalcomprarealizada - 1;
+                    $almacen->cantidadcompracancelado = $almacen->cantidadcompracancelado + 1;
+                    $almacen->update();
+                }
+
+                $provdor = new Proveedor();
+                $proveedor = $provdor->find( $notacompra->fkidproveedor );
+                if ( !is_null( $proveedor ) ) {
+                    $proveedor->nroorden = intval( $proveedor->nroorden ) - 1;
+                    $proveedor->cantidadtotalcomprarealizada = $proveedor->cantidadtotalcomprarealizada - 1;
+                    $proveedor->cantidadcompracancelada = $proveedor->cantidadcompracancelada + 1;
+                    $proveedor->update();
+                }
+
+                if ( !is_null( $notacompra->fkidordencompra ) ) {
+                    $ordcomp = new OrdenCompra();
+                    $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
+                    if ( !is_null( $ordencompra ) ) {
+                        $ordencompra->iscompra = "N";
+                        $ordencompra->update();
+                    }
+                }
+
+                $tpotrans = new TipoTransaccion();
+                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
+                if ( !is_null( $tipotransaccion ) ) {
+                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
+                    $tipotransaccion->update();
+                }
+
                 $ntacompdet = new NotaCompraDetalle();
                 $arrayNotaCompraDetalle = $ntacompdet->getCompraDetalle( $ntacompdet, $request->idnotacompra );
 
@@ -437,7 +487,7 @@ class NotaCompraController extends Controller
                                 $almacenproductodetalle->update();
                             }
                             $prod = new Producto();
-                            $producto = $prod->find($almacenproductodetalle->fkidproducto);
+                            $producto = $prod->find($notacompradetalle->fkidproducto);
                             if ( !is_null( $producto ) ) {
                                 $producto->stockactual = intval( $producto->stockactual ) - intval( $notacompradetalle->cantidad );
                                 $producto->totalnotacompra = intval( $producto->totalnotacompra ) - intval( $notacompradetalle->cantidad );
@@ -454,29 +504,20 @@ class NotaCompraController extends Controller
                                     $proveedorproducto->update();
                                 }
                             }
+                            $proveedor = $provdor->find( $notacompra->fkidproveedor );
                             if ( !is_null( $proveedor ) ) {
                                 $proveedor->cantidadtotalproductocomprarealizada = $proveedor->cantidadtotalproductocomprarealizada - intval($notacompradetalle->cantidad);
                                 $proveedor->cantidadproductocompracancelada = $proveedor->cantidadproductocompracancelada + intval($notacompradetalle->cantidad);
                                 $proveedor->update();
                             }
+                            $almacen = $alm->find( $notacompradetalle->fkidalmacen );
+                            if ( !is_null( $almacen ) ) {
+                                $almacen->cantidadtotalproductocomprarealizada = $almacen->cantidadtotalproductocomprarealizada - intval($notacompradetalle->cantidad);
+                                $almacen->cantidadproductocompracancelado = $almacen->cantidadproductocompracancelado + intval($notacompradetalle->cantidad);
+                                $almacen->update();
+                            }
                         }
                     }
-                }
-
-                if ( !is_null( $notacompra->fkidordencompra ) ) {
-                    $ordcomp = new OrdenCompra();
-                    $ordencompra = $ordcomp->find( $notacompra->fkidordencompra );
-                    if ( !is_null( $ordencompra ) ) {
-                        $ordencompra->iscompra = "N";
-                        $ordencompra->update();
-                    }
-                }
-
-                $tpotrans = new TipoTransaccion();
-                $tipotransaccion = $tpotrans->find( $notacompra->fkidtipotransaccion );
-                if ( !is_null( $tipotransaccion ) ) {
-                    $tipotransaccion->cantidadcancelada = intval( $tipotransaccion->cantidadcancelada ) + 1;
-                    $tipotransaccion->update();
                 }
 
                 DB::commit();
