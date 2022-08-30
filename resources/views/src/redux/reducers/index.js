@@ -48,6 +48,7 @@ import { DosificacionReducer } from './comercio/venta/dosificacionReducers';
 import { NotaVentaReducer } from './comercio/venta/notaVentaReducers';
 import { DevolucionNotaVentaReducer } from './comercio/venta/devolucionNotaVentaReducers';
 import { NotaSalidaReducer } from './comercio/inventario/notaSalidaReducers';
+import { InformeVentaReducer } from './comercio/venta/informeVentaReducers';
 
 const rootReducer = combineReducers( {
     visible:     VisibleReducer,
@@ -98,6 +99,7 @@ const rootReducer = combineReducers( {
     devolucionCompra: DevolucionCompraCompraReducer,
 
     informeCompra: InformeCompraReducer,
+    informeVenta: InformeVentaReducer,
 
     array: ListadoModuleReducer,
 } );

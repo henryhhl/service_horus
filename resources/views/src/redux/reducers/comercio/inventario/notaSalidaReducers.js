@@ -106,13 +106,14 @@ export const NotaSalidaReducer = ( state = initialState, action = { payload, typ
             state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
             state.sucursal     = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
             
-            let arrayAlmacen = ( typeof state.fkidsucursal == "number" ) ? arraySucursal[0].arrayalmacen : [];
+            let arrayAlmacen = ( Functions.esNumeric(state.fkidsucursal) ) ? arraySucursal[0].arrayalmacen : [];
             
             state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
             state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
 
             state.arrayNotaSalidaDetalle = loadDetailNote( state );
 
+            state.estado = "A";
             state.loading = false;
             state = Object.assign( {}, state );
             return state;

@@ -35,7 +35,9 @@ function C_ListadoProducto( props ) {
     function get_data( search = "" ) {
         httpRequest( 'get', webservices.wscomercioinventarioproducto_index, {
             search: search, orderBy: 'asc', esPaginado: 0,
+            fkidalmacen: props.fkidalmacen,
         } ) . then( (result) => {
+            console.log(result)
             resultData( result );
             if ( result.response == 1 ) {
                 C_Message( "success", "Servicio realizado exitosamente." );
@@ -62,8 +64,33 @@ function C_ListadoProducto( props ) {
         };
         if (item.idproducto == value) {
             item.checked = true;
+            return item.checked;
+        }
+        if ( props.arrayFKIDProducto.length > 0 ) {
+            for (let index = 0; index < props.arrayFKIDProducto.length; index++) {
+                const element = props.arrayFKIDProducto[index];
+                if ( element.fkidproducto == item.idproducto ) {
+                    item.checked = true;
+                    return item.checked;
+                }
+            }
         }
         return item.checked;
+    };
+
+    function checkedStyle(item) {
+        if (item.idproducto == value) {
+            return true;
+        }
+        if ( props.arrayFKIDProducto.length > 0 ) {
+            for (let index = 0; index < props.arrayFKIDProducto.length; index++) {
+                const element = props.arrayFKIDProducto[index];
+                if ( element.fkidproducto == item.idproducto ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     };
 
     function onCheckedData(item) {
@@ -95,23 +122,23 @@ function C_ListadoProducto( props ) {
 
     return (
         <div className="form-group mt-2">
-            <Row gutter={ [12, 6] }>
-                <Col sm={{ span: 4, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                    <C_Input
-                        titleText={"Buscar Criterio de búsqueda"}
-                        placeholder={"Buscar..."}
-                        value={search}
-                        onChange={onchangeSearch}
-                        onPressEnter={ () => get_data( search ) }
-                        autoFocus={true}
-                        suffix={ <i className="fa fa-search" /> }
-                    />
-                </Col>
-            </Row>
+            
             <div className="main-card mt-2 mb-2 card">
                 { onComponentCreate() }
                 <div className="card-body">
+                    <Row gutter={ [12, 6] } className="mb-2">
+                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                            <C_Input
+                                titleText={"Buscar Criterio de búsqueda"}
+                                placeholder={"Buscar..."}
+                                value={search}
+                                onChange={onchangeSearch}
+                                onPressEnter={ () => get_data( search ) }
+                                autoFocus={true}
+                                suffix={ <i className="fa fa-search" /> }
+                            />
+                        </Col>
+                    </Row>
                     <div className="table-responsive"
                         style={{ position: 'relative', overflowX: 'hidden', overflowY: 'auto', maxHeight: 300, width: '100%', }}
                     >
@@ -119,7 +146,7 @@ function C_ListadoProducto( props ) {
                             <thead>
                                 <tr>
                                     <th className="text-left" style={{ width: 15, }}>Sel.</th>
-                                    <th className="text-left" >#</th>
+                                    <th className="text-left" style={{ width: 40, }}>#</th>
                                     <th className="text-left">
                                         Código
                                     </th>
@@ -142,7 +169,7 @@ function C_ListadoProducto( props ) {
                             </thead>
                             <tbody>
                                 { array_data.map( ( item, key ) => {
-                                    let style = (item.checked || value == item.idproducto) ? {background: '#e0f3ff'} : {};
+                                    let style = (checkedStyle(item)) ? {background: '#e0f3ff'} : {};
                                     return (
                                         <tr key={key} style={ Object.assign( style, { cursor: 'pointer', } ) }
                                             onClick={ () => onCheckedData(item) }
@@ -195,6 +222,8 @@ function C_ListadoProducto( props ) {
 C_ListadoProducto.propTypes = {
     value:  PropTypes.any,
     create: PropTypes.bool,
+    fkidalmacen: PropTypes.any,
+    arrayFKIDProducto: PropTypes.array,
     
     onCreate:  PropTypes.func,
     onChecked: PropTypes.func,
@@ -202,6 +231,8 @@ C_ListadoProducto.propTypes = {
 
 C_ListadoProducto.defaultProps = {
     value: null,
+    arrayFKIDProducto: [],
+    fkidalmacen: null,
     create: false,
 }
 

@@ -127,14 +127,14 @@ const initialState = {
 export const DevolucionNotaVentaReducer = ( state = initialState, action = { payload, type} ) => {
 
     const { payload, type } = action;
- 
-    switch ( action.type ) {
+     switch ( type ) {
 
         case Strings.devolucionnotaventa_onChange:
             state = Object.assign( {}, action.payload );
             return state;
 
         case Strings.devolucionnotaventa_onCreate:
+            const { arrayConceptoVenta } = payload;
             cleanObejct( state );
             state.iddevolucionnotaventa = action.payload.iddevolucionnotaventa;
             state.loading = false;
@@ -156,6 +156,9 @@ export const DevolucionNotaVentaReducer = ( state = initialState, action = { pay
 
             state.fkidtipotransaccion = 2;
             state.tipotransaccion = "Venta";
+
+            state.fkidconceptoventa = Functions.initValueServiceInArray( arrayConceptoVenta, "idconceptoventa" );
+            state.conceptoventa = Functions.initValueServiceInArray( arrayConceptoVenta, "descripcion" );
 
             // state.devolucionnotaventadetalle = loadDevolucionNotaVentaDetalle(state);
 
@@ -306,8 +309,10 @@ function defaulDevolucionNotaVentaDetalle( index = 0, state = initialState, deta
         preciounitario: detalle ? parseFloat(detalle.preciounitario).toFixed(2) : "",
         preciosubtotal: detalle ? parseFloat(detalle.preciosubtotal).toFixed(2) : "",
 
-        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
         fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        sucursal: detalle ? detalle.sucursal : state.sucursal,
+
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
         almacen: detalle ? detalle.almacen : state.almacen,
 
         nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
@@ -326,6 +331,10 @@ function defaulDevolucionNotaVentaDetalle( index = 0, state = initialState, deta
 
         fkidvendedor: detalle ? detalle.fkidvendedor : null,
         vendedor: detalle ? detalle.vendedor : "",
+
+        fkidcliente: detalle ? detalle.fkidcliente : null,
+        cliente: detalle ? detalle.cliente : "",
+
         nota: detalle ? detalle.nota : "",
 
         fkidalmacenunidadmedidaproducto: null,

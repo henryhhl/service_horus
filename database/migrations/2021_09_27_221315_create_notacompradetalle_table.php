@@ -33,6 +33,7 @@ class CreateNotacompradetalleTable extends Migration
             $table->integer('fkidseccioninventario')->unsigned()->nullable();
             $table->integer('fkidproveedor')->unsigned();
 
+            $table->integer('stockactualanterior')->default(0);
             $table->integer('cantidadsolicitada')->default(0);
             $table->integer('cantidadrecibida')->default(0);
             $table->integer('cantidadfaltante')->default(0);

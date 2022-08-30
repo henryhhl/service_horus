@@ -208,6 +208,7 @@ class NotaIngresoController extends Controller
                 ] );
             }
 
+            DB::rollBack();
             return response( )->json( [
                 'response' => -1,
                 'notaingreso' => $notaingreso,

@@ -27,7 +27,7 @@ class Cliente extends Model
         'descuentoinicial' => 0, 'descuentofinal' => 0,
         'montototaladeudado' => 0, 'fechaultimopago' => null, 'montototaladeudadoultimopago' => 0, 'fechaultimaventa' => null, 'montototalultimaventa' => 0,
         'imagen' => null, 'extension' => null, 'tipopersoneria' => 'S',
-        'cantidadventarealizada' => 0, 'cantidadventacancelada' => 0, 'cantidadproductoventarealizada' => 0, 'cantidadproductovendidocancelada' => 0,
+        'cantidadventarealizada' => 0, 'cantidadventacancelada' => 0, 'cantidadproductoventarealizada' => 0, 'cantidadproductoventacancelada' => 0,
         'cantidaddevolucionventarealizada' => 0, 'cantidaddevolucionventacancelada' => 0, 'cantidadproductodevolucionventarealizada' => 0, 'cantidadproductodevolucionventacancelada' => 0,
         'cantidadtotalventarealizada' => 0, 'cantidadtotalproductoventarealizada' => 0, 'cantidadtotaldevolucionventarealizada' => 0, 'cantidadtotalproductodevolucionventarealizada' => 0,
         'estado' => 'A',  'isdelete' => 'A', 'x_idusuario' => null,
@@ -39,11 +39,38 @@ class Cliente extends Model
         'descuento', 'cantidaditems', 'descuentoxcantidaditems', 'descuentoinicial', 'descuentofinal',
         'montototaladeudado', 'fechaultimopago', 'montototaladeudadoultimopago', 'fechaultimaventa', 'montototalultimaventa',
         'contacto', 'direccion', 'diascredito', 'limitecredito', 'imagen', 'extension', 'tipopersoneria',
-        'cantidadventarealizada', 'cantidadventacancelada', 'cantidadproductoventarealizada', 'cantidadproductovendidocancelada',
+        'cantidadventarealizada', 'cantidadventacancelada', 'cantidadproductoventarealizada', 'cantidadproductoventacancelada',
         'cantidaddevolucionventarealizada', 'cantidaddevolucionventacancelada', 'cantidadproductodevolucionventarealizada', 'cantidadproductodevolucionventacancelada',
         'cantidadtotalventarealizada', 'cantidadtotalproductoventarealizada', 'cantidadtotaldevolucionventarealizada', 'cantidadtotalproductodevolucionventarealizada',
         'fecha', 'hora', 'estado', 'isdelete', 'x_idusuario',
     ];
+
+    public function getTransacciones( $query ) {
+        $arrayCliente = $query
+            ->select( [
+                'cliente.fkidciudadpais', 'cliente.fkidciudad', 'cliente.fkidclientetipo', 'cliente.fkidlistaprecio', 'cliente.fkidconceptoventa', 'cliente.fkidsucursal',
+                'cliente.codigo', 'cliente.nombre', 'cliente.apellido', 'cliente.razonsocial', 'cliente.nit', 'cliente.email', 'cliente.casilla', 'cliente.fax', 'cliente.telefono', 'cliente.celular',
+                'cliente.contacto', 'cliente.direccion', 'cliente.diascredito', 'cliente.limitecredito', 'cliente.idcliente',
+                'cliente.descuento', 'cliente.cantidaditems', 'cliente.descuentoxcantidaditems', 'cliente.descuentoinicial', 'cliente.descuentofinal',
+                'cliente.montototaladeudado', 'cliente.fechaultimopago', 'cliente.montototaladeudadoultimopago', 'cliente.fechaultimaventa', 'cliente.montototalultimaventa',
+                'cliente.imagen', 'cliente.extension', 'cliente.tipopersoneria',
+                'cliente.estado', 'cliente.isdelete', 'cliente.fecha', 'cliente.hora',
+                'ciupais.idciudad as idciudadpais', 'ciupais.descripcion as ciudadpais',
+                'ciu.idciudad', 'ciu.descripcion as ciudad',
+                'tipo.idclientetipo', 'tipo.descripcion as tipocliente',
+                'cliente.cantidadventarealizada', 'cliente.cantidadventacancelada', 'cliente.cantidadproductoventarealizada', 'cliente.cantidadproductoventacancelada',
+                'cliente.cantidaddevolucionventarealizada', 'cliente.cantidaddevolucionventacancelada', 'cliente.cantidadproductodevolucionventarealizada', 'cliente.cantidadproductodevolucionventacancelada',
+                'cliente.cantidadtotalventarealizada', 'cliente.cantidadtotalproductoventarealizada', 'cliente.cantidadtotaldevolucionventarealizada', 'cliente.cantidadtotalproductodevolucionventarealizada',
+            ] )
+            ->leftJoin('ciudad as ciupais', 'cliente.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('ciudad as ciu', 'cliente.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('clientetipo as tipo', 'cliente.fkidclientetipo', '=', 'tipo.idclientetipo')
+            ->whereNull( 'cliente.deleted_at' )
+            ->orderBy( 'cliente.nombre' , 'ASC' )
+            ->get();
+
+        return $arrayCliente;
+    }
 
     public function get_data( $query, $request )
     {

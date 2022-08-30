@@ -81,6 +81,37 @@ class Proveedor extends Model
         );
     }
 
+    public function getTransacciones( $query ) {
+        $arrayProveedor = $query
+            ->leftJoin('ciudad as ciupais', 'proveedor.fkidciudadpais', '=', 'ciupais.idciudad')
+            ->leftJoin('ciudad as ciu', 'proveedor.fkidciudad', '=', 'ciu.idciudad')
+            ->leftJoin('proveedortipo as provtipo', 'proveedor.fkidproveedortipo', '=', 'provtipo.idproveedortipo')
+            ->leftJoin('proveedorgrupo as provgrupo', 'proveedor.fkidproveedorgrupo', '=', 'provgrupo.idproveedorgrupo')
+            ->select( [
+                'proveedor.idproveedor', 'proveedor.codigo', 'proveedor.nombre', 'proveedor.direccion', 'proveedor.nit',
+                'proveedor.telefono', 'proveedor.celular', 'proveedor.fax', 'proveedor.email', 'proveedor.sitioweb',
+                'proveedor.nroorden', 'proveedor.diascredito', 'proveedor.formadepago', 'proveedor.tipopersoneria',
+                'proveedor.imagen', 'proveedor.extension', 'proveedor.fechaalta', 'proveedor.fechabaja', 'proveedor.contacto',
+                'proveedor.fkidciudadpais', 'ciupais.descripcion as ciudadpais',
+                'proveedor.fkidciudad', 'ciu.descripcion as ciudad',
+                'proveedor.fkidproveedortipo', 'provtipo.descripcion as proveedortipo',
+                'proveedor.fkidproveedorgrupo', 'provgrupo.descripcion as proveedorgrupo',
+                'proveedor.estado', 'proveedor.fecha', 'proveedor.hora',
+                'proveedor.cantidadsolicitudcomprarealizada', 'proveedor.cantidadsolicitudcompracancelada', 'proveedor.cantidadordencomprarealizada', 'proveedor.cantidadordencompracancelada',
+                'proveedor.cantidadcomprarealizada', 'proveedor.cantidadcompracancelada', 'proveedor.cantidaddevolucioncomprarealizada', 'proveedor.cantidaddevolucioncompracancelada',
+                'proveedor.cantidadproductosolicitudcomprarealizada', 'proveedor.cantidadproductosolicitudcompracancelada', 'proveedor.cantidadproductoordencomprarealizada', 'proveedor.cantidadproductoordencompracancelada',
+                'proveedor.cantidadproductocomprarealizada', 'proveedor.cantidadproductocompracancelada', 'proveedor.cantidadproductodevolucioncomprarealizada', 'proveedor.cantidadproductodevolucioncompracancelada',
+                'proveedor.cantidadtotalsolicitudcomprarealizada', 'proveedor.cantidadtotalproductosolicitudcomprarealizada', 'proveedor.cantidadtotalordencomprarealizada',
+                'proveedor.cantidadtotalproductoordencomprarealizada', 'proveedor.cantidadtotalcomprarealizada', 'proveedor.cantidadtotalproductocomprarealizada',
+                'proveedor.cantidadtotaldevolucioncomprarealizada', 'proveedor.cantidadtotalproductodevolucioncomprarealizada',
+            ] )
+            ->whereNull( 'proveedor.deleted_at' )
+            ->orderBy( 'proveedor.nombre' , 'ASC' )
+            ->get();
+
+        return $arrayProveedor;
+    }
+
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;

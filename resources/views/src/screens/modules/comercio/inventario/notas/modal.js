@@ -21,7 +21,7 @@ function ModalInventarioNota( props ) {
                         visible={visible}
                         onClose={onClose}
                         title="NOTA INGRESO"
-                        width={"98%"} style={{ top: 30, }}
+                        width={"98%"} style={{ top: 10, }}
                     >
                         <IndexNotaIngreso
                             onClose={ onClose }

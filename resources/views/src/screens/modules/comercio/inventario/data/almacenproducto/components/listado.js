@@ -52,8 +52,33 @@ function C_ListadoAlmacenProducto( props ) {
         item.checked = false;
         if (item.fkidproducto == value) {
             item.checked = true;
+            return item.checked;
+        }
+        if ( props.arrayFKIDProducto.length > 0 ) {
+            for (let index = 0; index < props.arrayFKIDProducto.length; index++) {
+                const element = props.arrayFKIDProducto[index];
+                if ( element.fkidproducto == item.fkidproducto ) {
+                    item.checked = true;
+                    return item.checked;
+                }
+            }
         }
         return item.checked;
+    };
+
+    function checkedStyle(item) {
+        if (item.idproducto == value) {
+            return true;
+        }
+        if ( props.arrayFKIDProducto.length > 0 ) {
+            for (let index = 0; index < props.arrayFKIDProducto.length; index++) {
+                const element = props.arrayFKIDProducto[index];
+                if ( element.fkidproducto == item.fkidproducto ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     };
 
     function onCheckedData(item) {
@@ -76,22 +101,21 @@ function C_ListadoAlmacenProducto( props ) {
 
     return (
         <div className="form-group mt-2">
-            <Row gutter={ [12, 8] }>
-                <Col sm={{ span: 8, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
-                    <C_Input
-                        titleText={"Buscar Criterio de búsqueda"}
-                        placeholder={"Buscar..."}
-                        value={search}
-                        onChange={onchangeSearch}
-                        onPressEnter={ () => get_data( search ) }
-                        autoFocus={true}
-                        suffix={ <i className="fa fa-search" /> }
-                    />
-                </Col>
-            </Row>
             <div className="main-card mt-2 mb-2 card">
                 <div className="card-body">
+                    <Row gutter={ [12, 6] } className="mb-2">
+                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                            <C_Input
+                                titleText={"Buscar Criterio de búsqueda"}
+                                placeholder={"Buscar..."}
+                                value={search}
+                                onChange={onchangeSearch}
+                                onPressEnter={ () => get_data( search ) }
+                                autoFocus={true}
+                                suffix={ <i className="fa fa-search" /> }
+                            />
+                        </Col>
+                    </Row>
                     <div className="table-responsive"
                         style={{ position: 'relative', overflowX: 'hidden', overflowY: 'auto', maxHeight: 300, width: '100%', }}
                     >
@@ -133,7 +157,7 @@ function C_ListadoAlmacenProducto( props ) {
                             </thead>
                             <tbody>
                                 { array_data.map( ( item, key ) => {
-                                    let style = ( value == item.fkidproducto) ? {background: '#e0f3ff'} : {};
+                                    let style = (checkedStyle(item)) ? {background: '#e0f3ff'} : {};
                                     return (
                                         <tr key={key} 
                                             style={ Object.assign( style, { cursor: 'pointer', } ) }
@@ -199,8 +223,9 @@ C_ListadoAlmacenProducto.propTypes = {
     onChecked:   PropTypes.func,
     isventa:     PropTypes.string,
     estado:      PropTypes.string,
-    fkidalmacen: PropTypes.number,
-    fkidlistaprecio: PropTypes.number,
+    fkidalmacen: PropTypes.any,
+    fkidlistaprecio: PropTypes.any,
+    arrayFKIDProducto: PropTypes.array,
 }
 
 C_ListadoAlmacenProducto.defaultProps = {
@@ -209,6 +234,7 @@ C_ListadoAlmacenProducto.defaultProps = {
     estado: null,
     fkidalmacen: null,
     fkidlistaprecio: null,
+    arrayFKIDProducto: [],
 }
 
 export default C_ListadoAlmacenProducto;

@@ -26,6 +26,8 @@ function M_ListadoProducto( props ) {
                 onChecked={ onChecked }
                 value={ value }
                 create={ create }
+                fkidalmacen={props.fkidalmacen}
+                arrayFKIDProducto={props.arrayFKIDProducto}
                 // onCreate={ props.onCreate }
             />
         </C_ModalDraggable>
@@ -38,6 +40,8 @@ M_ListadoProducto.propTypes = {
     create:  PropTypes.bool,
 
     value: PropTypes.any,
+    fkidalmacen: PropTypes.any,
+    arrayFKIDProducto: PropTypes.array,
 
     width:  PropTypes.any,
     zIndex: PropTypes.number,
@@ -54,6 +58,8 @@ M_ListadoProducto.defaultProps = {
     create: false,
 
     value: null,
+    fkidalmacen: null,
+    arrayFKIDProducto: [],
 
     width: "85%",
     zIndex: 1200,

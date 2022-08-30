@@ -336,6 +336,7 @@ function defaultNotaCompraDetalle( index = 0, state = initialState, detalle = nu
         fkidseccioninventario: null,
         seccioninventario: "",
 
+        stockactualanterior: detalle ? detalle.stockactualanterior : "",
         cantidad: detalle ? detalle.cantidad : "",
         cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
         cantidadrecibida: detalle ? detalle.cantidadrecibida : "",

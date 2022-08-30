@@ -113,7 +113,9 @@ class DevolucionNotaVenta extends Model
                         'almproddet.ingresos', 'almproddet.salidas', 'almproddet.traspasos', 'almproddet.ventas', 'almproddet.compras',
                         'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stocktotal', 'prod.peso', 'prod.volumen', 'prod.valorequivalente',
                         'unidmed.idunidadmedida', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
-                        'alm.idalmacen', 'alm.descripcion as almacen', 'alm.fkidsucursal',
+                        'alm.idalmacen', 'alm.descripcion as almacen',
+                        'suc.idsucursal', 'suc.descripcion as sucursal',
+                        'clte.idcliente', DB::raw("CONCAT(clte.nombre, ' ', clte.apellido) as cliente"),
                         'venddor.idvendedor', DB::raw("CONCAT(venddor.nombre, ' ', venddor.apellido) as vendedor"),
                         'listprec.idlistaprecio', 'listprec.descripcion as listaprecio',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca',
@@ -122,7 +124,9 @@ class DevolucionNotaVenta extends Model
                     ] )
                     ->leftJoin('almacenproductodetalle as almproddet', 'devolucionnotaventadetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
                     ->leftJoin('almacen as alm', 'devolucionnotaventadetalle.fkidalmacen', '=', 'alm.idalmacen')
+                    ->leftJoin('sucursal as suc', 'devolucionnotaventadetalle.fkidsucursal', '=', 'suc.idsucursal')
                     ->leftJoin('listaprecio as listprec', 'devolucionnotaventadetalle.fkidlistaprecio', '=', 'listprec.idlistaprecio')
+                    ->leftJoin('cliente as clte', 'devolucionnotaventadetalle.fkidcliente', '=', 'clte.idcliente')
                     ->leftJoin('vendedor as venddor', 'devolucionnotaventadetalle.fkidvendedor', '=', 'venddor.idvendedor')
                     ->leftJoin('producto as prod', 'devolucionnotaventadetalle.fkidproducto', '=', 'prod.idproducto')
                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')

@@ -328,13 +328,27 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 50,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 45,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costosubtotal.toString().length == 0 ) ?
                         "" : 
                         <label> 
                             {data.costosubtotal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
+            dataIndex: 'sucursal', key: 'sucursal', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.sucursal == null ) ?
+                        "" : 
+                        <label> 
+                            {data.sucursal}
                         </label>
                     }
                 </span>
@@ -363,6 +377,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                         "" : 
                         <label> 
                             {data.seccioninventario}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Proveedor' } </span>, 
+            dataIndex: 'proveedor', key: 'proveedor', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.proveedor == null ) ?
+                        "" : 
+                        <label> 
+                            {data.proveedor}
                         </label>
                     }
                 </span>

@@ -257,6 +257,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         { 
+            title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
+            dataIndex: 'sucursal', key: 'sucursal', width: 60,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.sucursal == null ) ?
+                        "" : 
+                        <label> 
+                            {data.sucursal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
             title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
             dataIndex: 'almacen', key: 'almacen', width: 60,
             render: ( text, data, index ) => (
@@ -265,6 +279,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                         "" : 
                         <label> 
                             {data.almacen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Proveedor' } </span>, 
+            dataIndex: 'proveedor', key: 'proveedor', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.proveedor == null ) ?
+                        "" : 
+                        <label> 
+                            {data.proveedor}
                         </label>
                     }
                 </span>

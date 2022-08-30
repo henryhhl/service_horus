@@ -72,6 +72,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             fkidseccioninventario: null,
             seccioninventario: "",
 
+            stockactualanterior: "",
             cantidad: "",
             cantidadsolicitada: "",
             cantidadrecibida: "",
@@ -208,8 +209,21 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                 </span>
             ),
         },
+        {
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
+            width: 50,
+            dataIndex: 'stockactualanterior',
+            key: 'stockactualanterior',
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label> 
+                        { data.stockactualanterior }
+                    </label>
+                </span>
+            ),
+        },
         { 
-            title: <span style={{ fontSize: 11, }}> { 'Cant.' } </span>, 
+            title: <span style={{ fontSize: 11, }}> { 'Cantidad' } </span>, 
             dataIndex: 'cantidad', key: 'cantidad', width: 50,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
@@ -374,14 +388,42 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         { 
+            title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
+            dataIndex: 'sucursal', key: 'sucursal', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.sucursal == null ) ?
+                        "" : 
+                        <label> 
+                            {data.sucursal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
             title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
-            dataIndex: 'almacen', key: 'almacen', width: 60,
+            dataIndex: 'almacen', key: 'almacen', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.almacen == null ) ?
                         "" : 
                         <label> 
                             {data.almacen}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Proveedor' } </span>, 
+            dataIndex: 'proveedor', key: 'proveedor', width: 90,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.proveedor == null ) ?
+                        "" : 
+                        <label> 
+                            {data.proveedor}
                         </label>
                     }
                 </span>

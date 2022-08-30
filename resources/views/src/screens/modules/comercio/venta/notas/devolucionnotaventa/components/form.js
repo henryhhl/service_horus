@@ -154,8 +154,10 @@ function C_Form( props ) {
                 preciounitario: parseFloat(element.preciounitario).toFixed(2),
                 preciosubtotal: parseFloat(element.preciosubtotal).toFixed(2),
 
-                fkidalmacen: element.fkidalmacen,
                 fkidsucursal: element.fkidsucursal,
+                sucursal: element.sucursal,
+
+                fkidalmacen: element.fkidalmacen,
                 almacen: element.almacen,
 
                 nrolote: parseFloat(element.nrolote).toFixed(2),
@@ -174,6 +176,9 @@ function C_Form( props ) {
 
                 fkidvendedor: element.fkidvendedor,
                 vendedor: element.vendedor,
+
+                fkidcliente: element.fkidcliente,
+                cliente: element.cliente,
                 nota: element.nota,
 
                 fkidnotaventadetalle: element.idnotaventadetalle,

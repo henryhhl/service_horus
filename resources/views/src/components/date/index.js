@@ -2,9 +2,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { DatePicker } from 'antd';
+import { ConfigProvider, DatePicker } from 'antd';
 import moment from 'moment';
 import { Functions } from '../../utils/functions';
+
+import 'moment/locale/es';
+import locale from 'antd/es/locale/es_ES';
 
 import './css/date.css';
 
@@ -53,9 +56,9 @@ function C_Date( props ) {
     };
 
     return (
-        <>
+        <ConfigProvider locale={locale}>
             { onComponent() }
-        </>
+        </ConfigProvider>
     );
 };
 

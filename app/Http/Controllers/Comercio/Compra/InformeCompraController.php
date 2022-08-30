@@ -8,6 +8,7 @@ use App\Models\Comercio\Compra\ConceptoCompra;
 use App\Models\Comercio\Compra\NotaCompra;
 use App\Models\Comercio\Compra\Proveedor;
 use App\Models\Comercio\Inventario\Almacen;
+use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Inventario\UnidadMedidaProducto;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -77,7 +78,7 @@ class InformeCompraController extends Controller
                     DB::raw( "(
                         SELECT COUNT(*) 
                         FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                        WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                        WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                         ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fkidsucursal = '$fkidsucursal'
                     )" ), '>', '0'
                 ] );
@@ -115,7 +116,7 @@ class InformeCompraController extends Controller
                     DB::raw( "(
                         SELECT COUNT(*) 
                         FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                        WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                        WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                         ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fkidalmacen = '$fkidalmacen'
                     )" ), '>', '0'
                 ] );
@@ -153,7 +154,7 @@ class InformeCompraController extends Controller
                     DB::raw( "(
                         SELECT COUNT(*) 
                         FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                        WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                        WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                         ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fkidconceptocompra = '$fkidconceptocompra'
                     )" ), '>', '0'
                 ] );
@@ -191,7 +192,7 @@ class InformeCompraController extends Controller
                     DB::raw( "(
                         SELECT COUNT(*) 
                         FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                        WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                        WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                         ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fkidproveedor = '$fkidproveedor'
                     )" ), '>', '0'
                 ] );
@@ -229,7 +230,7 @@ class InformeCompraController extends Controller
                     DB::raw( "(
                         SELECT COUNT(*) 
                         FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                        WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                        WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                         ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.tipocompra = '$tipocompra'
                     )" ), '>', '0'
                 ] );
@@ -292,7 +293,7 @@ class InformeCompraController extends Controller
                         DB::raw( "(
                             SELECT COUNT(*) 
                             FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                            WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                            WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                             ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fechanotacompra >= '$fechainicio'
                         )" ), '>', '0'
                     ] );
@@ -300,7 +301,7 @@ class InformeCompraController extends Controller
                         DB::raw( "(
                             SELECT COUNT(*) 
                             FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                            WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                            WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                             ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fechanotacompra <= '$fechafinal'
                         )" ), '>', '0'
                     ] );
@@ -336,7 +337,7 @@ class InformeCompraController extends Controller
                         DB::raw( "(
                             SELECT COUNT(*) 
                             FROM notacompradetalle ntacompdet, notacompra ntacomp 
-                            WHERE ntacompdet.fkidunidadmedidaproducto = unidadmedidaproducto.idunidadmedidaproducto AND 
+                            WHERE ntacompdet.fkidproducto = producto.idproducto AND 
                             ntacompdet.fkidnotacompra = ntacomp.idnotacompra AND ntacomp.fechanotacompra >= '$fechainicio'
                         )" ), '>', '0'
                     ] );
@@ -350,10 +351,9 @@ class InformeCompraController extends Controller
                     array_push( $arrayCondicionNotaCompra, [
                         DB::raw( "(
                             SELECT COUNT(*) 
-                            FROM notacompradetalle ntacompdet, unidadmedidaproducto unidmedprod, producto prod 
+                            FROM notacompradetalle ntacompdet, producto prod 
                             WHERE ntacompdet.fkidnotacompra = notacompra.idnotacompra AND 
-                                unidmedprod.idunidadmedidaproducto = ntacompdet.fkidunidadmedidaproducto AND
-                                unidmedprod.fkidproducto = prod.idproducto AND
+                                ntacompdet.fkidproducto = prod.idproducto AND
                                 prod.fkidcategoria = '$fkidcategoria'
                         )" ), '>', '0'
                     ] );
@@ -366,10 +366,9 @@ class InformeCompraController extends Controller
                     array_push( $arrayCondicionNotaCompra, [
                         DB::raw( "(
                             SELECT COUNT(*) 
-                            FROM notacompradetalle ntacompdet, unidadmedidaproducto unidmedprod, producto prod 
+                            FROM notacompradetalle ntacompdet, producto prod 
                             WHERE ntacompdet.fkidnotacompra = notacompra.idnotacompra AND 
-                                unidmedprod.idunidadmedidaproducto = ntacompdet.fkidunidadmedidaproducto AND
-                                unidmedprod.fkidproducto = prod.idproducto AND
+                                ntacompdet.fkidproducto = prod.idproducto AND
                                 prod.fkidproductomarca = '$fkidproductomarca'
                         )" ), '>', '0'
                     ] );
@@ -382,10 +381,9 @@ class InformeCompraController extends Controller
                     array_push( $arrayCondicionNotaCompra, [
                         DB::raw( "(
                             SELECT COUNT(*) 
-                            FROM notacompradetalle ntacompdet, unidadmedidaproducto unidmedprod, producto prod 
+                            FROM notacompradetalle ntacompdet, producto prod 
                             WHERE ntacompdet.fkidnotacompra = notacompra.idnotacompra AND 
-                                unidmedprod.idunidadmedidaproducto = ntacompdet.fkidunidadmedidaproducto AND
-                                unidmedprod.fkidproducto = prod.idproducto AND
+                                ntacompdet.fkidproducto = prod.idproducto AND
                                 prod.fkidproductogrupo = '$fkidproductogrupo'
                         )" ), '>', '0'
                     ] );
@@ -398,10 +396,9 @@ class InformeCompraController extends Controller
                     array_push( $arrayCondicionNotaCompra, [
                         DB::raw( "(
                             SELECT COUNT(*) 
-                            FROM notacompradetalle ntacompdet, unidadmedidaproducto unidmedprod, producto prod 
+                            FROM notacompradetalle ntacompdet, producto prod 
                             WHERE ntacompdet.fkidnotacompra = notacompra.idnotacompra AND 
-                                unidmedprod.idunidadmedidaproducto = ntacompdet.fkidunidadmedidaproducto AND
-                                unidmedprod.fkidproducto = prod.idproducto AND
+                            ntacompdet.fkidproducto = prod.idproducto AND
                                 prod.fkidproductosubgrupo = '$fkidproductosubgrupo'
                         )" ), '>', '0'
                     ] );
@@ -414,11 +411,10 @@ class InformeCompraController extends Controller
                     array_push( $arrayCondicionNotaCompra, [
                         DB::raw( "(
                             SELECT COUNT(*) 
-                            FROM notacompradetalle ntacompdet, unidadmedidaproducto unidmedprod, producto prod 
+                            FROM notacompradetalle ntacompdet, producto prod 
                             WHERE ntacompdet.fkidnotacompra = notacompra.idnotacompra AND 
-                                unidmedprod.idunidadmedidaproducto = ntacompdet.fkidunidadmedidaproducto AND
-                                unidmedprod.fkidproducto = prod.idproducto AND
-                                unidmedprod.fkidproducto = '$fkidproducto'
+                                ntacompdet.fkidproducto = prod.idproducto AND
+                                ntacompdet.fkidproducto = '$fkidproducto'
                         )" ), '>', '0'
                     ] );
                 }
@@ -431,6 +427,7 @@ class InformeCompraController extends Controller
             $concepcomp = new ConceptoCompra();
             $notcomp = new NotaCompra();
             $unidmedprod = new UnidadMedidaProducto();
+            $prod = new Producto();
 
             if ( $formato == "PN" ) {
 
@@ -460,16 +457,16 @@ class InformeCompraController extends Controller
                             ->where( $arrayCondicionNotaCompra )
                             ->with( [ 'arraynotacompradetalle' => function( $query ) {
                                 $query
-                                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'notacompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('almacenproductodetalle as almproddet', 'notacompradetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                                    ->leftJoin('producto as prod', 'notacompradetalle.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                                     ->select( 
                                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra',
                                         'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
-                                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
-                                        'prod.idproducto', 'prod.nombre', 
+                                        'almproddet.stockactual as stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                                        'prod.idproducto', 'prod.codigo', 'prod.nombre', 
                                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                                     )
@@ -505,16 +502,16 @@ class InformeCompraController extends Controller
                             ->where( $arrayCondicionNotaCompra )
                             ->with( [ 'arraynotacompradetalle' => function( $query ) {
                                 $query
-                                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'notacompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('almacenproductodetalle as almproddet', 'notacompradetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                                    ->leftJoin('producto as prod', 'notacompradetalle.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                                     ->select( 
                                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra',
                                         'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
-                                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
-                                        'prod.idproducto', 'prod.nombre', 
+                                        'almproddet.stockactual as stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                                        'prod.idproducto', 'prod.codigo', 'prod.nombre', 
                                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                                     )
@@ -550,16 +547,16 @@ class InformeCompraController extends Controller
                             ->where( $arrayCondicionNotaCompra )
                             ->with( [ 'arraynotacompradetalle' => function( $query ) {
                                 $query
-                                    ->leftJoin('unidadmedidaproducto as unidmedprod', 'notacompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                                    ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                                    ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('almacenproductodetalle as almproddet', 'notacompradetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                                    ->leftJoin('producto as prod', 'notacompradetalle.fkidproducto', '=', 'prod.idproducto')
+                                    ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                                     ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                                     ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                                     ->select( 
                                         'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra',
                                         'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
-                                        'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
-                                        'prod.idproducto', 'prod.nombre', 
+                                        'almproddet.stockactual as stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                                        'prod.idproducto', 'prod.codigo', 'prod.nombre', 
                                         'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                                         'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                                     )
@@ -591,16 +588,16 @@ class InformeCompraController extends Controller
                     ] )
                     ->with( [ 'arraynotacompradetalle' => function( $query ) {
                         $query
-                            ->leftJoin('unidadmedidaproducto as unidmedprod', 'notacompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                            ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                            ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('almacenproductodetalle as almproddet', 'notacompradetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                            ->leftJoin('producto as prod', 'notacompradetalle.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                             ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                             ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                             ->select( 
                                 'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra',
                                 'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
-                                'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
-                                'prod.idproducto', 'prod.nombre', 
+                                'almproddet.stockactual as stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                                'prod.idproducto', 'prod.codigo', 'prod.nombre', 
                                 'ciud.idciudad', 'ciud.descripcion as ciudadorigen',
                                 'prodmarc.idproductomarca', 'prodmarc.descripcion as productomarca'
                             )
@@ -630,9 +627,9 @@ class InformeCompraController extends Controller
                     ] )
                     ->with( [ 'arraynotacompradetalle' => function( $query ) use ( $arrayCondicionNotaCompraDetalle ) {
                         $query
-                            ->leftJoin('unidadmedidaproducto as unidmedprod', 'notacompradetalle.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                            ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                            ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('almacenproductodetalle as almproddet', 'notacompradetalle.fkidalmacenproductodetalle', '=', 'almproddet.idalmacenproductodetalle')
+                            ->leftJoin('producto as prod', 'notacompradetalle.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                             ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                             ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                             ->leftJoin('productogrupo as prodgrup', 'prod.fkidproductogrupo', '=', 'prodgrup.idproductogrupo')
@@ -641,8 +638,8 @@ class InformeCompraController extends Controller
                             ->select( 
                                 'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidnotacompra',
                                 'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
-                                'unidmedprod.stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 'unidmedprod.codigo',
-                                'prod.idproducto', 'prod.nombre as producto', 
+                                'almproddet.stockactual as stock', 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida',
+                                'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 
                                 'ciud.idciudad', 'ciud.descripcion as origen',
                                 'prodmarc.idproductomarca', 'prodmarc.descripcion as marca',
                                 'prodgrup.idproductogrupo', 'prodgrup.descripcion as grupo',
@@ -659,18 +656,16 @@ class InformeCompraController extends Controller
             }
 
             if ( $formato == "LM" ) {
-                $arrayInformeCompra = $unidmedprod
-                    ->leftJoin('producto as prod', 'unidadmedidaproducto.fkidproducto', '=', 'prod.idproducto')
-                    ->leftJoin('unidadmedida as unidmed', 'unidadmedidaproducto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                    ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
-                    ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
-                    ->leftJoin('productogrupo as prodgrup', 'prod.fkidproductogrupo', '=', 'prodgrup.idproductogrupo')
-                    ->leftJoin('productosubgrupo as prodsubgrup', 'prod.fkidproductosubgrupo', '=', 'prodsubgrup.idproductosubgrupo')
-                    ->leftJoin('categoria as cat', 'prod.fkidcategoria', '=', 'cat.idcategoria')
+                $arrayInformeCompra = $prod
+                    ->leftJoin('unidadmedida as unidmed', 'producto.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
+                    ->leftJoin('ciudad as ciud', 'producto.fkidciudadorigen', '=', 'ciud.idciudad')
+                    ->leftJoin('productomarca as prodmarc', 'producto.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+                    ->leftJoin('productogrupo as prodgrup', 'producto.fkidproductogrupo', '=', 'prodgrup.idproductogrupo')
+                    ->leftJoin('productosubgrupo as prodsubgrup', 'producto.fkidproductosubgrupo', '=', 'prodsubgrup.idproductosubgrupo')
+                    ->leftJoin('categoria as cat', 'producto.fkidcategoria', '=', 'cat.idcategoria')
                     ->select( 
-                        'unidadmedidaproducto.idunidadmedidaproducto', 'unidadmedidaproducto.stock', 'unidadmedidaproducto.codigo',
                         'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                        'prod.idproducto', 'prod.nombre as producto', 
+                        'producto.idproducto', 'producto.codigo', 'producto.nombre as producto', 'producto.stockactual as stock',
                         'ciud.idciudad', 'ciud.descripcion as origen',
                         'prodmarc.idproductomarca', 'prodmarc.descripcion as marca',
                         'prodgrup.idproductogrupo', 'prodgrup.descripcion as grupo',
@@ -685,7 +680,7 @@ class InformeCompraController extends Controller
                             ->leftJoin('conceptocompra as concepcomp', 'notacompra.fkidconceptocompra', '=', 'concepcomp.idconceptocompra')
                             ->leftJoin('proveedor as prov', 'notacompra.fkidproveedor', '=', 'prov.idproveedor')
                             ->select( [ 
-                                'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidunidadmedidaproducto',
+                                'notacompradetalle.idnotacompradetalle', 'notacompradetalle.fkidproducto',
                                 'notacompradetalle.cantidad', 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal',
                                 'notacompra.idnotacompra', 'notacompra.fechanotacompra', 'notacompra.tipocambio', 
                                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
@@ -697,8 +692,8 @@ class InformeCompraController extends Controller
                             ->orderBy('notacompra.idnotacompra');
                     } ] )
                     ->where( $arrayCondicionLibroMayor )
-                    ->whereNull('unidadmedidaproducto.deleted_at')
-                    ->orderBy('unidadmedidaproducto.idunidadmedidaproducto')
+                    ->whereNull('producto.deleted_at')
+                    ->orderBy('producto.idproducto')
                     ->get()->toArray();
             }
 
@@ -721,9 +716,8 @@ class InformeCompraController extends Controller
                             ->leftJoin('almacen as alm', 'notacompra.fkidalmacen', '=', 'alm.idalmacen')
                             ->leftJoin('conceptocompra as concepcomp', 'notacompra.fkidconceptocompra', '=', 'concepcomp.idconceptocompra')
                             ->leftJoin('notacompradetalle as notcompdet', 'notacompra.idnotacompra', '=', 'notcompdet.fkidnotacompra')
-                            ->leftJoin('unidadmedidaproducto as unidmedprod', 'notcompdet.fkidunidadmedidaproducto', '=', 'unidmedprod.idunidadmedidaproducto')
-                            ->leftJoin('unidadmedida as unidmed', 'unidmedprod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
-                            ->leftJoin('producto as prod', 'unidmedprod.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('producto as prod', 'notcompdet.fkidproducto', '=', 'prod.idproducto')
+                            ->leftJoin('unidadmedida as unidmed', 'prod.fkidunidadmedida', '=', 'unidmed.idunidadmedida')
                             ->leftJoin('ciudad as ciud', 'prod.fkidciudadorigen', '=', 'ciud.idciudad')
                             ->leftJoin('productomarca as prodmarc', 'prod.fkidproductomarca', '=', 'prodmarc.idproductomarca')
                             ->leftJoin('productogrupo as prodgrup', 'prod.fkidproductogrupo', '=', 'prodgrup.idproductogrupo')
@@ -734,9 +728,8 @@ class InformeCompraController extends Controller
                                 'notacompra.fkidsucursal', 'sucu.descripcion as sucursal',
                                 'notacompra.fkidalmacen', 'alm.descripcion as almacen',
                                 'notacompra.fkidconceptocompra', 'concepcomp.descripcion as conceptocompra',
-                                'unidmedprod.idunidadmedidaproducto', 'unidmedprod.stock', 'unidmedprod.codigo',
                                 'unidmed.abreviatura', 'unidmed.descripcion as unidadmedida', 
-                                'prod.idproducto', 'prod.nombre as producto', 
+                                'prod.idproducto', 'prod.codigo', 'prod.nombre as producto', 'prod.stockactual as stock',
                                 'ciud.idciudad', 'ciud.descripcion as origen',
                                 'prodmarc.idproductomarca', 'prodmarc.descripcion as marca',
                                 'prodgrup.idproductogrupo', 'prodgrup.descripcion as grupo',

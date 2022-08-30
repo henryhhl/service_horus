@@ -211,19 +211,19 @@ export const NotaVentaReducer = ( state = initialState, action = { payload, type
             state.montoanticipo = 0;
             state.isdevolucionventa = 'N';
 
-            state.fkidconceptoventa = arrayConceptoVenta.length > 0 ? arrayConceptoVenta[0].idconceptoventa : null;
-            state.conceptoventa = arrayConceptoVenta.length > 0 ? arrayConceptoVenta[0].descripcion : "";
+            state.fkidconceptoventa = Functions.initValueServiceInArray( arrayConceptoVenta, "idconceptoventa" );
+            state.conceptoventa = Functions.initValueServiceInArray( arrayConceptoVenta, "descripcion" );
 
             state.fkidlistaprecio = arrayListaPrecio.length > 0 ? arrayListaPrecio[0].idlistaprecio : null;
             state.listaprecio = arrayListaPrecio.length > 0 ? arrayListaPrecio[0].descripcion : "";
 
-            state.fkidsucursal = arraySucursal.length > 0 ? arraySucursal[0].idsucursal : null;
-            state.sucursal = arraySucursal.length > 0 ? arraySucursal[0].descripcion : "";
+            state.fkidsucursal = Functions.initValueServiceInArray( arraySucursal, "idsucursal" );
+            state.sucursal = Functions.initValueServiceInArray( arraySucursal, "descripcion" );
 
-            let arrayAlmacen = arraySucursal.length > 0 ? arraySucursal[0].arrayalmacen : [];
+            let arrayAlmacen = ( Functions.esNumeric(state.fkidsucursal) ) ? arraySucursal[0].arrayalmacen : [];
 
-            state.fkidalmacen = arrayAlmacen.length > 0 ? arrayAlmacen[0].idalmacen : null;
-            state.almacen = arrayAlmacen.length > 0 ? arrayAlmacen[0].descripcion : "";
+            state.fkidalmacen = Functions.initValueServiceInArray( arrayAlmacen, "idalmacen" );
+            state.almacen = Functions.initValueServiceInArray( arrayAlmacen, "descripcion" );
 
             state.fkidtipopago = arrayTipoPago.length > 0 ? arrayTipoPago[0].idtipopago : null;
             state.tipopago = arrayTipoPago.length > 0 ? arrayTipoPago[0].descripcion : "";
@@ -360,7 +360,7 @@ function onSetData( state = initialState, payload ) {
     let arrayNotaVentaDetalle = [];
     for (let pos = 0; pos < payload.arraynotaventadetalle.length; pos++) {
         const element = payload.arraynotaventadetalle[pos];
-        let detalle = defaulNotaVentaDetalle( pos, null, element );
+        let detalle = defaulNotaVentaDetalle( pos, state, element );
         arrayNotaVentaDetalle = [ ...arrayNotaVentaDetalle, detalle ];
     }
     
@@ -385,6 +385,7 @@ function defaulNotaVentaDetalle( index = 0, state = initialState, detalle = null
         fkidalmacenproductodetalle: detalle ? detalle.fkidalmacenproductodetalle : null,
         producto: detalle ? detalle.producto : "",
 
+        stockactualanterior : detalle ? detalle.stockactualanterior : "",
         cantidadsolicitada: detalle ? detalle.cantidadsolicitada : "",
         cantidad: detalle ? detalle.cantidad : "",
         unidadmedida: detalle ? `${parseFloat(detalle.valorequivalente).toFixed(2)} ${detalle.abreviatura}` : "",
@@ -400,8 +401,8 @@ function defaulNotaVentaDetalle( index = 0, state = initialState, detalle = null
         descuento: detalle ? detalle.descuento : "",
         montodescuento: detalle ? parseFloat(detalle.montodescuento).toFixed(2) : "",
 
-        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
         fkidsucursal: detalle ? detalle.fkidsucursal : state.fkidsucursal,
+        fkidalmacen: detalle ? detalle.fkidalmacen : state.fkidalmacen,
         almacen: detalle ? detalle.almacen : state.almacen,
 
         nrolote: detalle ? parseFloat(detalle.nrolote).toFixed(2) : "",
@@ -420,6 +421,9 @@ function defaulNotaVentaDetalle( index = 0, state = initialState, detalle = null
 
         fkidvendedor: detalle ? detalle.fkidvendedor : null,
         vendedor: detalle ? detalle.vendedor : "",
+        
+        fkidcliente: detalle ? detalle.fkidcliente : null,
+        cliente: detalle ? detalle.cliente : "",
         nota: detalle ? detalle.nota : "",
 
         isdevolucionventa: detalle ? detalle.isdevolucionventa : "N",

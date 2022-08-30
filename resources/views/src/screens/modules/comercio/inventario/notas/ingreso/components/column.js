@@ -96,13 +96,13 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
     function onDeleteRowDetalle( data, index ) {
         notaIngreso.arrayNotaIngresoDetalle = notaIngreso.arrayNotaIngresoDetalle.filter( (item, key) => key !== index );
 
-        for (let index = 0; index < detalle.arrayNotaIngresoDetalle.length; index++) {
-            let element = detalle.arrayNotaIngresoDetalle[index];
+        for (let index = 0; index < notaIngreso.arrayNotaIngresoDetalle.length; index++) {
+            let element = notaIngreso.arrayNotaIngresoDetalle[index];
             element.key = index;
         }
 
         if ( data.idnotaingresodetalle != null ) {
-            detalle.arrayDeleteNotaIngresoDetalle = [ ...detalle.arrayDeleteNotaIngresoDetalle, data.idnotaingresodetalle ];
+            notaIngreso.arrayDeleteNotaIngresoDetalle = [ ...notaIngreso.arrayDeleteNotaIngresoDetalle, data.idnotaingresodetalle ];
         }
 
         updateTotales();
@@ -175,6 +175,20 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
                             "SELECCIONAR" : <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </>
                         }
                     </label>
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>, 
+            dataIndex: 'stockactualanterior', key: 'stockactualanterior', width: 50,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( typeof parseFloat(data.stockactualanterior) != "number" ) ?
+                        "" : 
+                        <label> 
+                            {data.stockactualanterior}
+                        </label>
+                    }
                 </span>
             ),
         },
@@ -328,7 +342,7 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
-            dataIndex: 'sucursal', key: 'sucursal', width: 80,
+            dataIndex: 'sucursal', key: 'sucursal', width: 90,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.sucursal == null ) ?
@@ -342,7 +356,7 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
-            dataIndex: 'almacen', key: 'almacen', width: 70,
+            dataIndex: 'almacen', key: 'almacen', width: 80,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.almacen == null ) ?
@@ -356,7 +370,7 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Marca' } </span>, 
-            dataIndex: 'productomarca', key: 'productomarca', width: 60,
+            dataIndex: 'productomarca', key: 'productomarca', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.productomarca == null ) ?
@@ -370,13 +384,13 @@ export const columns = ( notaIngreso, disabled, onVisibleProducto = () => {}, on
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Origen' } </span>, 
-            dataIndex: 'productociudad', key: 'productociudad', width: 60,
+            dataIndex: 'ciudadorigen', key: 'ciudadorigen', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
-                    { ( data.productociudad == null ) ?
+                    { ( data.ciudadorigen == null ) ?
                         "" : 
                         <label> 
-                            {data.productociudad}
+                            {data.ciudadorigen}
                         </label>
                     }
                 </span>

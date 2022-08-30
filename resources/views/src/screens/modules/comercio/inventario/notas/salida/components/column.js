@@ -96,13 +96,13 @@ export const columns = ( notaSalida, disabled, onVisibleProducto = () => {}, onC
     function onDeleteRowDetalle( data, index ) {
         notaSalida.arrayNotaSalidaDetalle = notaSalida.arrayNotaSalidaDetalle.filter( (item, key) => key !== index );
 
-        for (let index = 0; index < detalle.arrayNotaSalidaDetalle.length; index++) {
-            let element = detalle.arrayNotaSalidaDetalle[index];
+        for (let index = 0; index < notaSalida.arrayNotaSalidaDetalle.length; index++) {
+            let element = notaSalida.arrayNotaSalidaDetalle[index];
             element.key = index;
         }
 
         if ( data.idnotasalidadetalle != null ) {
-            detalle.arrayDeleteNotaSalidaDetalle = [ ...detalle.arrayDeleteNotaSalidaDetalle, data.idnotasalidadetalle ];
+            notaSalida.arrayDeleteNotaSalidaDetalle = [ ...notaSalida.arrayDeleteNotaSalidaDetalle, data.idnotasalidadetalle ];
         }
 
         updateTotales();
@@ -175,6 +175,20 @@ export const columns = ( notaSalida, disabled, onVisibleProducto = () => {}, onC
                             "SELECCIONAR" : <> <span style={{ color: 'black', }}> {data.unidadmedida} </span> { data.producto }  </>
                         }
                     </label>
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>, 
+            dataIndex: 'stockactualanterior', key: 'stockactualanterior', width: 50,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( typeof parseFloat(data.stockactualanterior) != "number" ) ?
+                        "" : 
+                        <label> 
+                            {data.stockactualanterior}
+                        </label>
+                    }
                 </span>
             ),
         },

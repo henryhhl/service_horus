@@ -4,7 +4,7 @@ import { message, notification } from 'antd';
 
 import { CloseOutlined } from '@ant-design/icons';
 
-function C_Message( type, messages ) {
+function C_Message( type, messages, placement = "bottomRight" ) {
     // message.open( {
     //     type: type,
     //     content: <span style={{ position: 'relative', top: 3, }}> { messages } </span>,
@@ -14,7 +14,7 @@ function C_Message( type, messages ) {
     // } );
     notification.open( {
         message: null,
-        placement: "bottomRight",
+        placement: placement,
         // type: type,
         duration: 3,
         description: 

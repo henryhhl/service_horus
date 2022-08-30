@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Col, Row, Table } from 'antd';
-import { C_Checkbox, C_Date, C_Input } from '../../../../../../../components';
+import { C_Checkbox, C_Confirm, C_Date, C_Input, C_Message } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 import { columns } from './column';
 
@@ -69,13 +69,44 @@ function C_Form( props ) {
         if ( !disabled.data ) setVisibleSucursal(true);
     };
 
-    function onChangeFKIDSucursal( data ) {
-        notaSalida.fkidsucursal  = data.idsucursal;
-        notaSalida.sucursal      = data.descripcion;
+    function updateSucursalData(sucursal) {
+        notaSalida.fkidsucursal  = sucursal.idsucursal;
+        notaSalida.sucursal      = sucursal.descripcion;
+        notaSalida.fkidalmacen  = null;
+        notaSalida.almacen      = "";
         notaSalida.error.fkidsucursal   = false;
         notaSalida.message.fkidsucursal = "";
+        for (let index = 0; index < notaSalida.arrayNotaSalidaDetalle.length; index++) {
+            const element = notaSalida.arrayNotaSalidaDetalle[index];
+            element.fkidsucursal = sucursal.idsucursal;
+            element.sucursal = sucursal.descripcion;
+            element.fkidalmacen = null;
+            element.almacen = "";
+            element = initDetalle(element);
+        }
         onChange( notaSalida );
         setVisibleSucursal(false);
+    }
+
+    function onChangeFKIDSucursal( sucursal ) {
+        if ( notaSalida.fkidsucursal == sucursal.idsucursal ) {
+            notaSalida.fkidsucursal  = sucursal.idsucursal;
+            notaSalida.sucursal      = sucursal.descripcion;
+            notaSalida.error.fkidsucursal   = false;
+            notaSalida.message.fkidsucursal = "";
+            onChange( notaSalida );
+            setVisibleSucursal(false);
+            return;
+        }
+        if ( notaSalida.fkidsucursal == null || notaSalida.fkidsucursal == "" ) {
+            updateSucursalData(sucursal);
+            return;
+        }
+        let onUpdate = () => updateSucursalData(sucursal);
+        C_Confirm( { 
+            title: "Cambiar Sucursal", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentSucursal() {
@@ -90,17 +121,50 @@ function C_Form( props ) {
         );
     };
 
+    function updateAlmacenData(almacen) {
+        notaSalida.fkidalmacen  = almacen.idalmacen;
+        notaSalida.almacen      = almacen.descripcion;
+        notaSalida.error.fkidalmacen   = false;
+        notaSalida.message.fkidalmacen = "";
+        for (let index = 0; index < notaSalida.arrayNotaSalidaDetalle.length; index++) {
+            const element = notaSalida.arrayNotaSalidaDetalle[index];
+            element.fkidalmacen = almacen.idalmacen;
+            element.almacen = almacen.descripcion;
+
+            element.fkidsucursal = notaSalida.fkidsucursal;
+            element.sucursal = notaSalida.sucursal;
+
+            element = initDetalle(element);
+
+        }
+        onChange( notaSalida );
+        setVisibleAlmacen(false);
+    }
+
     function onShowAlmacen() {
         if ( !disabled.data ) setVisibleAlmacen(true);
     };
 
-    function onChangeFKIDAlmacen( data ) {
-        notaSalida.fkidalmacen  = data.idalmacen;
-        notaSalida.almacen      = data.descripcion;
-        notaSalida.error.fkidalmacen   = false;
-        notaSalida.message.fkidalmacen = "";
-        onChange( notaSalida );
-        setVisibleAlmacen(false);
+    function onChangeFKIDAlmacen( almacen ) {
+        if ( notaSalida.fkidalmacen == almacen.idalmacen ) {
+            notaSalida.fkidalmacen  = almacen.idalmacen;
+            notaSalida.almacen      = almacen.descripcion;
+            notaSalida.error.fkidalmacen   = false;
+            notaSalida.message.fkidalmacen = "";
+            onChange( notaSalida );
+            setVisibleAlmacen(false);
+            return;
+        }
+        if ( notaSalida.fkidalmacen == null || notaSalida.fkidalmacen == "" ) {
+            updateAlmacenData(almacen);
+            setVisibleAlmacen(false);
+            return;
+        }
+        let onUpdate = () => updateAlmacenData(almacen);
+        C_Confirm( { 
+            title: "Cambiar Álmacen", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentAlmacen() {
@@ -142,10 +206,74 @@ function C_Form( props ) {
     };
 
     function onVisibleProducto( detalle, index ) {
+        if ( notaSalida.fkidsucursal == null || notaSalida.fkidsucursal == "" ) {
+            C_Message( 'warning', 'Campo sucursal requerido.' );
+            return;
+        }
+        if ( notaSalida.fkidalmacen == null || notaSalida.fkidalmacen == "" ) {
+            C_Message( 'warning', 'Campo Álmacen requerido.' );
+            return;
+        }
         detalle.index = index;
         detalle.visible_producto = true;
         setRowDetalle(detalle);
     };
+
+    function initDetalle(detalle, data = null) {
+        detalle.codigo = data ? data.codigo : "";
+        detalle.producto = data ? data.nombre : "";
+        detalle.fkidproducto = data ? data.idproducto : null;
+        detalle.unidadmedida = data ? `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}` : "";
+
+        detalle.fkidciudadorigen = data ? data.fkidciudadorigen : null;
+        detalle.ciudadorigen = data ? data.ciudadorigen : "";
+
+        detalle.fkidproductomarca = data ? data.fkidproductomarca : null;
+        detalle.productomarca = data ? data.productomarca : "";
+
+        detalle.fkidproductotipo = data ? data.fkidproductotipo : null;
+        detalle.productotipo = data ? data.productotipo : "";
+
+        detalle.fkidsucursal = notaSalida.fkidsucursal;
+        detalle.sucursal = notaSalida.sucursal;
+
+        detalle.fkidalmacen = notaSalida.fkidalmacen;
+        detalle.almacen = notaSalida.almacen;
+
+        detalle.stockactualanterior = (data != null) ? (data.stockalmacen != null) ? data.stockalmacen : 0 : "";
+        detalle.cantidad = data ? 0 : "";
+        detalle.nrocajas = data ? 0 : "";
+
+        detalle.descuento = data ? 0  : "";
+        detalle.montodescuento = data ? 0 : "";
+
+        detalle.costobase = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costounitario = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costosubtotal = data ? "0.00" : "";
+
+        detalle.peso = data ? parseFloat(data.peso).toFixed(2) : "";
+        detalle.pesosubtotal = data ? "0.00" : "";
+
+        detalle.volumen = data ? parseFloat(data.volumen).toFixed(2) : "";
+        detalle.volumensubtotal = data ? "0.00" : "";
+
+        detalle.fechavencimiento = null;
+        detalle.fvencimiento = null;
+        detalle.nota = null;
+
+        detalle.nrolote = data ? "0.00" : "";
+        detalle.nrofabrica = data ? "0.00" : "";
+
+        detalle.fkidnotasalida = null;
+        detalle.idnotasalidadetalle = null;
+        detalle.fkidalmacenproductodetalle = null;
+
+        detalle.visible_producto = false;
+        detalle.visible_sucursal = false;
+        detalle.visible_almacen = false;
+        detalle.errorcantidad = false;
+        detalle.errorcostounitario = false;
+    }
 
     function componentProducto() {
         if ( row_detalle === null ) return null;
@@ -154,65 +282,11 @@ function C_Form( props ) {
             <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
+                fkidalmacen={row_detalle.fkidalmacen}
+                arrayFKIDProducto={notaSalida.arrayNotaSalidaDetalle}
                 onChange={ ( data ) => {
-                    console.log(data);
                     let detalle = notaSalida.arrayNotaSalidaDetalle[row_detalle.index];
-
-                    detalle.codigo = data.codigo;
-                    detalle.producto = data.nombre;
-                    detalle.fkidproducto = data.idproducto;
-                    detalle.unidadmedida = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}`;
-
-                    detalle.fkidciudadorigen = data.fkidciudadorigen;
-                    detalle.ciudadorigen = data.ciudadorigen;
-
-                    detalle.fkidproductomarca = data.fkidproductomarca;
-                    detalle.productomarca = data.productomarca;
-
-                    detalle.fkidproductotipo = data.fkidproductotipo;
-                    detalle.productotipo = data.productotipo;
-
-                    detalle.fkidsucursal = notaSalida.fkidsucursal;
-                    detalle.sucursal = notaSalida.sucursal;
-
-                    detalle.fkidalmacen = notaSalida.fkidalmacen;
-                    detalle.almacen = notaSalida.almacen;
-
-                    detalle.stockactualanterior = data.stockactual;
-                    detalle.cantidad = 0;
-                    detalle.nrocajas = 0;
-
-                    detalle.descuento = 0;
-                    detalle.montodescuento = 0;
-
-                    detalle.costobase = parseFloat(data.costounitario).toFixed(2);
-                    detalle.costounitario = parseFloat(data.costounitario).toFixed(2);
-                    detalle.costosubtotal = "0.00";
-
-                    detalle.peso = parseFloat(data.peso).toFixed(2);
-                    detalle.pesosubtotal = "0.00";
-
-                    detalle.volumen = parseFloat(data.volumen).toFixed(2);
-                    detalle.volumensubtotal = "0.00";
-
-                    detalle.fechavencimiento = null;
-                    detalle.fvencimiento = null;
-                    detalle.nota = null;
-
-                    detalle.nrolote = "0.00";
-                    detalle.nrofabrica = "0.00";
-
-                    detalle.fkidnotasalida = null;
-                    detalle.idnotasalidadetalle = null;
-                    detalle.fkidalmacenproductodetalle = null;
-
-                    detalle.visible_producto = false;
-                    detalle.visible_sucursal = false;
-                    detalle.visible_almacen = false;
-                    detalle.errorcantidad = false;
-                    detalle.errorcostounitario = false;
-        
+                    initDetalle(detalle, data);
                     onChange(notaSalida);
                     setRowDetalle(null);
                 } }

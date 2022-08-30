@@ -898,7 +898,7 @@ function C_Form( props ) {
                                     rowKey={'fkidlistaprecio'}
                                 />
                             </Col>
-                            <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                            {/* <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                                 <div className="main-card mt-2 card pl-2 pr-2 pb-2 pt-1">
                                     <div className="card-header card-header-title font-size-lg text-capitalize">
                                         Listado Sucursal de Álmacenes
@@ -919,15 +919,15 @@ function C_Form( props ) {
                                         } ) }
                                     </div>
                                 </div>
-                            </Col>
-                            {/* <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                            </Col> */}
+                            <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                                 <C_Image
                                     data={ producto.imagen }
                                     onChange={onChangeImage}
                                     id="img-producto"
                                     disabled={disabled.data}
                                 />
-                            </Col> */}
+                            </Col>
                         </Row>
                     </Col>
                 </Row>

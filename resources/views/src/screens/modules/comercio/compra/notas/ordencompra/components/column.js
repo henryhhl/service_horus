@@ -187,6 +187,19 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         {
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
+            width: 40,
+            dataIndex: 'stockactual',
+            key: 'stockactual',
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    <label> 
+                        { data.stockactual }
+                    </label>
+                </span>
+            ),
+        },
+        {
             title: <span style={{ fontSize: 11, }}> { 'Solicitada' } </span>,
             width: 40,
             dataIndex: 'cantidadsolicitada',
@@ -200,8 +213,8 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         { 
-            title: <span style={{ fontSize: 11, }}> { 'Cant.' } </span>, 
-            dataIndex: 'cantidad', key: 'cantidad', width: 50,
+            title: <span style={{ fontSize: 11, }}> { 'Cantidad' } </span>, 
+            dataIndex: 'cantidad', key: 'cantidad', width: 40,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.cantidad.toString().length == 0 ) ?
@@ -273,7 +286,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         {
             title: <span style={{ fontSize: 11, }}> { 'Costo Base' } </span>,
-            width: 50,
+            width: 45,
             dataIndex: 'costobase',
             key: 'costobase',
             render: ( text, data, index ) => (
@@ -286,7 +299,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Unit.' } </span>, 
-            dataIndex: 'costounitario', key: 'costounitario', width: 60,
+            dataIndex: 'costounitario', key: 'costounitario', width: 50,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costounitario.toString().length == 0 ) ?
@@ -356,7 +369,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
         },
         { 
             title: <span style={{ fontSize: 11, }}> { 'Costo Total' } </span>, 
-            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 70,
+            dataIndex: 'costosubtotal', key: 'costosubtotal', width: 60,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.costosubtotal.toString().length == 0 ) ?
@@ -369,8 +382,22 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             ),
         },
         { 
+            title: <span style={{ fontSize: 11, }}> { 'Sucursal' } </span>, 
+            dataIndex: 'sucursal', key: 'sucursal', width: 70,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.sucursal == null ) ?
+                        "" : 
+                        <label> 
+                            {data.sucursal}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
             title: <span style={{ fontSize: 11, }}> { 'Álmacen' } </span>, 
-            dataIndex: 'almacen', key: 'almacen', width: 60,
+            dataIndex: 'almacen', key: 'almacen', width: 70,
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     { ( data.almacen == null ) ?
@@ -391,6 +418,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                         "" : 
                         <label> 
                             {data.seccioninventario}
+                        </label>
+                    }
+                </span>
+            ),
+        },
+        { 
+            title: <span style={{ fontSize: 11, }}> { 'Proveedor' } </span>, 
+            dataIndex: 'proveedor', key: 'proveedor', width: 80,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.proveedor == null ) ?
+                        "" : 
+                        <label> 
+                            {data.proveedor}
                         </label>
                     }
                 </span>

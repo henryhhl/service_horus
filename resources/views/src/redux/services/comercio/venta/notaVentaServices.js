@@ -66,7 +66,7 @@ const onGrabar = async ( notaventa ) => {
         fkidconceptoventa: notaventa.fkidconceptoventa,
         fkidmoneda: notaventa.fkidmoneda,
         fkidusers: notaventa.fkidusers,
-        fkidtipotransaccion: notaventa.fkidtipotransaccion,
+        fkidtipotransaccion: 8,
         fkidtipopago: notaventa.fkidtipopago,
 
         nrodebito: notaventa.nrodebito,
@@ -154,7 +154,7 @@ const onUpdate = async ( notaventa ) => {
         fkidconceptoventa: notaventa.fkidconceptoventa,
         fkidmoneda: notaventa.fkidmoneda,
         fkidusers: notaventa.fkidusers,
-        fkidtipotransaccion: notaventa.fkidtipotransaccion,
+        fkidtipotransaccion: 8,
         fkidtipopago: notaventa.fkidtipopago,
 
         nrodebito: notaventa.nrodebito,

@@ -20,7 +20,7 @@ class NotaVentaDetalle extends Model
     protected $attributes = [
         'cantidad' => 0, 'cantidadsolicitada' => 0, 'preciobase' => 0, 'preciounitario' => 0, 'preciosubtotal' => 0,
         'descuento' => 0, 'montodescuento' => 0, 'nota' => null, 'nrolote' => 0, 'nrofabrica' => 0, 'fechavencimiento' => null,
-        'estadoproceso' => 'F', 'tipoentrega' => null, 'isdevolucionventa' => 'N',
+        'estadoproceso' => 'F', 'tipoentrega' => null, 'isdevolucionventa' => 'N', 'stockactualanterior' => 0,
         'estado' => 'A', 'isdelete' => 'A', 'x_idusuario' => null,
     ];
 
@@ -28,7 +28,7 @@ class NotaVentaDetalle extends Model
         'fkidnotaventa', 'fkidalmacenproductodetalle', 'fkidalmacen', 'fkidvendedor',
         'fkidproducto', 'fkidproductotipo', 'fkidproductomarca',
         'fkidlistaprecio', 'fkidlistapreciodetalle', 'fkidcliente', 'fkidsucursal',
-        'cantidad', 'cantidadsolicitada', 'preciobase', 'preciounitario', 'preciosubtotal',
+        'stockactualanterior', 'cantidad', 'cantidadsolicitada', 'preciobase', 'preciounitario', 'preciosubtotal',
         'descuento', 'montodescuento', 'nota', 'estadoproceso', 'tipoentrega', 'isdevolucionventa',
         'nrolote', 'nrofabrica', 'fechavencimiento',
         'x_idusuario', 'isdelete', 'estado', 'fecha', 'hora',
@@ -41,7 +41,7 @@ class NotaVentaDetalle extends Model
                 'notaventadetalle.fkidalmacen', 'notaventadetalle.fkidvendedor', 'notaventadetalle.fkidcliente', 'notaventadetalle.fkidsucursal',
                 'notaventadetalle.fkidproducto', 'notaventadetalle.fkidproductotipo', 'notaventadetalle.fkidproductomarca', 
                 'notaventadetalle.fkidlistaprecio', 'notaventadetalle.fkidlistapreciodetalle',
-                'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 
+                'notaventadetalle.cantidad', 'notaventadetalle.cantidadsolicitada', 'notaventadetalle.stockactualanterior',
                 'notaventadetalle.preciobase', 'notaventadetalle.preciounitario', 'notaventadetalle.preciosubtotal',
                 'notaventadetalle.descuento', 'notaventadetalle.montodescuento', 'notaventadetalle.nota', 
                 'notaventadetalle.estadoproceso', 'notaventadetalle.tipoentrega', 'notaventadetalle.isdevolucionventa',
@@ -71,6 +71,7 @@ class NotaVentaDetalle extends Model
         $fkidcliente = $detalle->fkidcliente;
         $fkidsucursal = $detalle->fkidsucursal;
 
+        $stockactualanterior = $detalle->stockactualanterior;
         $cantidad = $detalle->cantidad;
         $cantidadsolicitada = $detalle->cantidadsolicitada;
 
@@ -108,6 +109,7 @@ class NotaVentaDetalle extends Model
             'fkidcliente' => $fkidcliente,
             'fkidsucursal' => $fkidsucursal,
 
+            'stockactualanterior' => $stockactualanterior,
             'cantidad' => $cantidad,
             'cantidadsolicitada' => $cantidadsolicitada,
 
@@ -150,6 +152,7 @@ class NotaVentaDetalle extends Model
         $fkidcliente = $detalle->fkidcliente;
         $fkidsucursal = $detalle->fkidsucursal;
 
+        $stockactualanterior = $detalle->stockactualanterior;
         $cantidad = $detalle->cantidad;
         $cantidadsolicitada = $detalle->cantidadsolicitada;
 
@@ -185,6 +188,7 @@ class NotaVentaDetalle extends Model
                 'fkidcliente' => $fkidcliente,
                 'fkidsucursal' => $fkidsucursal,
 
+                'stockactualanterior' => $stockactualanterior,
                 'cantidad' => $cantidad,
                 'cantidadsolicitada' => $cantidadsolicitada,
 

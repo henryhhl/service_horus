@@ -133,6 +133,44 @@ class NotaVentaController extends Controller
 
             DB::beginTransaction();
 
+            $arraynotaventadetalle = json_decode( $request->input( 'arraynotaventadetalle', '[]' ) );
+            foreach ( $arraynotaventadetalle as $detalle ) {
+                if ( !is_null( $detalle->fkidproducto ) ) {
+                    if ( intval( $detalle->cantidad ) <= 0 ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'La cantidad del producto ' . $detalle->producto . ' debe ser mayor a 0.',
+                        ] );
+                    }
+                    if ( intval( $detalle->preciounitario ) <= 0 ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'El precio unitario del producto ' . $detalle->producto . ' debe ser mayor a 0.',
+                        ] );
+                    }
+                    if ( intval( $detalle->cantidad ) > intval( $detalle->stockactualanterior ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'La cantidad del producto ' . $detalle->producto . ' debe ser mayor al STOCK.',
+                        ] );
+                    }
+                    $almproddet = new AlmacenProductoDetalle();
+                    $firstalmprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                    if ( is_null( $firstalmprod ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'El producto ' . $detalle->producto . ' no existe en el álmacen.',
+                        ] );
+                    }
+                    if ( intval( $detalle->cantidad ) > intval( $firstalmprod->stockactual ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'Stock actualizado de ' . $firstalmprod->stockactual . ', la cantidad del producto ' . $detalle->producto . ' debe ser mayor al STOCK.',
+                        ] );
+                    }
+                }
+            }
+
             $ntavta = new NotaVenta();
             $notaventa = $ntavta->store( $ntavta, $request );
 
@@ -354,6 +392,44 @@ class NotaVentaController extends Controller
                     'errors'    => $validator->errors(),
                     'message'   => "Conflictos al solicitar el servicio.",
                 ] );
+            }
+
+            $arraynotaventadetalle = json_decode( $request->input( 'arraynotaventadetalle', '[]' ) );
+            foreach ( $arraynotaventadetalle as $detalle ) {
+                if ( !is_null( $detalle->fkidproducto ) ) {
+                    if ( intval( $detalle->cantidad ) <= 0 ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'La cantidad del producto ' . $detalle->producto . ' debe ser mayor a 0.',
+                        ] );
+                    }
+                    if ( intval( $detalle->preciounitario ) <= 0 ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'El precio unitario del producto ' . $detalle->producto . ' debe ser mayor a 0.',
+                        ] );
+                    }
+                    if ( intval( $detalle->cantidad ) > intval( $detalle->stockactualanterior ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'La cantidad del producto ' . $detalle->producto . ' debe ser mayor al STOCK.',
+                        ] );
+                    }
+                    $almproddet = new AlmacenProductoDetalle();
+                    $firstalmprod = $almproddet->firstAlmacenProducto($almproddet, $detalle->fkidalmacen, $detalle->fkidproducto );
+                    if ( is_null( $firstalmprod ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'El producto ' . $detalle->producto . ' no existe en el álmacen.',
+                        ] );
+                    }
+                    if ( intval( $detalle->cantidad ) > intval( $firstalmprod->stockactual ) ) {
+                        return response( )->json( [
+                            'response' => -1,
+                            'message'  => 'Stock actualizado de ' . $firstalmprod->stockactual . ', la cantidad del producto ' . $detalle->producto . ' debe ser mayor al STOCK.',
+                        ] );
+                    }
+                }
             }
 
             $ntavta = new NotaVenta();

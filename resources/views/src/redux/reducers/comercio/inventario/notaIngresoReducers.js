@@ -87,7 +87,6 @@ export const NotaIngresoReducer = ( state = initialState, action = { payload, ty
             state.idnotaingreso = action.payload.idnotaingreso;
             state.fechanotaingreso   = dateToString( new Date() );
             state.nromanual    = "0";
-            state.esingresado  = "N";
             state.esnotaingreso  = "N";
             state.actualizarcostos  = "N";
             state.tipocambio  = "6.95";
@@ -115,6 +114,8 @@ export const NotaIngresoReducer = ( state = initialState, action = { payload, ty
 
             state.arrayNotaIngresoDetalle = loadDetailEntryNote( state );
 
+            state.estado = "A";
+            state.esingresado = "A";
             state.loading = false;
             state = Object.assign( {}, state );
             return state;

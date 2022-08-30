@@ -96,23 +96,22 @@ function C_ListadoAlmacen( props ) {
 
     return (
         <div className="form-group mt-2">
-            <Row gutter={ [12, 6] }>
-                <Col sm={{ span: 4, }}></Col>
-                <Col xs={{ span: 24, }} sm={{ span: 16, }}>
-                    <C_Input
-                        titleText={"Buscar Criterio de búsqueda"}
-                        placeholder={"Buscar..."}
-                        value={search}
-                        onChange={onchangeSearch}
-                        onPressEnter={ () => get_data( search ) }
-                        autoFocus={true}
-                        suffix={ <i className="fa fa-search" /> }
-                    />
-                </Col>
-            </Row>
             <div className="main-card mt-2 mb-2 card">
                 { onComponentCreate() }
                 <div className="card-body">
+                    <Row gutter={ [12, 6] } className="mb-2">
+                        <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                            <C_Input
+                                titleText={"Buscar Criterio de búsqueda"}
+                                placeholder={"Buscar..."}
+                                value={search}
+                                onChange={onchangeSearch}
+                                onPressEnter={ () => get_data( search ) }
+                                autoFocus={true}
+                                suffix={ <i className="fa fa-search" /> }
+                            />
+                        </Col>
+                    </Row>
                     <div className="table-responsive"
                         style={{ position: 'relative', overflowX: 'hidden', overflowY: 'auto', maxHeight: 300, width: '100%', }}
                     >

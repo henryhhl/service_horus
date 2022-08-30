@@ -49,6 +49,10 @@ const esObject = ( data ) => {
     return ( typeof data == "object" );
 };
 
+export const esNumeric = ( data ) => {
+    return ( typeof data == "number" );
+}
+
 const esArray = ( data ) => {
     return ( Array.isArray( data ) );
 };
@@ -174,6 +178,7 @@ export const Functions = {
     esBoolean,
     esString,
     esObject,
+    esNumeric,
     esDecimal,
     existeData,
     convertDMYToYMD,

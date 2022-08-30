@@ -257,10 +257,40 @@ const onImprimir = ( ) => {
     };
 };
 
+function validateDetails(notasalida) {
+    let contador = 0;
+    for (let index = 0; index < notasalida.arrayNotaSalidaDetalle.length; index++) {
+        const element = notasalida.arrayNotaSalidaDetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.costounitario) <= 0 ) {
+                element.errorcosto = true;
+                C_Message( "warning", `El costo de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.cantidad) > parseInt(element.stockactualanterior) ) {
+                element.errorstockactual = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser menor al stock.`, 'topRight' );
+                return false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === notasalida.arrayNotaSalidaDetalle.length ) {
+        C_Message( "warning", `Campo Producto requerido.`, 'topRight' );
+        return false;
+    }
+    return true;
+}
+
 function onValidate( notasalida ) {
-    const { codigo, nrofactura, nrorefprov } = notasalida;
     let bandera = true;
-    if ( codigo?.toString().length > 150 ) {
+    if ( notasalida.codigo?.toString().length > 150 ) {
         notasalida.error.codigo   = true;
         notasalida.message.codigo = "Se permite máximo 150 caracteres";
         bandera = false;
@@ -285,30 +315,9 @@ function onValidate( notasalida ) {
         notasalida.message.fkidmoneda = "Campo requerido";
         bandera = false;
     }
-    let contador = 0;
-    for (let index = 0; index < notasalida.arrayNotaSalidaDetalle.length; index++) {
-        const element = notasalida.arrayNotaSalidaDetalle[index];
-        if ( element.fkidproducto != null ) {
-            if ( parseInt(element.cantidad) <= 0 ) {
-                element.errorcantidad = true;
-                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-            if ( parseInt(element.costounitario) <= 0 ) {
-                element.errorcosto = true;
-                C_Message( "warning", `El costo de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-        } else {
-            contador++;
-        }
-    }
-    if ( contador === notasalida.arrayNotaSalidaDetalle.length ) {
-        C_Message( "warning", `Campo Producto requerido` );
-        bandera = false;
-    }
+    bandera = validateDetails(notasalida);
     if ( !bandera ) {
-        C_Message( "error", "Problemas al registrar" );
+        C_Message( "error", `Error al procesar el servicio favor de verificar, Campos Requeridos.` );
     }
     return bandera;
 };

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import ModalDatoGeneral from './data/modal';
 import ModalInventarioNota from './notas/modal';
+import ModalInventarioInforme from './informes/modal';
 
 function IndexModuleInventario( props ) {
     const { arrayMenu, visible, onClose } = props;
@@ -31,7 +32,13 @@ function IndexModuleInventario( props ) {
                 );
 
             case "INFORMES":
-                return null;
+                return (
+                    <ModalInventarioInforme 
+                        visible={ visible }
+                        onClose={ onClose }
+                        arrayMenu={ array }
+                    />
+                );
         
             default:
                 return null;

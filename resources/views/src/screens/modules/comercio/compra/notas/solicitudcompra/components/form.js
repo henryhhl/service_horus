@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Col, Row, Table } from 'antd';
-import { C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 
 import M_ListadoSucursal from '../../../../venta/data/sucursal/modal/listado';
@@ -11,7 +11,6 @@ import M_ListadoAlmacen from '../../../../inventario/data/almacen/modal/listado'
 import M_ListadoConceptoCompra from '../../../data/conceptocompra/modal/listado';
 import M_ListadoSeccionInventario from '../../../../inventario/data/seccion/modal/listado';
 import M_ListadoProveedor from '../../../data/proveedor/modal/listado';
-import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 
 import { columns } from './column';
 import M_ListadoProducto from '../../../../inventario/data/producto/modal/listado';
@@ -101,20 +100,44 @@ function C_Form( props ) {
         if ( !disabled.data ) setVisibleSucursal(true);
     };
 
-    function onChangeFKIDSucursal( data ) {
-        solicitudCompra.fkidsucursal  = data.idsucursal;
-        solicitudCompra.sucursal      = data.descripcion;
+    function updateSucursalData(sucursal) {
+        solicitudCompra.fkidsucursal  = sucursal.idsucursal;
+        solicitudCompra.sucursal      = sucursal.descripcion;
+        solicitudCompra.fkidalmacen  = null;
+        solicitudCompra.almacen      = "";
         solicitudCompra.error.fkidsucursal   = false;
         solicitudCompra.message.fkidsucursal = "";
-
         for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
-            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
-            element.fkidsucursal = data.idsucursal;
-            element.sucursal = data.descripcion;
+            const element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidsucursal = sucursal.idsucursal;
+            element.sucursal = sucursal.descripcion;
+            element.fkidalmacen = null;
+            element.almacen = "";
+            element = initDetalle(element);
         }
-
         onChange( solicitudCompra );
         setVisibleSucursal(false);
+    }
+
+    function onChangeFKIDSucursal( sucursal ) {
+        if ( solicitudCompra.fkidsucursal == sucursal.idsucursal ) {
+            solicitudCompra.fkidsucursal  = sucursal.idsucursal;
+            solicitudCompra.sucursal      = sucursal.descripcion;
+            solicitudCompra.error.fkidsucursal   = false;
+            solicitudCompra.message.fkidsucursal = "";
+            onChange( solicitudCompra );
+            setVisibleSucursal(false);
+            return;
+        }
+        if ( solicitudCompra.fkidsucursal == null || solicitudCompra.fkidsucursal == "" ) {
+            updateSucursalData(sucursal);
+            return;
+        }
+        let onUpdate = () => updateSucursalData(sucursal);
+        C_Confirm( { 
+            title: "Cambiar Sucursal", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentSucursal() {
@@ -133,20 +156,46 @@ function C_Form( props ) {
         if ( ( !disabled.data ) && ( typeof solicitudCompra.fkidsucursal === "number" ) ) setVisibleAlmacen(true);
     };
 
-    function onChangeFKIDAlmacen( data ) {
-        solicitudCompra.fkidalmacen  = data.idalmacen;
-        solicitudCompra.almacen      = data.descripcion;
+    function updateAlmacenData(almacen) {
+        solicitudCompra.fkidalmacen  = almacen.idalmacen;
+        solicitudCompra.almacen      = almacen.descripcion;
         solicitudCompra.error.fkidalmacen   = false;
         solicitudCompra.message.fkidalmacen = "";
-
         for (let index = 0; index < solicitudCompra.arraySolicitudCompraDetalle.length; index++) {
-            let element = solicitudCompra.arraySolicitudCompraDetalle[index];
-            element.fkidalmacen = data.idalmacen;
-            element.almacen = data.descripcion;
-        }
+            const element = solicitudCompra.arraySolicitudCompraDetalle[index];
+            element.fkidalmacen = almacen.idalmacen;
+            element.almacen = almacen.descripcion;
 
+            element.fkidsucursal = solicitudCompra.fkidsucursal;
+            element.sucursal = solicitudCompra.sucursal;
+
+            element = initDetalle(element);
+
+        }
         onChange( solicitudCompra );
         setVisibleAlmacen(false);
+    }
+
+    function onChangeFKIDAlmacen( almacen ) {
+        if ( solicitudCompra.fkidalmacen == almacen.idalmacen ) {
+            solicitudCompra.fkidalmacen  = almacen.idalmacen;
+            solicitudCompra.almacen      = almacen.descripcion;
+            solicitudCompra.error.fkidalmacen   = false;
+            solicitudCompra.message.fkidalmacen = "";
+            onChange( solicitudCompra );
+            setVisibleAlmacen(false);
+            return;
+        }
+        if ( solicitudCompra.fkidalmacen == null || solicitudCompra.fkidalmacen == "" ) {
+            updateAlmacenData(almacen);
+            setVisibleAlmacen(false);
+            return;
+        }
+        let onUpdate = () => updateAlmacenData(almacen);
+        C_Confirm( { 
+            title: "Cambiar Álmacen", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentAlmacen() {
@@ -220,6 +269,14 @@ function C_Form( props ) {
     };
 
     function onVisibleProducto( detalle, index ) {
+        if ( solicitudCompra.fkidsucursal == null || solicitudCompra.fkidsucursal == "" ) {
+            C_Message( 'warning', 'Campo sucursal requerido.' );
+            return;
+        }
+        if ( solicitudCompra.fkidalmacen == null || solicitudCompra.fkidalmacen == "" ) {
+            C_Message( 'warning', 'Campo Álmacen requerido.' );
+            return;
+        }
         detalle.index = index;
         detalle.visible_producto = true;
         setRowDetalle(detalle);
@@ -233,34 +290,36 @@ function C_Form( props ) {
         return false;
     };
 
+    function initDetalle(detalle, data = null) {
+        detalle.fkidproducto = data ? data.idproducto : null;
+        detalle.codigo = data ? data.codigo : "";
+        detalle.producto = data ? data.nombre : "";
+        detalle.unidadmedida = data ? `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}` : "";
+
+        detalle.fkidciudadorigen = data ? data.fkidciudadorigen : null;
+        detalle.ciudadorigen = data ?data.ciudadorigen : "";
+
+        detalle.fkidproductomarca = data ? data.fkidproductomarca : null;
+        detalle.productomarca = data ? data.productomarca : "";
+
+        detalle.fkidproductotipo = data ? data.fkidproductotipo : null;
+        detalle.productotipo = data ? data.productotipo : "";
+
+        detalle.stockactual = (data) ? (data.stockalmacen != null) ? parseInt(data.stockalmacen) : "0" : "";
+        detalle.cantidadsolicitada = data ? 0 : "";
+        detalle.cantidadpendiente = data ? 0 : "";
+
+        detalle.costobase = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costounitario = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costosubtotal = data ? "0.00" : "";
+        detalle.errorcantidad = false;
+        detalle.errorcostounitario = false;
+    }
+
     function onFKIDProducto( producto ) {
         if ( !existProducto( producto.idproducto ) ) {
             let detalle = solicitudCompra.arraySolicitudCompraDetalle[row_detalle.index];
-
-            detalle.fkidproducto = producto.idproducto;
-            detalle.codigo = producto.codigo ? producto.codigo : "";
-            detalle.producto = producto.nombre;
-            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
-
-            detalle.fkidciudadorigen = producto.fkidciudadorigen;
-            detalle.ciudadorigen = producto.ciudadorigen;
-
-            detalle.fkidproductomarca = producto.fkidproductomarca;
-            detalle.productomarca = producto.productomarca;
-
-            detalle.fkidproductotipo = producto.fkidproductotipo;
-            detalle.productotipo = producto.productotipo;
-
-            detalle.stockactual = parseInt(producto.stockactual);
-            detalle.cantidadsolicitada = 0;
-            detalle.cantidadpendiente = 0;
-
-            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costosubtotal = "0.00";
-            detalle.errorcantidad = false;
-            detalle.errorcostounitario = false;
-
+            initDetalle(detalle, producto);
             onChange(solicitudCompra);
             setRowDetalle(null);
         } else {
@@ -275,8 +334,9 @@ function C_Form( props ) {
             <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
+                arrayFKIDProducto={solicitudCompra.arraySolicitudCompraDetalle}
                 onChange={onFKIDProducto}
+                fkidalmacen={row_detalle.fkidalmacen}
             />
         );
     };
@@ -422,7 +482,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( solicitudCompra, disabled, onChange, onVisibleProducto ) } 
                     dataSource={solicitudCompra.arraySolicitudCompraDetalle}
-                    scroll={{ x: 2300, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2600, y: solicitudCompra.arraySolicitudCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

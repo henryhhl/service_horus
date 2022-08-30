@@ -17,13 +17,13 @@ class InicioController extends Controller
             $arrayTipoTransaccion = $tpotrans->get_data( $tpotrans, $request );
 
             $prod = new Producto();
-            $arrayProducto = $prod->get_data( $prod, $request );
+            $arrayProducto = $prod->getTransacciones( $prod );
 
             $clte = new Cliente();
-            $arrayCliente = $clte->get_data( $clte, $request );
+            $arrayCliente = $clte->getTransacciones( $clte );
 
             $prov = new Proveedor();
-            $arrayProveedor = $prov->get_data( $prov, $request );
+            $arrayProveedor = $prov->getTransacciones( $prov );
 
             return response()->json( [
                 'response' => 1,

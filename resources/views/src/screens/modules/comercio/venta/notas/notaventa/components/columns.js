@@ -16,6 +16,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             fkidalmacenproductodetalle: null,
             producto: "",
 
+            stockactualanterior: "",
             cantidadsolicitada: "",
             cantidad: "",
             unidadmedida: "",
@@ -51,6 +52,9 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
 
             fkidvendedor: null,
             vendedor: "",
+
+            fkidcliente: null,
+            cliente: "",
             nota: "",
 
             isdevolucionventa: "N",
@@ -125,7 +129,6 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     {
-                        ( typeof data.fkidalmacen == "number" ) && ( typeof data.fkidlistaprecio == "number" ) &&
                         <>
                             {
                                 disabled.data ?
@@ -162,7 +165,6 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     {
-                        ( typeof data.fkidalmacen == "number" ) && ( typeof data.fkidlistaprecio == "number" ) &&
                         <>
                             {
                                 disabled.data ?
@@ -186,6 +188,20 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
                                 </>
                             }
                         </>
+                    }
+                </span>
+            ),
+        },
+        {
+            title: <span style={{ fontSize: 11, }}> { 'Stock' } </span>,
+            dataIndex: 'stockactualanterior', key: 'stockactualanterior', width: 40,
+            render: ( text, data, index ) => (
+                <span style={{ fontSize: 10, display: 'flex', }}>
+                    { ( data.stockactualanterior == null ) ?
+                        "" :
+                        <label style={{ cursor: 'pointer', }}>
+                            {data.stockactualanterior}
+                        </label>
                     }
                 </span>
             ),
@@ -519,8 +535,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     {
-                        ( typeof data.fkidlistaprecio == "number" ) &&
-                            disabled.data ? 
+                        (( data.fkidlistaprecio != null ) && ( data.fkidproducto != null ) && ( disabled.data )) ? 
                             <label style={{ cursor: 'pointer', }} >
                                 <span> {data.listaprecio} </span>
                             </label> : 
@@ -540,8 +555,7 @@ export const columns = ( detalle, disabled = { data: false, }, onChangeDetalle =
             render: ( text, data, index ) => (
                 <span style={{ fontSize: 10, display: 'flex', }}>
                     {
-                        ( typeof data.fkidalmacen == "number" ) &&
-                        disabled.data ? 
+                        (( data.fkidalmacen != null ) && ( data.fkidproducto != null ) && ( disabled.data )) ? 
                         <label style={{ cursor: 'pointer', }} >
                             <span> {data.almacen} </span>
                         </label> : 

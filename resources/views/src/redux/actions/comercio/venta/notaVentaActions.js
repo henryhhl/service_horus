@@ -257,6 +257,37 @@ const onImprimir = ( ) => {
     };
 };
 
+function validateDetails(notaventa) {
+    let contador = 0;
+    for (let index = 0; index < notaventa.notaventadetalle.length; index++) {
+        const element = notaventa.notaventadetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.preciounitario) <= 0 ) {
+                element.errorpreciounitario = true;
+                C_Message( "warning", `El precio de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.cantidad) > parseInt(element.stockactualanterior) ) {
+                element.errorstockactual = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser menor al stock.`, 'topRight' );
+                return false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === notaventa.notaventadetalle.length ) {
+        C_Message( "warning", `Campo Producto requerido.`, 'topRight' );
+        return false;
+    }
+    return true;
+}
+
 function onValidate( notaventa ) {
     let bandera = true;
     if ( notaventa.codigo?.toString().length > 150 ) {
@@ -383,31 +414,10 @@ function onValidate( notaventa ) {
         bandera = false;
     }
 
-    let contador = 0;
-    for (let index = 0; index < notaventa.notaventadetalle.length; index++) {
-        const element = notaventa.notaventadetalle[index];
-        if ( element.fkidproducto != null ) {
-            if ( parseInt(element.cantidad) <= 0 ) {
-                element.errorcantidad = true;
-                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-            if ( parseInt(element.preciounitario) <= 0 ) {
-                element.errorpreciounitario = true;
-                C_Message( "warning", `El precio de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-        } else {
-            contador++;
-        }
-    }
-    if ( contador === notaventa.notaventadetalle.length ) {
-        C_Message( "warning", `Requerido ingresar al menos un producto.` );
-        bandera = false;
-    }
+    bandera = validateDetails(notaventa);
 
     if ( !bandera ) {
-        C_Message( "error", "Conflictos. Favor de llenar datos requeridos." );
+        C_Message( "error", "Error al procesar el servicio favor de verificar, Campos Requeridos." );
     }
     return bandera;
 };

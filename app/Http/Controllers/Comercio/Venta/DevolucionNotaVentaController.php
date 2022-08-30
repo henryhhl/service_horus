@@ -9,6 +9,7 @@ use App\Models\Comercio\Inventario\Almacen;
 use App\Models\Comercio\Inventario\AlmacenProductoDetalle;
 use App\Models\Comercio\Inventario\Producto;
 use App\Models\Comercio\Venta\Cliente;
+use App\Models\Comercio\Venta\ConceptoVenta;
 use App\Models\Comercio\Venta\DevolucionNotaVenta;
 use App\Models\Comercio\Venta\DevolucionNotaVentaDetalle;
 use App\Models\Comercio\Venta\TipoTransaccion;
@@ -82,9 +83,13 @@ class DevolucionNotaVentaController extends Controller
             $devntavta = new DevolucionNotaVenta();
             $iddevolucionnotaventa = $devntavta->newID();
 
+            $conctovta = new ConceptoVenta();
+            $arrayConceptoVenta = $conctovta->get_data( $conctovta, $request );
+
             return response()->json( [
                 'response' => 1,
                 'iddevolucionnotaventa'  => $iddevolucionnotaventa,
+                'arrayConceptoVenta'  => $arrayConceptoVenta,
             ] );
 
         } catch ( \Exception $th ) {

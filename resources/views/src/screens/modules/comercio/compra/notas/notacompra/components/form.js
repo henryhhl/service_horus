@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { Col, Row, Table } from 'antd';
-import { C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 const { convertDMYToYMD } = Functions;
 
@@ -250,13 +250,44 @@ function C_Form( props ) {
         if ( !disabled.data ) setVisibleSucursal(true);
     };
 
-    function onChangeFKIDSucursal( data ) {
-        notaCompra.fkidsucursal  = data.idsucursal;
-        notaCompra.sucursal      = data.descripcion;
+    function updateSucursalData(sucursal) {
+        notaCompra.fkidsucursal  = sucursal.idsucursal;
+        notaCompra.sucursal      = sucursal.descripcion;
+        notaCompra.fkidalmacen  = null;
+        notaCompra.almacen      = "";
         notaCompra.error.fkidsucursal   = false;
         notaCompra.message.fkidsucursal = "";
+        for (let index = 0; index < notaCompra.arrayNotaCompraDetalle.length; index++) {
+            const element = notaCompra.arrayNotaCompraDetalle[index];
+            element.fkidsucursal = sucursal.idsucursal;
+            element.sucursal = sucursal.descripcion;
+            element.fkidalmacen = null;
+            element.almacen = "";
+            element = initDetalle(element);
+        }
         onChange( notaCompra );
         setVisibleSucursal(false);
+    }
+
+    function onChangeFKIDSucursal( sucursal ) {
+        if ( notaCompra.fkidsucursal == sucursal.idsucursal ) {
+            notaCompra.fkidsucursal  = sucursal.idsucursal;
+            notaCompra.sucursal      = sucursal.descripcion;
+            notaCompra.error.fkidsucursal   = false;
+            notaCompra.message.fkidsucursal = "";
+            onChange( notaCompra );
+            setVisibleSucursal(false);
+            return;
+        }
+        if ( notaCompra.fkidsucursal == null || notaCompra.fkidsucursal == "" ) {
+            updateSucursalData(sucursal);
+            return;
+        }
+        let onUpdate = () => updateSucursalData(sucursal);
+        C_Confirm( { 
+            title: "Cambiar Sucursal", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentSucursal() {
@@ -275,13 +306,46 @@ function C_Form( props ) {
         if ( ( !disabled.data ) && ( typeof notaCompra.fkidsucursal === "number" ) ) setVisibleAlmacen(true);
     };
 
-    function onChangeFKIDAlmacen( data ) {
-        notaCompra.fkidalmacen  = data.idalmacen;
-        notaCompra.almacen      = data.descripcion;
+    function updateAlmacenData(almacen) {
+        notaCompra.fkidalmacen  = almacen.idalmacen;
+        notaCompra.almacen      = almacen.descripcion;
         notaCompra.error.fkidalmacen   = false;
         notaCompra.message.fkidalmacen = "";
+        for (let index = 0; index < notaCompra.arrayNotaCompraDetalle.length; index++) {
+            const element = notaCompra.arrayNotaCompraDetalle[index];
+            element.fkidalmacen = almacen.idalmacen;
+            element.almacen = almacen.descripcion;
+
+            element.fkidsucursal = notaCompra.fkidsucursal;
+            element.sucursal = notaCompra.sucursal;
+
+            element = initDetalle(element);
+
+        }
         onChange( notaCompra );
         setVisibleAlmacen(false);
+    }
+
+    function onChangeFKIDAlmacen( almacen ) {
+        if ( notaCompra.fkidalmacen == almacen.idalmacen ) {
+            notaCompra.fkidalmacen  = almacen.idalmacen;
+            notaCompra.almacen      = almacen.descripcion;
+            notaCompra.error.fkidalmacen   = false;
+            notaCompra.message.fkidalmacen = "";
+            onChange( notaCompra );
+            setVisibleAlmacen(false);
+            return;
+        }
+        if ( notaCompra.fkidalmacen == null || notaCompra.fkidalmacen == "" ) {
+            updateAlmacenData(almacen);
+            setVisibleAlmacen(false);
+            return;
+        }
+        let onUpdate = () => updateAlmacenData(almacen);
+        C_Confirm( { 
+            title: "Cambiar Álmacen", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentAlmacen() {
@@ -359,6 +423,14 @@ function C_Form( props ) {
     };
 
     function onVisibleProducto( detalle, index ) {
+        if ( notaCompra.fkidsucursal == null || notaCompra.fkidsucursal == "" ) {
+            C_Message( 'warning', 'Campo sucursal requerido.' );
+            return;
+        }
+        if ( notaCompra.fkidalmacen == null || notaCompra.fkidalmacen == "" ) {
+            C_Message( 'warning', 'Campo Álmacen requerido.' );
+            return;
+        }
         detalle.index = index;
         detalle.visible_producto = true;
         detalle.visible_unidadmedida = false;
@@ -373,58 +445,61 @@ function C_Form( props ) {
         return false;
     };
 
+    function initDetalle(detalle, data = null) {
+        detalle.fkidproducto = data ? data.idproducto : null;
+        detalle.codigo = data ? data.codigo : "";
+        detalle.producto = data ? data.nombre : "";
+        detalle.unidadmedida = data ? `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}` : "";
+
+        detalle.fkidciudadorigen = data ? data.fkidciudadorigen : null;
+        detalle.ciudadorigen = data ? data.ciudadorigen : "";
+
+        detalle.fkidproductomarca = data ? data.fkidproductomarca : null;
+        detalle.productomarca = data ? data.productomarca : "";
+
+        detalle.fkidproductotipo = data ? data.fkidproductotipo : null;
+        detalle.productotipo = data ? data.productotipo : "";
+
+        detalle.stockactual = data ? parseInt(data.stockactual) : "";
+        detalle.cantidadsolicitada = data ? 0 : "";
+        detalle.cantidadrecibida = data ? 0 : "";
+        detalle.cantidadfaltante = data ? 0 : "";
+        detalle.cantidadsobrante = data ? 0 : "";
+        detalle.cantidad = data ? 0 : "";
+        detalle.stockactualanterior = (data && data?.stockalmacen != null) ? data.stockalmacen : 0;
+
+        detalle.costobase = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costounitario = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costosubtotal = data ? "0.00" : "";
+
+        detalle.peso = data ? parseFloat(data.peso).toFixed(2) : "";
+        detalle.pesosubtotal = data ? "0.00" : "";
+
+        detalle.volumen = data ? parseFloat(data.volumen).toFixed(2) : "";
+        detalle.volumensubtotal = data ? "0.00" : "";
+
+        detalle.nrolote = data ? "0.00" : "";
+        detalle.nrofabrica = data ? "0.00" : "";
+        detalle.nrocajas = data ? "0" : "";
+
+        detalle.isdevolucioncompra = "N";
+        detalle.isordencompra = "N";
+        detalle.issolicitudcompra = "N";
+
+        detalle.fkidnotacompra = null;
+        detalle.fkidordencompra = null;
+        detalle.fkidordencompradetalle = null;
+        detalle.fkidsolicitudcompradetalle = null;
+        detalle.fkidsolicitudcompra = null;
+
+        detalle.idnotacompradetalle = null;
+        detalle.fkidalmacenproductodetalle = null;
+    }
+
     function onFKIDProducto( producto ) {
         if ( !existProducto( producto.idproducto ) ) {
             let detalle = notaCompra.arrayNotaCompraDetalle[row_detalle.index];
-
-            detalle.fkidproducto = producto.idproducto;
-            detalle.codigo = producto.codigo ? producto.codigo : "";
-            detalle.producto = producto.nombre;
-            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
-
-            detalle.fkidciudadorigen = producto.fkidciudadorigen;
-            detalle.ciudadorigen = producto.ciudadorigen;
-
-            detalle.fkidproductomarca = producto.fkidproductomarca;
-            detalle.productomarca = producto.productomarca;
-
-            detalle.fkidproductotipo = producto.fkidproductotipo;
-            detalle.productotipo = producto.productotipo;
-
-            detalle.stockactual = parseInt(producto.stockactual);
-            detalle.cantidadsolicitada = 0;
-            detalle.cantidadrecibida = 0;
-            detalle.cantidadfaltante = 0;
-            detalle.cantidadsobrante = 0;
-            detalle.cantidad = 0;
-
-            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costosubtotal = "0.00";
-
-            detalle.peso = parseFloat(producto.peso).toFixed(2);
-            detalle.pesosubtotal = "0.00";
-
-            detalle.volumen = parseFloat(producto.volumen).toFixed(2);
-            detalle.volumensubtotal = "0.00";
-
-            detalle.nrolote = "0.00";
-            detalle.nrofabrica = "0.00";
-            detalle.nrocajas = "0";
-
-            detalle.isdevolucioncompra = "N";
-            detalle.isordencompra = "N";
-            detalle.issolicitudcompra = "N";
-
-            detalle.fkidnotacompra = null;
-            detalle.fkidordencompra = null;
-            detalle.fkidordencompradetalle = null;
-            detalle.fkidsolicitudcompradetalle = null;
-            detalle.fkidsolicitudcompra = null;
-
-            detalle.idnotacompradetalle = null;
-            detalle.fkidalmacenproductodetalle = null;
-
+            initDetalle(detalle, producto);
             onChange(notaCompra);
             setRowDetalle(null);
         } else {
@@ -439,35 +514,11 @@ function C_Form( props ) {
             <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
+                arrayFKIDProducto={notaCompra.arrayNotaCompraDetalle}
                 onChange={ onFKIDProducto }
+                fkidalmacen={row_detalle.fkidalmacen}
             />
         );
-    };
-
-    function updateTotales() {
-        let cantidadtotal = 0;
-        let montototal = 0;
-        notaCompra.arrayNotaCompraDetalle.map( (item) => {
-            if ( item.fkidproducto !== null ) {
-                cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costosubtotal);
-            }
-        } );
-        notaCompra.cantidadtotal = parseInt(cantidadtotal);
-        notaCompra.montosubtotal = parseFloat(montototal).toFixed(2);
-        let fletes = parseFloat(notaCompra.fletes);
-        let internacion = parseFloat(notaCompra.internacion);
-        let otrosgastos = parseFloat(notaCompra.otrosgastos);
-        let montosubtotal = parseFloat(notaCompra.montosubtotal);
-        let montodescuento = parseFloat(notaCompra.montodescuento);
-        let impuesto = parseFloat(notaCompra.impuesto);
-
-        let nrofactura = notaCompra.nrofactura;
-        let impuestototal = nrofactura > 0 ? parseFloat( (montosubtotal - montodescuento) * ( impuesto / 100 ) ) : 0;
-        notaCompra.impuestototal = impuestototal.toFixed(2);
-
-        notaCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos - montodescuento - impuestototal).toFixed(2);
     };
 
     function onShowOrdenCompra() {
@@ -553,6 +604,7 @@ function C_Form( props ) {
                 fkidseccioninventario: detalle.fkidseccioninventario,
                 seccioninventario: detalle.seccioninventario,
 
+                stockactualanterior: detalle.stockactual,
                 cantidad: parseInt(detalle.cantidad),
                 cantidadsolicitada: parseInt(detalle.cantidad),
                 cantidadrecibida: "0",
@@ -833,7 +885,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( notaCompra, disabled, onChange, onVisibleProducto  ) }
                     dataSource={notaCompra.arrayNotaCompraDetalle}
-                    scroll={{ x: 2600, y: notaCompra.arrayNotaCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 3000, y: notaCompra.arrayNotaCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>

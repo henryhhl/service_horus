@@ -39,8 +39,19 @@ function IndexAlmacen( props ) {
     }
 
     function onGrabarData() {
-        if( almacen.update )  props.onUpdate( almacen );
-        else props.onGrabar( almacen )
+        if( almacen.update ) {
+            let onUpdate = () => props.onUpdate( almacen );
+            C_Confirm( {
+                title: "Actualizar Almacén", onOk: onUpdate,
+                okType: "primary", content: "Estás seguro de actualizar información?",
+            } );
+        } else {
+            let onGrabar = () => props.onGrabar( almacen );
+            C_Confirm( {
+                title: "Registrar Almacén", onOk: onGrabar,
+                okType: "primary", content: "Estás seguro de registrar información?",
+            } );
+        }
     };
 
     function onConfirmarDelete() {

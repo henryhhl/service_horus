@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Col, Row, Table } from 'antd';
-import { C_Checkbox, C_Date, C_Input } from '../../../../../../../components';
-import { Functions } from '../../../../../../../utils/functions';
+import { C_Checkbox, C_Confirm, C_Date, C_Input, C_Message } from '../../../../../../../components';
+import { esNumeric, Functions } from '../../../../../../../utils/functions';
 import { columns } from './column';
 
 import M_ListadoSucursal from '../../../../venta/data/sucursal/modal/listado';
@@ -65,17 +65,100 @@ function C_Form( props ) {
         onChange( notaIngreso );
     };
 
+    function initDetail(element) {
+        element.codigo = "";
+        element.producto = "";
+        element.fkidproducto = null;
+        element.unidadmedida = "";
+
+        element.fkidciudadorigen = null;
+        element.ciudadorigen = "";
+
+        element.fkidproductomarca = null;
+        element.productomarca = "";
+
+        element.fkidproductotipo = null;
+        element.productotipo = "";
+
+
+        element.stockactualanterior = "";
+        element.cantidad = "";
+        element.nrocajas = "";
+
+        element.descuento = "";
+        element.montodescuento = "";
+
+        element.costobase = "";
+        element.costounitario = "";
+        element.costosubtotal = "";
+        element.costopromedio = "";
+
+        element.peso = "";
+        element.pesosubtotal = "";
+
+        element.volumen = "";
+        element.volumensubtotal = "";
+
+        element.fechavencimiento = null;
+        element.fvencimiento = null;
+        element.nota = null;
+
+        element.nrolote = "";
+        element.nrofabrica = "";
+
+        element.fkidnotaingreso = null;
+        element.idnotaingresodetalle = null;
+        element.fkidalmacenproductodetalle = null;
+
+        element.visible_producto = false;
+        element.visible_sucursal = false;
+        element.visible_almacen = false;
+        element.errorcantidad = false;
+        element.errorcostounitario = false;
+    }
+
     function onShowSucursal() {
         if ( !disabled.data ) setVisibleSucursal(true);
     };
 
-    function onChangeFKIDSucursal( data ) {
-        notaIngreso.fkidsucursal  = data.idsucursal;
-        notaIngreso.sucursal      = data.descripcion;
+    function updateSucursalData(sucursal) {
+        notaIngreso.fkidsucursal  = sucursal.idsucursal;
+        notaIngreso.sucursal      = sucursal.descripcion;
+        notaIngreso.fkidalmacen  = null;
+        notaIngreso.almacen      = "";
         notaIngreso.error.fkidsucursal   = false;
         notaIngreso.message.fkidsucursal = "";
+        for (let index = 0; index < notaIngreso.arrayNotaIngresoDetalle.length; index++) {
+            const element = notaIngreso.arrayNotaIngresoDetalle[index];
+            element.fkidsucursal = sucursal.idsucursal;
+            element.sucursal = sucursal.descripcion;
+            element.fkidalmacen = null;
+            element.almacen = "";
+            element = initDetail(element);
+        }
         onChange( notaIngreso );
         setVisibleSucursal(false);
+    }
+
+    function onChangeFKIDSucursal( sucursal ) {
+        if ( notaIngreso.fkidsucursal == sucursal.idsucursal ) {
+            notaIngreso.fkidsucursal  = sucursal.idsucursal;
+            notaIngreso.sucursal      = sucursal.descripcion;
+            notaIngreso.error.fkidsucursal   = false;
+            notaIngreso.message.fkidsucursal = "";
+            onChange( notaIngreso );
+            setVisibleSucursal(false);
+            return;
+        }
+        if ( notaIngreso.fkidsucursal == null || notaIngreso.fkidsucursal == "" ) {
+            updateSucursalData(sucursal);
+            return;
+        }
+        let onUpdate = () => updateSucursalData(sucursal);
+        C_Confirm( { 
+            title: "Cambiar Sucursal", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentSucursal() {
@@ -94,13 +177,46 @@ function C_Form( props ) {
         if ( !disabled.data ) setVisibleAlmacen(true);
     };
 
-    function onChangeFKIDAlmacen( data ) {
-        notaIngreso.fkidalmacen  = data.idalmacen;
-        notaIngreso.almacen      = data.descripcion;
+    function updateAlmacenData(almacen) {
+        notaIngreso.fkidalmacen  = almacen.idalmacen;
+        notaIngreso.almacen      = almacen.descripcion;
         notaIngreso.error.fkidalmacen   = false;
         notaIngreso.message.fkidalmacen = "";
+        for (let index = 0; index < notaIngreso.arrayNotaIngresoDetalle.length; index++) {
+            const element = notaIngreso.arrayNotaIngresoDetalle[index];
+            element.fkidalmacen = almacen.idalmacen;
+            element.almacen = almacen.descripcion;
+
+            element.fkidsucursal = notaIngreso.fkidsucursal;
+            element.sucursal = notaIngreso.sucursal;
+
+            element = initDetail(element);
+
+        }
         onChange( notaIngreso );
         setVisibleAlmacen(false);
+    }
+
+    function onChangeFKIDAlmacen( almacen ) {
+        if ( notaIngreso.fkidalmacen == almacen.idalmacen ) {
+            notaIngreso.fkidalmacen  = almacen.idalmacen;
+            notaIngreso.almacen      = almacen.descripcion;
+            notaIngreso.error.fkidalmacen   = false;
+            notaIngreso.message.fkidalmacen = "";
+            onChange( notaIngreso );
+            setVisibleAlmacen(false);
+            return;
+        }
+        if ( notaIngreso.fkidalmacen == null || notaIngreso.fkidalmacen == "" ) {
+            updateAlmacenData(almacen);
+            setVisibleAlmacen(false);
+            return;
+        }
+        let onUpdate = () => updateAlmacenData(almacen);
+        C_Confirm( { 
+            title: "Cambiar Álmacen", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentAlmacen() {
@@ -142,10 +258,80 @@ function C_Form( props ) {
     };
 
     function onVisibleProducto( detalle, index ) {
+        if ( !esNumeric(notaIngreso.fkidsucursal)) {
+            C_Message( 'warning', 'Campo sucursal requerido.' );
+            return;
+        }
+        if ( !esNumeric(notaIngreso.fkidalmacen)) {
+            C_Message( 'warning', 'Campo Álmacen requerido.' );
+            return;
+        }
         detalle.index = index;
         detalle.visible_producto = true;
         setRowDetalle(detalle);
     };
+
+    function onChangeFKIDProducto( data ) {
+        let detalle = notaIngreso.arrayNotaIngresoDetalle[row_detalle.index];
+
+        detalle.codigo = data.codigo;
+        detalle.producto = data.nombre;
+        detalle.fkidproducto = data.idproducto;
+        detalle.unidadmedida = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}`;
+
+        detalle.fkidciudadorigen = data.fkidciudadorigen;
+        detalle.ciudadorigen = data.ciudadorigen;
+
+        detalle.fkidproductomarca = data.fkidproductomarca;
+        detalle.productomarca = data.productomarca;
+
+        detalle.fkidproductotipo = data.fkidproductotipo;
+        detalle.productotipo = data.productotipo;
+
+        detalle.fkidsucursal = notaIngreso.fkidsucursal;
+        detalle.sucursal = notaIngreso.sucursal;
+
+        detalle.fkidalmacen = notaIngreso.fkidalmacen;
+        detalle.almacen = notaIngreso.almacen;
+
+        detalle.stockactualanterior = data.stockalmacen != null ? data.stockalmacen : 0;
+        detalle.cantidad = 0;
+        detalle.nrocajas = 0;
+
+        detalle.descuento = 0;
+        detalle.montodescuento = 0;
+
+        detalle.costobase = parseFloat(data.costounitario).toFixed(2);
+        detalle.costounitario = parseFloat(data.costounitario).toFixed(2);
+        detalle.costosubtotal = "0.00";
+        detalle.costopromedio = 0;
+
+        detalle.peso = parseFloat(data.peso).toFixed(2);
+        detalle.pesosubtotal = "0.00";
+
+        detalle.volumen = parseFloat(data.volumen).toFixed(2);
+        detalle.volumensubtotal = "0.00";
+
+        detalle.fechavencimiento = null;
+        detalle.fvencimiento = null;
+        detalle.nota = null;
+
+        detalle.nrolote = "0.00";
+        detalle.nrofabrica = "0.00";
+
+        detalle.fkidnotaingreso = null;
+        detalle.idnotaingresodetalle = null;
+        detalle.fkidalmacenproductodetalle = null;
+
+        detalle.visible_producto = false;
+        detalle.visible_sucursal = false;
+        detalle.visible_almacen = false;
+        detalle.errorcantidad = false;
+        detalle.errorcostounitario = false;
+
+        onChange(notaIngreso);
+        setRowDetalle(null);
+    }
 
     function componentProducto() {
         if ( row_detalle === null ) return null;
@@ -154,69 +340,9 @@ function C_Form( props ) {
             <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
-                onChange={ ( data ) => {
-                    console.log(data);
-                    let detalle = notaIngreso.arrayNotaIngresoDetalle[row_detalle.index];
-
-                    detalle.codigo = data.codigo;
-                    detalle.producto = data.nombre;
-                    detalle.fkidproducto = data.idproducto;
-                    detalle.unidadmedida = `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}`;
-
-                    detalle.fkidciudadorigen = data.fkidciudadorigen;
-                    detalle.ciudadorigen = data.ciudadorigen;
-
-                    detalle.fkidproductomarca = data.fkidproductomarca;
-                    detalle.productomarca = data.productomarca;
-
-                    detalle.fkidproductotipo = data.fkidproductotipo;
-                    detalle.productotipo = data.productotipo;
-
-                    detalle.fkidsucursal = notaIngreso.fkidsucursal;
-                    detalle.sucursal = notaIngreso.sucursal;
-
-                    detalle.fkidalmacen = notaIngreso.fkidalmacen;
-                    detalle.almacen = notaIngreso.almacen;
-
-                    detalle.stockactualanterior = data.stockactual;
-                    detalle.cantidad = 0;
-                    detalle.nrocajas = 0;
-
-                    detalle.descuento = 0;
-                    detalle.montodescuento = 0;
-
-                    detalle.costobase = parseFloat(data.costounitario).toFixed(2);
-                    detalle.costounitario = parseFloat(data.costounitario).toFixed(2);
-                    detalle.costosubtotal = "0.00";
-                    detalle.costopromedio = 0;
-
-                    detalle.peso = parseFloat(data.peso).toFixed(2);
-                    detalle.pesosubtotal = "0.00";
-
-                    detalle.volumen = parseFloat(data.volumen).toFixed(2);
-                    detalle.volumensubtotal = "0.00";
-
-                    detalle.fechavencimiento = null;
-                    detalle.fvencimiento = null;
-                    detalle.nota = null;
-
-                    detalle.nrolote = "0.00";
-                    detalle.nrofabrica = "0.00";
-
-                    detalle.fkidnotaingreso = null;
-                    detalle.idnotaingresodetalle = null;
-                    detalle.fkidalmacenproductodetalle = null;
-
-                    detalle.visible_producto = false;
-                    detalle.visible_sucursal = false;
-                    detalle.visible_almacen = false;
-                    detalle.errorcantidad = false;
-                    detalle.errorcostounitario = false;
-        
-                    onChange(notaIngreso);
-                    setRowDetalle(null);
-                } }
+                onChange={ onChangeFKIDProducto }
+                fkidalmacen={row_detalle.fkidalmacen}
+                arrayFKIDProducto={notaIngreso.arrayNotaIngresoDetalle}
             />
         );
     };
@@ -264,7 +390,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Date 
-                        label={"Fecha"}
+                        label={"Fecha*"}
                         value={ notaIngreso.fechanotaingreso }
                         onChange={ onChangeFecha }
                         disabled={ disabled.data }
@@ -273,14 +399,14 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input 
-                        label={"Moneda"}
+                        label={"Moneda*"}
                         value={ notaIngreso.moneda }
                         disabled={ true }
                     />
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <C_Input 
-                        label={"Tipo Cambio"}
+                        label={"Tipo Cambio*"}
                         value={ notaIngreso.tipocambio }
                         onChange={ onChangeTipoCambio }
                         disabled={ disabled.data }
@@ -290,7 +416,7 @@ function C_Form( props ) {
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Sucursal"}
+                        label={"Sucursal*"}
                         placeholder={ "SELECCIONAR SUCURSAL..." }
                         value={ notaIngreso.sucursal }
                         onClick={onShowSucursal}
@@ -302,7 +428,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Álmacen"}
+                        label={"Álmacen*"}
                         placeholder={ "SELECCIONAR ÁLMACEN..." }
                         value={ notaIngreso.almacen }
                         onClick={onShowAlmacen}
@@ -314,7 +440,7 @@ function C_Form( props ) {
                 </Col>
                 <Col xs={{ span: 24, }} sm={{ span: 8, }}>
                     <C_Input
-                        label={"Concepto"}
+                        label={"Concepto Inventario*"}
                         placeholder={ "SELECCIONAR CONCEPTO..." }
                         value={ notaIngreso.conceptoinventario }
                         onClick={onShowConceptoInventario}

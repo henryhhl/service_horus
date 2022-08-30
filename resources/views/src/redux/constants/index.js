@@ -273,6 +273,9 @@ const moduleVenta = {
     devolucionnotaventa_onFocus:      '[Devolucion Nota Venta] On Focus',
     devolucionnotaventa_offFocus:     '[Devolucion Nota Venta] Off Focus',
 
+    informeVenta_setInit: '[Informe Venta] Set Init',
+    informeVenta_onChange: '[Informe Venta] OnChange',
+
     producto_setLimpiar:   '[Producto] Set Limpiar',
     producto_setLoad:      '[Producto] Set Load',
     producto_onChange:     '[Producto] On Change',
@@ -433,6 +436,8 @@ const config = {
 
     setArchivoOption:   '[Archivo Option] Set Archivo Option',
     resetArchivoOption: '[Archivo Option] Reset Archivo Option',
+
+    setSucursal: '[Sucursal] Set Sucursal',
 
 };
 

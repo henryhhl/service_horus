@@ -30,6 +30,7 @@ function M_ListadoAlmacenProductoDetalle( props ) {
                 fkidalmacen={props.fkidalmacen}
                 fkidlistaprecio={props.fkidlistaprecio}
                 estado={props.estado}
+                arrayFKIDProducto={props.arrayFKIDProducto}
                 // onCreate={ props.onCreate }
             />
         </C_ModalDraggable>
@@ -46,12 +47,13 @@ M_ListadoAlmacenProductoDetalle.propTypes = {
     zIndex: PropTypes.number,
 
     data: PropTypes.array,
+    arrayFKIDProducto: PropTypes.array,
 
     title:    PropTypes.string,
     isventa:  PropTypes.string,
     estado:  PropTypes.string,
-    fkidalmacen:  PropTypes.number,
-    fkidlistaprecio: PropTypes.number,
+    fkidalmacen:  PropTypes.any,
+    fkidlistaprecio: PropTypes.any,
     onClose:  PropTypes.func,
     onChange: PropTypes.func,
 }
@@ -65,6 +67,7 @@ M_ListadoAlmacenProductoDetalle.defaultProps = {
     zIndex: 1200,
 
     data: [],
+    arrayFKIDProducto: [],
 
     title: "LISTADO DE PRODUCTOS",
     isventa: null,

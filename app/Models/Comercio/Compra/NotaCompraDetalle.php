@@ -21,13 +21,13 @@ class NotaCompraDetalle extends Model
         'fkidsolicitudcompra' => null, 'fkidsolicitudcompradetalle' => null, 'fkidordencompra' => null, 'fkidordencompradetalle' => null,
         'estado' => 'A',  'isdelete' => 'A', 'cantidad' => 0, 'costounitario' => 0, 'costosubtotal' => 0, 'fkidproveedor' => 0,
         'cantidadsolicitada' => 0, 'cantidadrecibida' => 0, 'cantidadfaltante' => 0, 'cantidadsobrante' => 0, 'descuento' => 0, 'montodescuento' => 0,
-        'nrocajas' => 0, 'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null,
+        'nrocajas' => 0, 'peso' => 0, 'pesosubtotal' => 0, 'volumen' => 0, 'volumensubtotal' => 0, 'nota' => null, 'stockactualanterior' => 0,
         'isdevolucioncompra' => 'N', 'isordencompra' => 'N', 'issolicitudcompra' => 'N', 'fechavencimiento' => null, 'nrolote' => 0, 'nrofabrica' => 0,
     ];
 
     protected $fillable = [
         'fkidnotacompra', 'fkidalmacenproductodetalle', 'fkidproducto', 'fkidordencompra', 'fkidordencompradetalle', 'fkidsolicitudcompra', 'fkidsolicitudcompradetalle',
-        'fkidsucursal', 'fkidalmacen', 'fkidseccioninventario', 'fkidproveedor', 'costobase', 'descuento', 'montodescuento',
+        'fkidsucursal', 'fkidalmacen', 'fkidseccioninventario', 'fkidproveedor', 'costobase', 'descuento', 'montodescuento', 'stockactualanterior',
         'cantidadsolicitada', 'cantidadrecibida', 'cantidadfaltante', 'cantidadsobrante', 'cantidad', 'costounitario', 'costosubtotal',
         'nrocajas', 'peso', 'pesosubtotal', 'volumen', 'volumensubtotal', 'nota', 'fechavencimiento', 'nrolote', 'nrofabrica',
         'isdevolucioncompra', 'isordencompra', 'issolicitudcompra', 'isdelete', 'estado', 'fecha', 'hora',
@@ -38,7 +38,7 @@ class NotaCompraDetalle extends Model
             ->select( [
                 'notacompradetalle.idnotacompradetalle', 'notacompradetalle.cantidad', 'notacompradetalle.nrocajas',
                 'notacompradetalle.costounitario', 'notacompradetalle.costosubtotal', 'notacompradetalle.costobase',
-                'notacompradetalle.descuento', 'notacompradetalle.montodescuento',
+                'notacompradetalle.descuento', 'notacompradetalle.montodescuento', 'notacompradetalle.stockactualanterior',
                 'notacompradetalle.peso', 'notacompradetalle.pesosubtotal',
                 'notacompradetalle.volumen', 'notacompradetalle.volumensubtotal',
                 'notacompradetalle.nota', 'notacompradetalle.fechavencimiento',
@@ -77,6 +77,7 @@ class NotaCompraDetalle extends Model
         $nota = isset( $detalle->nota ) ? $detalle->nota : null;
         $fechavencimiento = isset( $detalle->fechavencimiento ) ? $detalle->fechavencimiento : null;
 
+        $stockactualanterior = isset( $detalle->stockactualanterior ) ? $detalle->stockactualanterior : 0;
         $cantidad = isset( $detalle->cantidad ) ? $detalle->cantidad : 0;
         $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
         $cantidadrecibida = is_numeric( $detalle->cantidadrecibida ) ? $detalle->cantidadrecibida : 0;
@@ -126,6 +127,7 @@ class NotaCompraDetalle extends Model
             'nota' => $nota,
             'fechavencimiento' => $fechavencimiento,
 
+            'stockactualanterior' => $stockactualanterior,
             'cantidad' => $cantidad,
             'cantidadsolicitada' => $cantidadsolicitada,
             'cantidadrecibida' => $cantidadrecibida,
@@ -181,6 +183,7 @@ class NotaCompraDetalle extends Model
         $nota = isset( $detalle->nota ) ? $detalle->nota : null;
         $fechavencimiento = isset( $detalle->fechavencimiento ) ? $detalle->fechavencimiento : null;
 
+        $stockactualanterior = isset( $detalle->stockactualanterior ) ? $detalle->stockactualanterior : 0;
         $cantidad = isset( $detalle->cantidad ) ? $detalle->cantidad : 0;
         $cantidadsolicitada = is_numeric( $detalle->cantidadsolicitada ) ? $detalle->cantidadsolicitada : 0;
         $cantidadrecibida = is_numeric( $detalle->cantidadrecibida ) ? $detalle->cantidadrecibida : 0;
@@ -223,6 +226,7 @@ class NotaCompraDetalle extends Model
             'nota' => $nota,
             'fechavencimiento' => $fechavencimiento,
 
+            'stockactualanterior' => $stockactualanterior,
             'cantidad' => $cantidad,
             'cantidadsolicitada' => $cantidadsolicitada,
             'cantidadrecibida' => $cantidadrecibida,

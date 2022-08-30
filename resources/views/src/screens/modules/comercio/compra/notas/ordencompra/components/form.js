@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { Col, Row, Table } from 'antd';
-import { C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
+import { C_Confirm, C_Date, C_Input, C_Message, C_Select } from '../../../../../../../components';
 import { Functions } from '../../../../../../../utils/functions';
 const { convertDMYToYMD } = Functions;
 
@@ -13,7 +13,6 @@ import M_ListadoAlmacen from '../../../../inventario/data/almacen/modal/listado'
 import M_ListadoConceptoCompra from '../../../data/conceptocompra/modal/listado';
 import M_ListadoSeccionInventario from '../../../../inventario/data/seccion/modal/listado';
 import M_ListadoProveedor from '../../../data/proveedor/modal/listado';
-import M_ListadoUnidadMedidaProducto from '../../../../inventario/data/unidadmedidaproducto/modal/listado';
 import M_ListadoSolicitudCompra from '../../solicitudcompra/modal/listado';
 
 import { columns } from './column';
@@ -21,7 +20,7 @@ import M_ListadoProducto from '../../../../inventario/data/producto/modal/listad
 
 function C_Form( props ) {
     const { ordenCompra, disabled, onChange } = props;
-    const { codigo, idordencompra, focusInput, error, message } = ordenCompra;
+    const { idordencompra, focusInput, error, message } = ordenCompra;
 
     const [ visible_seccion, setVisibleSeccion ] = useState(false);
     const [ visible_sucursal, setVisibleSucursal ] = useState(false);
@@ -168,20 +167,44 @@ function C_Form( props ) {
         if ( !disabled.data ) setVisibleSucursal(true);
     };
 
-    function onChangeFKIDSucursal( data ) {
-        ordenCompra.fkidsucursal  = data.idsucursal;
-        ordenCompra.sucursal      = data.descripcion;
+    function updateSucursalData(sucursal) {
+        ordenCompra.fkidsucursal  = sucursal.idsucursal;
+        ordenCompra.sucursal      = sucursal.descripcion;
+        ordenCompra.fkidalmacen  = null;
+        ordenCompra.almacen      = "";
         ordenCompra.error.fkidsucursal   = false;
         ordenCompra.message.fkidsucursal = "";
-
         for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
-            let element = ordenCompra.arrayOrdenCompraDetalle[index];
-            element.fkidsucursal = data.idsucursal;
-            element.sucursal = data.descripcion;
+            const element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidsucursal = sucursal.idsucursal;
+            element.sucursal = sucursal.descripcion;
+            element.fkidalmacen = null;
+            element.almacen = "";
+            element = initDetalle(element);
         }
-
         onChange( ordenCompra );
         setVisibleSucursal(false);
+    }
+
+    function onChangeFKIDSucursal( sucursal ) {
+        if ( ordenCompra.fkidsucursal == sucursal.idsucursal ) {
+            ordenCompra.fkidsucursal  = sucursal.idsucursal;
+            ordenCompra.sucursal      = sucursal.descripcion;
+            ordenCompra.error.fkidsucursal   = false;
+            ordenCompra.message.fkidsucursal = "";
+            onChange( ordenCompra );
+            setVisibleSucursal(false);
+            return;
+        }
+        if ( ordenCompra.fkidsucursal == null || ordenCompra.fkidsucursal == "" ) {
+            updateSucursalData(sucursal);
+            return;
+        }
+        let onUpdate = () => updateSucursalData(sucursal);
+        C_Confirm( { 
+            title: "Cambiar Sucursal", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentSucursal() {
@@ -200,20 +223,46 @@ function C_Form( props ) {
         if ( ( !disabled.data ) && ( typeof ordenCompra.fkidsucursal === "number" ) ) setVisibleAlmacen(true);
     };
 
-    function onChangeFKIDAlmacen( data ) {
-        ordenCompra.fkidalmacen  = data.idalmacen;
-        ordenCompra.almacen      = data.descripcion;
+    function updateAlmacenData(almacen) {
+        ordenCompra.fkidalmacen  = almacen.idalmacen;
+        ordenCompra.almacen      = almacen.descripcion;
         ordenCompra.error.fkidalmacen   = false;
         ordenCompra.message.fkidalmacen = "";
-
         for (let index = 0; index < ordenCompra.arrayOrdenCompraDetalle.length; index++) {
-            let element = ordenCompra.arrayOrdenCompraDetalle[index];
-            element.fkidalmacen = data.idalmacen;
-            element.almacen = data.descripcion;
-        }
+            const element = ordenCompra.arrayOrdenCompraDetalle[index];
+            element.fkidalmacen = almacen.idalmacen;
+            element.almacen = almacen.descripcion;
 
+            element.fkidsucursal = ordenCompra.fkidsucursal;
+            element.sucursal = ordenCompra.sucursal;
+
+            element = initDetalle(element);
+
+        }
         onChange( ordenCompra );
         setVisibleAlmacen(false);
+    }
+
+    function onChangeFKIDAlmacen( almacen ) {
+        if ( ordenCompra.fkidalmacen == almacen.idalmacen ) {
+            ordenCompra.fkidalmacen  = almacen.idalmacen;
+            ordenCompra.almacen      = almacen.descripcion;
+            ordenCompra.error.fkidalmacen   = false;
+            ordenCompra.message.fkidalmacen = "";
+            onChange( ordenCompra );
+            setVisibleAlmacen(false);
+            return;
+        }
+        if ( ordenCompra.fkidalmacen == null || ordenCompra.fkidalmacen == "" ) {
+            updateAlmacenData(almacen);
+            setVisibleAlmacen(false);
+            return;
+        }
+        let onUpdate = () => updateAlmacenData(almacen);
+        C_Confirm( { 
+            title: "Cambiar Álmacen", onOk: onUpdate, 
+            okType: "primary", content: "Estás seguro de actualizar información?", 
+        } );
     };
 
     function componentAlmacen() {
@@ -287,6 +336,14 @@ function C_Form( props ) {
     };
 
     function onVisibleProducto( detalle, index ) {
+        if ( ordenCompra.fkidsucursal == null || ordenCompra.fkidsucursal == "" ) {
+            C_Message( 'warning', 'Campo sucursal requerido.' );
+            return;
+        }
+        if ( ordenCompra.fkidalmacen == null || ordenCompra.fkidalmacen == "" ) {
+            C_Message( 'warning', 'Campo Álmacen requerido.' );
+            return;
+        }
         detalle.index = index;
         detalle.visible_producto = true;
         setRowDetalle(detalle);
@@ -300,47 +357,49 @@ function C_Form( props ) {
         return false;
     };
 
+    function initDetalle(detalle, data = null) {
+        detalle.fkidproducto = data ? data.idproducto : null;
+        detalle.codigo = data ? data.codigo : "";
+        detalle.producto = data ? data.nombre : "";
+        detalle.unidadmedida = data ? `${parseFloat(data.valorequivalente).toFixed(2)} ${data.abreviatura}` : "";
+
+        detalle.fkidciudadorigen = data ? data.fkidciudadorigen : null;
+        detalle.ciudadorigen = data ? data.ciudadorigen : "";
+
+        detalle.fkidproductomarca = data ? data.fkidproductomarca : "";
+        detalle.productomarca = data ? data.productomarca : "";
+
+        detalle.fkidproductotipo = data ? data.fkidproductotipo : null;
+        detalle.productotipo = data ? data.productotipo : "";
+
+        detalle.stockactual = (data) ? (data.stockalmacen != null) ? parseInt(data.stockalmacen) : "0" : "";
+        detalle.cantidad = data ? 0 : "";
+        detalle.cantidadsolicitada = data ? 0 : "";
+
+        detalle.descuento = data ? 0 : "";
+        detalle.montodescuento = data ? 0 : "";
+
+        detalle.costobase = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costounitario = data ? parseFloat(data.costounitario).toFixed(2) : "";
+        detalle.costosubtotal = data ? "0.00" : "";
+
+        detalle.peso = data ? parseFloat(data.peso).toFixed(2) : "";
+        detalle.pesosubtotal = data ? "0.00" : "";
+        
+        detalle.volumen = data ? parseFloat(data.volumen).toFixed(2) : "";
+        detalle.volumensubtotal = data ? "0.00" : "";
+        detalle.errorcantidad = false;
+
+        detalle.iscompra = "N",
+        detalle.issolicitudcompra = "N",
+        detalle.fkidsolicitudcompradetalle = null;
+        detalle.fkidsolicitudcompra = null;
+    }
+
     function onFKIDProducto( producto ) {
         if ( !existProducto( producto.idproducto ) ) {
             let detalle = ordenCompra.arrayOrdenCompraDetalle[row_detalle.index];
-
-            detalle.fkidproducto = producto.idproducto;
-            detalle.codigo = producto.codigo ? producto.codigo : "";
-            detalle.producto = producto.nombre;
-            detalle.unidadmedida = `${parseFloat(producto.valorequivalente).toFixed(2)} ${producto.abreviatura}`;
-
-            detalle.fkidciudadorigen = producto.fkidciudadorigen;
-            detalle.ciudadorigen = producto.ciudadorigen;
-
-            detalle.fkidproductomarca = producto.fkidproductomarca;
-            detalle.productomarca = producto.productomarca;
-
-            detalle.fkidproductotipo = producto.fkidproductotipo;
-            detalle.productotipo = producto.productotipo;
-
-            detalle.stockactual = parseInt(producto.stockactual);
-            detalle.cantidad = 0;
-            detalle.cantidadsolicitada = 0;
-
-            detalle.descuento = 0;
-            detalle.montodescuento = 0;
-
-            detalle.costobase = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costounitario = parseFloat(producto.costounitario).toFixed(2);
-            detalle.costosubtotal = "0.00";
-
-            detalle.peso = parseFloat(producto.peso).toFixed(2);
-            detalle.pesosubtotal = "0.00";
-            
-            detalle.volumen = parseFloat(producto.volumen).toFixed(2);
-            detalle.volumensubtotal = "0.00";
-            detalle.errorcantidad = false;
-
-            detalle.iscompra = "N",
-            detalle.issolicitudcompra = "N",
-            detalle.fkidsolicitudcompradetalle = null;
-            detalle.fkidsolicitudcompra = null;
-
+            initDetalle(detalle, producto);
             onChange(ordenCompra);
             setRowDetalle(null);
         } else {
@@ -355,28 +414,11 @@ function C_Form( props ) {
             <M_ListadoProducto
                 visible={row_detalle.visible_producto}
                 onClose={ () =>  setRowDetalle(null) }
-                value={row_detalle.fkidproducto}
                 onChange={onFKIDProducto}
+                arrayFKIDProducto={ordenCompra.arrayOrdenCompraDetalle}
+                fkidalmacen={row_detalle.fkidalmacen}
             />
         );
-    };
-
-    function updateTotales() {
-        let cantidadtotal = 0;
-        let montototal = 0;
-        ordenCompra.arrayOrdenCompraDetalle.map( (item) => {
-            if ( item.fkidproducto !== null ) {
-                cantidadtotal += parseInt(item.cantidad);
-                montototal += parseFloat(item.costosubtotal);
-            }
-        } );
-        ordenCompra.cantidadtotal = parseInt(cantidadtotal);
-        ordenCompra.montosubtotal = parseFloat(montototal).toFixed(2);
-        let fletes = parseFloat(ordenCompra.fletes);
-        let internacion = parseFloat(ordenCompra.internacion);
-        let otrosgastos = parseFloat(ordenCompra.otrosgastos);
-        let montosubtotal = parseFloat(ordenCompra.montosubtotal);
-        ordenCompra.montototal = parseFloat(montosubtotal + fletes + internacion + otrosgastos).toFixed(2);
     };
 
     function onShowSolicitudCompra() {
@@ -667,7 +709,7 @@ function C_Form( props ) {
                     style={{ width: "100%", minWidth: "100%", maxWidth: "100%", }}
                     columns={ columns( ordenCompra, disabled, onChange, onVisibleProducto ) } 
                     dataSource={ordenCompra.arrayOrdenCompraDetalle}
-                    scroll={{ x: 2200, y: ordenCompra.arrayOrdenCompraDetalle.length == 0 ? 40 : 150 }}
+                    scroll={{ x: 2600, y: ordenCompra.arrayOrdenCompraDetalle.length == 0 ? 40 : 150 }}
                 />
             </div>
             <Row gutter={ [12, 8] }>
@@ -715,11 +757,27 @@ function C_Form( props ) {
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <Row gutter={ [12, 8] }>
                         <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                            <C_Input
-                                label={ "Cant. Total"}
-                                value={ ordenCompra.cantidadtotal }
+                            <C_Input 
+                                label={"Fletes"}
+                                value={ ordenCompra.fletes }
+                                onChange={ onChangeFletes }
                                 disabled={ disabled.data }
-                                readOnly
+                            />
+                        </Col>
+                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                            <C_Input 
+                                label={"Internación"}
+                                value={ ordenCompra.internacion }
+                                onChange={ onChangeInternacion }
+                                disabled={ disabled.data }
+                            />
+                        </Col>
+                        <Col xs={{ span: 24, }} sm={{ span: 24, }}>
+                            <C_Input 
+                                label={"Otros gastos"}
+                                value={ ordenCompra.otrosgastos }
+                                onChange={ onChangeOtrosGastos }
+                                disabled={ disabled.data }
                             />
                         </Col>
                     </Row>
@@ -727,34 +785,18 @@ function C_Form( props ) {
                 <Col xs={{ span: 24, }} sm={{ span: 4, }}>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
                         <C_Input
-                            label={ "Sub Total"}
-                            value={ ordenCompra.montosubtotal }
+                            label={ "Cant. Total"}
+                            value={ ordenCompra.cantidadtotal }
                             disabled={ disabled.data }
                             readOnly
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
-                            label={"Fletes"}
-                            value={ ordenCompra.fletes }
-                            onChange={ onChangeFletes }
+                        <C_Input
+                            label={ "Sub Total"}
+                            value={ ordenCompra.montosubtotal }
                             disabled={ disabled.data }
-                        />
-                    </Col>
-                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
-                            label={"Internación"}
-                            value={ ordenCompra.internacion }
-                            onChange={ onChangeInternacion }
-                            disabled={ disabled.data }
-                        />
-                    </Col>
-                    <Col xs={{ span: 24, }} sm={{ span: 24, }}>
-                        <C_Input 
-                            label={"Otros gastos"}
-                            value={ ordenCompra.otrosgastos }
-                            onChange={ onChangeOtrosGastos }
-                            disabled={ disabled.data }
+                            readOnly
                         />
                     </Col>
                     <Col xs={{ span: 24, }} sm={{ span: 24, }}>

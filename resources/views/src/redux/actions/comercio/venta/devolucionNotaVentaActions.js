@@ -331,34 +331,44 @@ function onValidate( devolucionnotaventa ) {
         bandera = false;
     }
 
-    let contador = 0;
-    for (let index = 0; index < devolucionnotaventa.devolucionnotaventadetalle.length; index++) {
-        const element = devolucionnotaventa.devolucionnotaventadetalle[index];
-        if ( element.fkidproducto != null ) {
-            if ( parseInt(element.cantidad) <= 0 ) {
-                element.errorcantidad = true;
-                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-            if ( parseInt(element.preciounitario) <= 0 ) {
-                element.errorpreciounitario = true;
-                C_Message( "warning", `El precio de ${element.producto} debe ser mayor a 0` );
-                bandera = false;
-            }
-        } else {
-            contador++;
-        }
-    }
-    if ( contador === devolucionnotaventa.devolucionnotaventadetalle.length ) {
-        C_Message( "warning", `Requerido ingresar al menos un producto.` );
-        bandera = false;
-    }
+    bandera = validateDetails(devolucionnotaventa);
 
     if ( !bandera ) {
         C_Message( "error", "Conflictos. Favor de llenar datos requeridos." );
     }
     return bandera;
 };
+
+function validateDetails(devolucionnotaventa) {
+    let contador = 0;
+    for (let index = 0; index < devolucionnotaventa.devolucionnotaventadetalle.length; index++) {
+        const element = devolucionnotaventa.devolucionnotaventadetalle[index];
+        if ( element.fkidproducto != null ) {
+            if ( parseInt(element.cantidad) <= 0 ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.preciounitario) <= 0 ) {
+                element.errorpreciounitario = true;
+                C_Message( "warning", `El precio de ${element.producto} debe ser mayor a 0`, 'topRight' );
+                return false;
+            }
+            if ( parseInt(element.cantidad) > parseInt(element.cantidadvendida) ) {
+                element.errorcantidad = true;
+                C_Message( "warning", `La cantidad de ${element.producto} debe ser menor a la cantidad vendida.`, 'topRight' );
+                return false;
+            }
+        } else {
+            contador++;
+        }
+    }
+    if ( contador === devolucionnotaventa.devolucionnotaventadetalle.length ) {
+        C_Message( "warning", `Campo Producto requerido.`, 'topRight' );
+        return false;
+    }
+    return true;
+}
 
 export const devolucionNotaVentaActions = {
     initData,

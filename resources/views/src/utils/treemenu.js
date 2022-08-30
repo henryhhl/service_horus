@@ -79,7 +79,27 @@ export const treeMenu = [
                     {
                         key: "INFORMES", title: "INFORMES",
                         children: [
-
+                            {
+                                key: "informesdiarios", title: "INFORMES DIARIOS",
+                                children: [
+                                    {
+                                        key: "kardexdearticulos", title: "KARDEX DE ARTICULOS",
+                                        children: [],
+                                    },
+                                ],
+                            },
+                            {
+                                key: "informesmensuales", title: "INFORMES MENSUALES",
+                                children: [],
+                            },
+                            {
+                                key: "informesestadisticos", title: "INFORMES ESTADÍSTICOS",
+                                children: [],
+                            },
+                            {
+                                key: "informesdecontrol", title: "INFORMES DE CONTROL",
+                                children: [],
+                            },
                         ],
                     },
                 ],
@@ -219,7 +239,25 @@ export const treeMenu = [
                     },
                     {
                         key: "INFORMES", title: "INFORMES",
-                        children: [],
+                        children: [
+                            {
+                                key: "informesdiarios", title: "INFORMES DIARIOS",
+                                children: [
+                                    {
+                                        key: "informegeneralventas", title: "INFORME GENERAL DE VENTAS",
+                                        children: [],
+                                    },
+                                    {
+                                        key: "ventasgeneralcostos", title: "VENTAS GENERAL POR COSTOS",
+                                        children: [],
+                                    },
+                                    {
+                                        key: "informegeneraldevoluciones", title: "INFORME GENERAL DE DEVOLUCIONES",
+                                        children: [],
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
             },

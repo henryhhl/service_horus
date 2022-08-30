@@ -77,20 +77,61 @@ class Producto extends Model
         );
     }
 
+    public function getTransacciones( $query ) {
+        $arrayProducto = $query
+            ->select( [
+                'producto.idproducto', 'producto.codigo', 'producto.nombre', 'producto.descripcion', 'producto.abreviatura',
+                'producto.stockactual', 'producto.nivel', 'producto.imagen',  'producto.extension',
+                'producto.valorequivalente', 'producto.peso', 'producto.volumen', 'producto.costobase',
+                'producto.costodescuento', 'producto.costomontodescuento', 'producto.costounitario',
+                'producto.fkidciudadorigen', 'ciu.descripcion as ciudadorigen',
+                'producto.fkidcategoria', 'cat.descripcion as categoria',
+                'producto.fkidproductomarca', 'prodmarc.descripcion as productomarca',
+                'producto.fkidproductotipo', 'prodtipo.descripcion as productotipo',
+                'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
+                'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
+                'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora',
+                'producto.ingresos', 'producto.salidas', 'producto.traspasos', 'producto.solicitudcompra', 'producto.ordencompra', 
+                'producto.notacompra', 'producto.devolucioncompra', 'producto.notaventa', 'producto.devolucionventa',
+                'producto.ingresocancelado', 'producto.salidacancelado', 'producto.traspasocancelado', 'producto.solicitudcompracancelado', 'producto.ordencompracancelado', 
+                'producto.notacompracancelado', 'producto.devolucioncompracancelado', 'producto.notaventacancelado', 'producto.devolucionventacancelado',
+                'producto.totalingresos', 'producto.totalsalidas', 'producto.totaltraspasos', 'producto.totalsolicitudcompra', 'producto.totalordencompra', 'producto.totalnotacompra',
+                'producto.totaldevolucioncompra', 'producto.totalnotaventa', 'producto.totaldevolucionventa',
+            ] )
+            ->leftJoin('ciudad as ciu', 'producto.fkidciudadorigen', '=', 'ciu.idciudad')
+            ->leftJoin('categoria as cat', 'producto.fkidcategoria', '=', 'cat.idcategoria')
+            ->leftJoin('productomarca as prodmarc', 'producto.fkidproductomarca', '=', 'prodmarc.idproductomarca')
+            ->leftJoin('productotipo as prodtipo', 'producto.fkidproductotipo', '=', 'prodtipo.idproductotipo')
+            ->leftJoin('productogrupo as prodgrupo', 'producto.fkidproductogrupo', '=', 'prodgrupo.idproductogrupo')
+            ->leftJoin('productosubgrupo as prodsubgrupo', 'producto.fkidproductosubgrupo', '=', 'prodsubgrupo.idproductosubgrupo')
+            ->leftJoin('unidadmedida as undmed', 'producto.fkidunidadmedida', '=', 'undmed.idunidadmedida')
+            ->whereNull( 'producto.deleted_at' )
+            ->orderBy( 'producto.nombre' , 'DESC' )
+            ->get();
+
+        return $arrayProducto;
+    }
+
     public function get_data( $query, $request )
     {
         $search  = isset($request->search)  ? $request->search  : null;
         $orderBy = isset($request->orderBy) ? $request->orderBy : 'DESC';
         $isventa = isset($request->isventa) ? $request->isventa : 'T';
         $fkidalmacen = isset($request->fkidalmacen) ? $request->fkidalmacen : null;
+        $fkidlistaprecio = isset($request->fkidlistaprecio) ? $request->fkidlistaprecio : null;
         $column  = isset($request->column) ? $request->column : 'idproducto';
 
         $column = 'producto.' . $column;
 
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
-        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) { $isventa = 'T'; 
-        } else { $isventa = strtoupper( $isventa ); }
+        if ( strtoupper( $isventa ) != 'A' && strtoupper( $isventa ) != 'N' ) { 
+            $isventa = 'T'; 
+        } else { 
+            $isventa = strtoupper( $isventa ); 
+        }
         if ( !is_numeric( $fkidalmacen ) ) $fkidalmacen = null;
+        if ( !is_numeric( $fkidlistaprecio ) ) $fkidlistaprecio = null;
 
         $islike =  Functions::isLikeAndIlike();
 
@@ -114,7 +155,13 @@ class Producto extends Model
                 'producto.fkidproductogrupo', 'prodgrupo.descripcion as productogrupo',
                 'producto.fkidproductosubgrupo', 'prodsubgrupo.descripcion as productosubgrupo',
                 'producto.fkidunidadmedida', 'undmed.descripcion as unidadmedida', 'undmed.abreviatura',
-                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora'
+                'producto.isventa', 'producto.isdelete', 'producto.estado', 'producto.fecha', 'producto.hora',
+                DB::raw("(
+                        SELECT (CASE WHEN almproddet.stockactual IS NULL THEN 0 ELSE almproddet.stockactual END) AS stock 
+                        FROM almacenproductodetalle almproddet 
+                        WHERE producto.idproducto = almproddet.fkidproducto AND almproddet.fkidalmacen = '$fkidalmacen'
+                    ) as stockalmacen"
+                ),
             ] )
             ->where( function ( $query ) use ( $search, $islike ) {
                 if ( is_numeric($search) ) {
@@ -182,10 +229,11 @@ class Producto extends Model
         $orderBy  = isset($request->orderBy)  ? $request->orderBy : 'DESC';
         $paginate = isset($request->paginate) ? $request->paginate : 20;
         $column   = 'producto.idproducto';
+        $fkidalmacen = isset($request->fkidalmacen) ? $request->fkidalmacen : null;
 
         if ( strtoupper( $orderBy ) != 'ASC' ) $orderBy = 'DESC';
-
         if ( !is_numeric( $paginate ) ) $paginate = 20;
+        if ( !is_numeric( $fkidalmacen ) ) $fkidalmacen = null;
 
         $islike =  Functions::isLikeAndIlike();
 
