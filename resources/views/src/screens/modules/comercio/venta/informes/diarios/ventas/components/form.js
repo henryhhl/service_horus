@@ -6,7 +6,7 @@ import { Col, Row } from 'antd';
 
 import { informeVentaActions } from '../../../../../../../../redux/actions/comercio/inventario/informeVentaActions';
 
-import { C_Date, C_Radio, C_Input, C_Select } from '../../../../../../../../components';
+import { C_Date, C_Radio, C_Input, C_Select, C_Button } from '../../../../../../../../components';
 import M_ListadoAlmacen from '../../../../../inventario/data/almacen/modal/listado';
 import M_ListadoCliente from '../../../../../venta/data/cliente/modal/listado';
 import M_ListadoConceptoVenta from '../../../../data/conceptoventa/modal/listado';
@@ -18,6 +18,7 @@ import M_ListadoProductoGrupo from '../../../../../inventario/data/productogrupo
 import M_ListadoProductoSubGrupo from '../../../../../inventario/data/productosubgrupo/modal/listado';
 import M_ListadoProductoTipo from '../../../../../inventario/data/productotipo/modal/listado';
 import M_ListadoProductoMarca from '../../../../../inventario/data/productomarca/modal/listado';
+import M_ListadoProducto from '../../../../../inventario/data/producto/modal/listado';
 
 
 function C_Form( props ) {
@@ -155,7 +156,18 @@ function C_Form( props ) {
         );
     }
 
-    console.log(props.informeVenta)
+    function componentProducto() {
+        if ( !informeVenta.visible_producto ) return null;
+        return (
+            <M_ListadoProducto 
+                visible={informeVenta.visible_producto}
+                onClose={ () => props.setVisibleProducto(informeVenta) }
+                value={informeVenta.fkidproducto}
+                onChange={ (producto) => props.setProducto(informeVenta, producto) }
+            />
+        );
+    }
+
     return (
         <>
             { componentAlmacen() }
@@ -172,6 +184,7 @@ function C_Form( props ) {
             { componentTipoProducto() }
 
             { componentMarca() }
+            { componentProducto() }
 
             <Row gutter={ [12, 8] }>
                 <Col xs={{ span: 24, }} sm={{ span: 12, }}>
@@ -244,8 +257,8 @@ function C_Form( props ) {
                                             <C_Select
                                                 label={ ""}
                                                 placeholder={ "SELECCIONAR MONEDA" }
-                                                // value={ proveedor.tipopersoneria }
-                                                // onChange={ onChangeTipoPersoneria }
+                                                value={ informeVenta.tipomoneda }
+                                                onChange={ (tipomoneda) => props.setTipoMoneda(informeVenta, tipomoneda) }
                                                 data={ [
                                                     { title: "", value: "" },
                                                     { title: "Moneda Extranjera", value: "E" },
@@ -373,7 +386,38 @@ function C_Form( props ) {
                                         select={true}
                                     />
                                 </Col>
+                                <Col xs={{ span: 24, }} sm={{ span: 8, }}>
+                                    <C_Input
+                                        label={"Producto"}
+                                        placeholder={ "SELECCIONAR PRODUCTO..." }
+                                        value={ informeVenta.producto }
+                                        onClick={ () => props.setVisibleProducto(informeVenta) }
+                                        select={true}
+                                    />
+                                </Col>
                             </Row>
+                            <div className="d-block text-right card-footer">
+                                <div className="form-row d-flex justify-content-end">
+                                    <C_Button
+                                        outline={true}
+                                        onClick={props.onLimpiar}
+                                    >
+                                        Limpiar
+                                    </C_Button>
+                                    <C_Button
+                                        outline={true}
+                                        onClick={props.onImprimir}
+                                    >
+                                        Imprimir
+                                    </C_Button>
+                                    <C_Button
+                                        outline={true}
+                                        onClick={props.onClose}
+                                    >
+                                        Terminar
+                                    </C_Button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </Col>
@@ -383,12 +427,16 @@ function C_Form( props ) {
 };
 
 C_Form.propTypes = {
+    onClose: PropTypes.func,
     onImprimir: PropTypes.func,
+    onLimpiar: PropTypes.func,
     informeVenta: PropTypes.object,
 }
 
 C_Form.defaultProps = {
     onClose:  () => {},
+    onImprimir: () => {},
+    onLimpiar: () => {},
     informeVenta: {},
 }
 
@@ -400,6 +448,7 @@ const mapDispatchToProps = {
     setConceptoVenta:   informeVentaActions.setConceptoVenta,
     setGrupo:   informeVentaActions.setGrupo,
     setMarca:   informeVentaActions.setMarca,
+    setProducto:   informeVentaActions.setProducto,
     setSubGrupo:   informeVentaActions.setSubGrupo,
     setSucursal:   informeVentaActions.setSucursal,
     setTipoProducto:   informeVentaActions.setTipoProducto,
@@ -407,6 +456,7 @@ const mapDispatchToProps = {
     setFechaInicio:   informeVentaActions.setFechaInicio,
     setFechaFinal:   informeVentaActions.setFechaFinal,
     setTipoInforme:   informeVentaActions.setTipoInforme,
+    setTipoMoneda: informeVentaActions.setTipoMoneda,
     setVisibleAlmacen: informeVentaActions.setVisibleAlmacen,
     setVisibleCategoria: informeVentaActions.setVisibleCategoria,
     setVisibleCliente: informeVentaActions.setVisibleCliente,
@@ -414,6 +464,7 @@ const mapDispatchToProps = {
     setVisibleConceptoVenta: informeVentaActions.setVisibleConceptoVenta,
     setVisibleGrupo: informeVentaActions.setVisibleGrupo,
     setVisibleMarca: informeVentaActions.setVisibleMarca,
+    setVisibleProducto: informeVentaActions.setVisibleProducto,
     setVisibleSubGrupo: informeVentaActions.setVisibleSubGrupo,
     setVisibleSucursal: informeVentaActions.setVisibleSucursal,
     setVisibleTipoProducto: informeVentaActions.setVisibleTipoProducto,

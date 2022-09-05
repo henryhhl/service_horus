@@ -274,6 +274,7 @@ const moduleVenta = {
     devolucionnotaventa_offFocus:     '[Devolucion Nota Venta] Off Focus',
 
     informeVenta_setInit: '[Informe Venta] Set Init',
+    informeVenta_onLimpiar: '[Informe Venta] On Limpiar',
     informeVenta_onChange: '[Informe Venta] OnChange',
 
     producto_setLimpiar:   '[Producto] Set Limpiar',

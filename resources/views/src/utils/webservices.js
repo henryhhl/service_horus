@@ -291,6 +291,8 @@ const webservices = {
     wscomercioventadevolucionnotaventa_reporte:    module.comercio.venta + '/devolucionnotaventa/reporte',
     wscomercioventadevolucionnotaventa_searchByID: module.comercio.venta + '/devolucionnotaventa/searchByID',
 
+    wscomercioventainformeventa_notaventageneral: module.comercio.venta + '/informeventa/notaventageneral',
+
 
 
     wscomerciocompraproveedortipo_index:      module.comercio.compra + '/proveedortipo/index',

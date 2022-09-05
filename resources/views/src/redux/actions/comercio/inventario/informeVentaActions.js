@@ -2,6 +2,8 @@
 import { C_Message } from "../../../../components";
 import { Functions } from "../../../../utils/functions";
 import { Strings } from "../../../constants";
+import { InformeVentaServices } from "../../../services/comercio/venta/informeVentaServices";
+import { removeLoading, setLoading } from "../../config/loadingActions";
 
 const setInit = () => ( {
     type: Strings.informeVenta_setInit,
@@ -15,6 +17,26 @@ const onChange = ( data ) => ( {
 const initData = () => {
     return ( dispatch ) => {
         dispatch( setInit() );
+    };
+};
+
+const onLimpiar = () => {
+    return ( dispatch ) => {
+        dispatch( setInit() );
+    };
+};
+
+const onImprimir = ( informeVenta ) => {
+    return async ( dispatch ) => {
+        await dispatch( setLoading() );
+        return await InformeVentaServices.onImprimir( informeVenta ).then( async (result) => {
+            if ( result.response == 1 ) {
+                // await dispatch( setImprimir( result ) );
+            }
+            return result;
+        } ) . finally ( () => {
+            dispatch( removeLoading() );
+        });
     };
 };
 
@@ -57,6 +79,13 @@ const setTipoInforme = (informeVenta) => {
     };
 };
 
+const setTipoMoneda = (informeVenta, tipomoneda) => {
+    return ( dispatch ) => {
+        informeVenta.tipomoneda = tipomoneda;
+        dispatch( onChange(informeVenta) );
+    };
+};
+
 const setVisibleSucursal = (informeVenta) => {
     return ( dispatch ) => {
         informeVenta.visible_sucursal = !informeVenta.visible_sucursal;
@@ -68,6 +97,7 @@ const setSucursal = (informeVenta, sucursal) => {
     return ( dispatch ) => {
         informeVenta.fkidsucursal = sucursal.idsucursal;
         informeVenta.sucursal = sucursal.descripcion;
+        informeVenta.visible_sucursal = false;
         dispatch( onChange(informeVenta) );
     };
 };
@@ -232,9 +262,27 @@ const setMarca = (informeVenta, marca) => {
     };
 };
 
+const setVisibleProducto = (informeVenta) => {
+    return ( dispatch ) => {
+        informeVenta.visible_producto = !informeVenta.visible_producto;
+        dispatch( onChange(informeVenta) );
+    };
+};
+
+const setProducto = (informeVenta, producto) => {
+    return ( dispatch ) => {
+        informeVenta.fkidproducto = producto.idproducto;
+        informeVenta.producto = producto.nombre;
+        informeVenta.visible_producto = false;
+        dispatch( onChange(informeVenta) );
+    };
+};
+
 export const informeVentaActions = {
     initData,
+    onLimpiar,
     onChange,
+    onImprimir,
     setVisibleAlmacen,
     setVisibleCategoria,
     setVisibleCliente,
@@ -242,6 +290,7 @@ export const informeVentaActions = {
     setVisibleConceptoVenta,
     setVisibleGrupo,
     setVisibleMarca,
+    setVisibleProducto,
     setVisibleSubGrupo,
     setVisibleSucursal,
     setVisibleTipoProducto,
@@ -253,6 +302,7 @@ export const informeVentaActions = {
     setConceptoVenta,
     setGrupo,
     setMarca,
+    setProducto,
     setSubGrupo,
     setSucursal,
     setTipoProducto,
@@ -260,4 +310,5 @@ export const informeVentaActions = {
     setFechaInicio,
     setFechaFinal,
     setTipoInforme,
+    setTipoMoneda,
 };

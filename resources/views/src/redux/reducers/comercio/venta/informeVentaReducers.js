@@ -8,6 +8,7 @@ const initialState = {
     focusInput: false,
     imprimir: false,
     loading:  false,
+    visible_pdf: false,
 
     fechainicio: "",
     fechafinal: "",

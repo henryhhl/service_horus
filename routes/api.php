@@ -318,6 +318,8 @@ Route::get($submodulocomercioventa  . '/devolucionnotaventa/searchByID', 'Comerc
 Route::post($submodulocomercioventa . '/devolucionnotaventa/reporte', 'Comercio\Venta\DevolucionNotaVentaController@reporte');
 
 
+Route::post($submodulocomercioventa . '/informeventa/notaventageneral', 'Comercio\Venta\InformeVentaController@notaventageneral');
+
 
 Route::get($submodulocomerciocompra  . '/proveedortipo/index', 'Comercio\Compra\ProveedorTipoController@index');
 Route::get($submodulocomerciocompra  . '/proveedortipo/create', 'Comercio\Compra\ProveedorTipoController@create');
